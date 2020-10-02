@@ -21,17 +21,17 @@ function analysis = analyzeResults(glucose,data,environment)
     
     %Identification metrics
     if(strcmp(environment.modality,'identifyReplayBGModel'))
-        analysis.identification.RMSE.median = sqrt(mean((glucose.median-data.Glucose).^2)); % [mg/dl]
-        analysis.identification.RMSE.ci5th = sqrt(mean((glucose.ci5th-data.Glucose).^2)); % [mg/dl]
-        analysis.identification.RMSE.ci25th = sqrt(mean((glucose.ci25th-data.Glucose).^2)); % [mg/dl]
-        analysis.identification.RMSE.ci75th = sqrt(mean((glucose.ci75th-data.Glucose).^2)); % [mg/dl]
-        analysis.identification.RMSE.ci95th = sqrt(mean((glucose.ci95th-data.Glucose).^2)); % [mg/dl]
+        analysis.identification.RMSE.median = sqrt(mean((glucose.median-data.glucose).^2)); % [mg/dl]
+        analysis.identification.RMSE.ci5th = sqrt(mean((glucose.ci5th-data.glucose).^2)); % [mg/dl]
+        analysis.identification.RMSE.ci25th = sqrt(mean((glucose.ci25th-data.glucose).^2)); % [mg/dl]
+        analysis.identification.RMSE.ci75th = sqrt(mean((glucose.ci75th-data.glucose).^2)); % [mg/dl]
+        analysis.identification.RMSE.ci95th = sqrt(mean((glucose.ci95th-data.glucose).^2)); % [mg/dl]
         
-    	analysis.identification.MARD.median = mean(abs(glucose.median-data.Glucose)./data.Glucose)*100; % [%]
-        analysis.identification.MARD.ci5th = mean(abs(glucose.ci5th-data.Glucose)./data.Glucose)*100; % [%]
-        analysis.identification.MARD.ci25th = mean(abs(glucose.ci25th-data.Glucose)./data.Glucose)*100; % [%]
-        analysis.identification.MARD.ci75th = mean(abs(glucose.ci75th-data.Glucose)./data.Glucose)*100; % [%]
-        analysis.identification.MARD.ci95th = mean(abs(glucose.ci95th-data.Glucose)./data.Glucose)*100; % [%]
+    	analysis.identification.MARD.median = mean(abs(glucose.median-data.glucose)./data.glucose)*100; % [%]
+        analysis.identification.MARD.ci5th = mean(abs(glucose.ci5th-data.glucose)./data.glucose)*100; % [%]
+        analysis.identification.MARD.ci25th = mean(abs(glucose.ci25th-data.glucose)./data.glucose)*100; % [%]
+        analysis.identification.MARD.ci75th = mean(abs(glucose.ci75th-data.glucose)./data.glucose)*100; % [%]
+        analysis.identification.MARD.ci95th = mean(abs(glucose.ci95th-data.glucose)./data.glucose)*100; % [%]
     end
     
 end

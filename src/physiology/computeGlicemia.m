@@ -19,7 +19,7 @@ function [G, x] = computeGlicemia(mP,data,model)
         
     %Initial conditions
     x = zeros(model.nx,TSTEPS);
-    x(1:9,1) = [data.Glucose(1);...                                                                            %G(0)
+    x(1:9,1) = [data.glucose(1);...                                                                            %G(0)
           mP.Xpb; ...                                                                                          %X(0)
           mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
           (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
@@ -27,7 +27,7 @@ function [G, x] = computeGlicemia(mP,data,model)
           0; ...                                                                                               %Qsto1(0)
           0; ...                                                                                               %Qsto2(0)
           mP.Qgutb; ...                                                                                        %Qgut(0)
-          data.Glucose(1)];                                                                                    %IG(0)                                                                                    
+          data.glucose(1)];                                                                                    %IG(0)                                                                                    
     
     G = zeros(1,TSTEPS);
     switch(model.glucoseModel)

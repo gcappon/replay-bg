@@ -24,8 +24,8 @@ function [bolus, basal] = insulinSetup(data,model,params)
     bolus = zeros(TSTEPS,1);
     
     for time = 1:length(0:5:(T-1))
-        bolus((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.Bolus(time)*1000/params.BW; %mU/(kg*min)
-        basal((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.Basal(time)*1000/params.BW; %mU/(kg*min)
+        bolus((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.bolus(time)*1000/params.BW; %mU/(kg*min)
+        basal((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.basal(time)*1000/params.BW; %mU/(kg*min)
     end
     
     

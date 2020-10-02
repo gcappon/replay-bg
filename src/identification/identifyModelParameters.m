@@ -43,7 +43,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         %Insulin kinetic parameters 
         modelParameters.SI = 5e-4; %mL/(uU*min)
         modelParameters.p2 = 0.01; %1/min
-        modelParameters.u2ss = mean(data.Basal)*1000/BW; %mU/(kg*min)
+        modelParameters.u2ss = mean(data.basal)*1000/BW; %mU/(kg*min)
 
         %Subcutaneous insulin absorption parameters
         modelParameters.VI = 0.126; %L/kg

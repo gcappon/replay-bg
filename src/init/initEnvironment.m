@@ -13,7 +13,7 @@ function environment = initEnvironment(modality,saveName,plotMode,verbose)
 
     warning off %shuts up the warning messages 
     
-    p = fileparts(which('identifyReplayBGModel'));
+    p = fileparts(which('replayBG'));
     p = regexp(p,filesep,'split');
     environment.replayBGPath = fullfile(filesep,p{1:end-2});
     

@@ -79,7 +79,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
         mP.ka2 = mP.kd;
     end
     
-    y = data.Glucose; %Measurement vector
+    y = data.glucose; %Measurement vector
     
     %Filter training data
     if(mcmc.filter)
