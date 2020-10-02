@@ -1,0 +1,24 @@
+function analysis = analyzeResults(glucose,data,environment)
+    
+    %Glucose control metrics
+    analysis.control.tHypo.median = 100*sum(glucose.median < 70)/length(glucose.median); % [%]
+    analysis.control.tHypo.ci5th = 100*sum(glucose.ci5th < 70)/length(glucose.ci5th); % [%]
+    analysis.control.tHypo.ci25th = 100*sum(glucose.ci25th < 70)/length(glucose.ci25th); % [%]
+    analysis.control.tHypo.ci75th = 100*sum(glucose.ci75th < 70)/length(glucose.ci75th); % [%]
+    analysis.control.tHypo.ci95th = 100*sum(glucose.ci95th < 70)/length(glucose.ci95th); % [%]
+    
+    analysis.control.tHyper.median = 100*sum(glucose.median > 180)/length(glucose.median); % [%]
+    analysis.control.tHyper.ci5th = 100*sum(glucose.ci5th > 180)/length(glucose.ci5th); % [%]
+    analysis.control.tHyper.ci25th = 100*sum(glucose.ci25th > 180)/length(glucose.ci25th); % [%]
+    analysis.control.tHyper.ci75th = 100*sum(glucose.ci75th > 180)/length(glucose.ci75th); % [%]
+    analysis.control.tHyper.ci95th = 100*sum(glucose.ci95th > 180)/length(glucose.ci95th); % [%]
+        
+    analysis.control.tEu.median = 100 - analysis.control.tHypo - analysis.control.tHyper; % [%]
+    
+    %Identification metrics
+    if(strcmp(environment.modality,'identifyReplayBGModel'))
+        analysis.identification.RMSE = sqrt(mean((glucose-data.Glucose).^2)); % [mg/dl]
+    	analysis.identification.MARD = mean(abs(glucose-data.Glucose)./data.Glucose)*100; % [%]
+    end
+    
+end
