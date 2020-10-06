@@ -15,7 +15,11 @@ function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,ver
     
     p = fileparts(which('replayBG'));
     p = regexp(p,filesep,'split');
-    environment.replayBGPath = fullfile(filesep,p{1:end-2});
+    if(isunix)
+        environment.replayBGPath = fullfile(filesep,p{1:end-2});
+    else
+        environment.replayBGPath = fullfile(p{1:end-2});
+    end
     
     environment.modality = modality; 
     environment.saveName = saveName;

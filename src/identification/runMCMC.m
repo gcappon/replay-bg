@@ -177,7 +177,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
                 hold off
                 switch(mP.typeN)
                     case 'SD'
-                        title(['Run: ' num2str(run) ' of ' num2str(mcmc.n) '; LL: ' num2str(ll(run)) '; (Gb,r1,beta): ' num2str(mP.Gb) ',' num2str(mP.r1) ',' num2str(mP.beta)] );
+                        title(['Run: ' num2str(run) ' of ' num2str(mcmc.n) '; LL: ' num2str(ll(run))] );
                     case 'CV'
                         title(['Run: ' num2str(run) ' of ' num2str(mcmc.n) '; LL: ' num2str(ll(run))] );
                 end
