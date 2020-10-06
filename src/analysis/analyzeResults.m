@@ -1,5 +1,10 @@
 function analysis = analyzeResults(glucose,data,environment)
     
+    if(environment.verbose)
+        tic;
+        fprintf(['Analyzing results...']);
+    end
+
     %Glucose control metrics
     analysis.control.tHypo.median = 100*sum(glucose.median < 70)/length(glucose.median); % [%]
     analysis.control.tHypo.ci5th = 100*sum(glucose.ci5th < 70)/length(glucose.ci5th); % [%]
@@ -20,7 +25,7 @@ function analysis = analyzeResults(glucose,data,environment)
     analysis.control.tEu.ci95th = 100 - analysis.control.tHypo.ci95th - analysis.control.tHyper.ci95th; % [%]
     
     %Identification metrics
-    if(strcmp(environment.modality,'identifyReplayBGModel'))
+    if(strcmp(environment.modality,'identification'))
         analysis.identification.RMSE.median = sqrt(mean((glucose.median-data.glucose).^2)); % [mg/dl]
         analysis.identification.RMSE.ci5th = sqrt(mean((glucose.ci5th-data.glucose).^2)); % [mg/dl]
         analysis.identification.RMSE.ci25th = sqrt(mean((glucose.ci25th-data.glucose).^2)); % [mg/dl]
@@ -32,6 +37,11 @@ function analysis = analyzeResults(glucose,data,environment)
         analysis.identification.MARD.ci25th = mean(abs(glucose.ci25th-data.glucose)./data.glucose)*100; % [%]
         analysis.identification.MARD.ci75th = mean(abs(glucose.ci75th-data.glucose)./data.glucose)*100; % [%]
         analysis.identification.MARD.ci95th = mean(abs(glucose.ci95th-data.glucose)./data.glucose)*100; % [%]
+    end
+    
+    if(environment.verbose)
+        time = toc;
+        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
     end
     
 end

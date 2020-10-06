@@ -17,6 +17,7 @@ function pdssToReplayBG(Experiment,savePath,offset,cutTh)
         disp(['Processing adult#' num2str(p) '...']);
 
             %set the time 
+            time = (0:5:(cutTh*60 - Ts))';
             time = datetime(0,1,1,offset,time,0);
 
             %set the glucose 

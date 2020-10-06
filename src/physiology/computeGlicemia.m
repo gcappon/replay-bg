@@ -42,10 +42,10 @@ function [G, x] = computeGlicemia(mP,data,model)
     [bolus, basal] = insulinSetup(data,model,mP);
     [meal] = mealSetup(data,model,mP);
     bolusDelay = floor(mP.tau/model.TS); 
-    mealDelay = floor(mP.beta);
+    mealDelay = round(mP.beta/model.TS);
     meal = [zeros(mealDelay,1); meal; zeros(bolusDelay,1)];
-    bolus = [zeros(bolusDelay,1); bolus];
-    basal = [basal; ones(bolusDelay,1)*basal(1)];
+    bolus = [zeros(bolusDelay,1); bolus; zeros(mealDelay,1)];
+    basal = [basal; ones(bolusDelay+mealDelay,1)*basal(1)];
     
     
     for k = 2:TSTEPS

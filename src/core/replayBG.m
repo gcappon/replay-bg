@@ -31,6 +31,8 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   the maximum number of MCMC runs; 
 %   - maxMCMCRunsWithMaxETA: (optional, default: 2) an integer that 
 %   specifies the maximum number of MCMC runs having maximum ETA; 
+%   - saveSuffix: (optional, default: '') a vector of char to be attached
+%   as suffix to the resulting output files' name;
 %   - plotMode: (optional, default: 1) a numerical flag that specifies
 %   whether to show the plot of the results or not. Can be 0 or 1;
 %   - verbose: (optional, default: 1) a numerical flag that specifies
@@ -79,6 +81,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     defaultMaxMCMCIterations = inf; 
     defaultMaxMCMCRuns = inf;
     defaultMaxMCMCRunsWithMaxETA = 2;
+    defaultSaveSuffix = '';
     defaultPlotMode = 1;
     defaultVerbose = 1;
     
@@ -90,9 +93,9 @@ function replayBG(modality, data, BW, saveName, varargin)
     validData = @(x) istimetable(x) && ...
         any(strcmp(x.Properties.VariableNames,'glucose')) && any(strcmp(x.Properties.VariableNames,'basal')) && ...
         any(strcmp(x.Properties.VariableNames,'bolus')) && any(strcmp(x.Properties.VariableNames,'CHO')) && ...
-        ~any(isnan(x.Glucose) | isnan(x.Basal) | isnan(x.Bolus) | isnan(x.CHO));
+        ~any(isnan(x.glucose) | isnan(x.basal) | isnan(x.bolus) | isnan(x.CHO));
     validBW = @(x) isnumeric(x);
-    validSaveName = @(x) ischar(saveName);
+    validSaveName = @(x) ischar(x);
     validMeasurementModel = @(x) any(validatestring(x,expectedMeasurementModels));
     validSampleTime = @(x) isnumeric(x) && ((x - round(x)) == 0);
     validSeed = @(x) isnumeric(x) && ((x - round(x)) == 0);
@@ -100,6 +103,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     validMaxMCMCIterations = @(x) isnumeric(x) && ((x - round(x)) == 0);
     validMaxMCMCRuns = @(x) isnumeric(x) && ((x - round(x)) == 0);
     validMaxMCMCRunsWithMaxETA = @(x) isnumeric(x) && ((x - round(x)) == 0);
+    validSaveSuffix = @(x) ischar(x);
     validPlotMode = @(x) x == 0 || x == 1;
     validVerbose = @(x) x == 0 || x == 1;
     
@@ -115,163 +119,37 @@ function replayBG(modality, data, BW, saveName, varargin)
     addParameter(ip,'maxMCMCIterations',defaultMaxMCMCIterations,validMaxMCMCIterations);
     addParameter(ip,'maxMCMCRuns',defaultMaxMCMCRuns,validMaxMCMCRuns);
     addParameter(ip,'maxMCMCRunsWithMaxETA',defaultMaxMCMCRunsWithMaxETA,validMaxMCMCRunsWithMaxETA);
+    addParameter(ip,'saveSuffix',defaultSaveSuffix,validSaveSuffix);
     addParameter(ip,'plotMode',defaultPlotMode,validPlotMode);
     addParameter(ip,'verbose',defaultVerbose,validVerbose);
     
     %Parse the input arguments
     parse(ip,modality,data,BW,saveName,varargin{:});
     
-    %Isolate data from the results
+    %Isolate data and BW from the results
     data = ip.Results.data;
+    BW = ip.Results.BW;
     %% ====================================================================
     
     %% ================ Initialize core variables =========================
-    %Initialize the environment parameters
-    environment = initEnvironment(ip.Results.modality,ip.Results.saveName,ip.Results.plotMode,ip.Results.verbose);
-    
-    %Start the log file
-    diary(environment.logFile);
-
-    if(environment.verbose)
-        fprintf('Setting up the model hyperparameters...');
-        tic;
-    end
-    
-    %Initialize the model hyperparameters
-    model = initModel(data,ip.Results.sampleTime,ip.Results.measurementModel,ip.Results.seed);
-    
-    if(environment.verbose)
-        time = toc;
-        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
-    end
-    
-    if(strcmp(environment.modality,'identification'))
-        
-        if(environment.verbose)
-            fprintf('Setting up the MCMC hyperparameters...');
-            tic;
-        end
-
-        %Initialize the mcmc hyperparameters (if modality: 'identification')
-        mcmc = initMarkovChainMonteCarlo(ip.Results.maxETAPerMCMCRun,ip.Results.maxMCMCIterations,ip.Results.maxMCMCRuns,ip.Results.maxMCMCRunsWithMaxETA);
-
-        if(environment.verbose)
-            time = toc;
-            fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
-        end
-        
-    end
+    [environment, model, mcmc] = initCoreVariables(data,ip);
     %% ====================================================================
     
-    %% ================ Get model parameters ==============================
-    if(strcmp(environment.modality,'identification'))
-        
-        if(environment.verbose)
-            st = [mcmc.thetaNames{1}];
-            for s = 2:mcmc.nPar
-                st = [st ' ' mcmc.thetaNames{s}];
-            end %for s
-            fprintf(['Identifying ReplayBG model using MCMC on ' st '...\n']);
-        end
-
-        %Identify model parameters (if modality: 'identification')
-        [modelParameters, draws] = identifyModelParameters(data, ip.Results.BW, mcmc, model, environment);
-        
-    else
-        
-        if(environment.verbose)
-            tic;
-            fprintf(['Loading model parameters...']);
-        end
-        
-        %Load the model parameters (if modality: 'replay')
-        load(fullfile(environment.replayBGPath,'results','modelParameters',['modelParameters_' environment.saveName]));
-        load(fullfile(environment.replayBGPath,'results','distributions',['distributions_' environment.saveName]));
-
-        if(environment.verbose)
-            time = toc;
-            fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
-        end
-        
-    end
-    
-    if(environment.verbose)
-        fprintf('DONE.\n');  
-    end
+    %% ================ Set model parameters ==============================
+    [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment,mcmc,model);
     %% ====================================================================
     
     %% ================ Replay of the scenario ============================
-    if(environment.verbose)
-        tic;
-        fprintf(['Replaying scenario...']);
-    end
-
-    %Obtain the glicemic realizations using the copula-generated parameter
-    %samples
-    glucose.realizations = zeros(height(data),length(draws.(mcmc.thetaNames{1}).samples));
-    for r = 1:length(draws.(mcmc.thetaNames{1}).samples)
-        
-        for p = 1:length(mcmc.thetaNames)
-            modelParameters.(mcmc.thetaNames{p}) = draws.(mcmc.thetaNames{p}).samples(r);
-        end
-        
-        [G, ~] = computeGlicemia(modelParameters,data,model);
-        glucose.realizations(:,r) = G(1:model.YTS:end)';
-        
-    end
-    
-    %Obtain the confidence intervals
-    glucose.ci25th = zeros(height(data),1);
-    glucose.ci75th = zeros(height(data),1);
-    
-    glucose.median = zeros(height(data),1);
-    
-    glucose.ci5th = zeros(height(data),1);
-    glucose.ci95th = zeros(height(data),1);
-    
-    for g = 1:length(glucose.median)
-        glucose.ci25th(g) = prctile(glucose.realizations(g,:),25);
-        glucose.ci75th(g) = prctile(glucose.realizations(g,:),75);
-        
-        glucose.median(g) = prctile(glucose.realizations(g,:),50);
-        
-        glucose.ci5th(g) = prctile(glucose.realizations(g,:),5);
-        glucose.ci95th(g) = prctile(glucose.realizations(g,:),95);
-    end
-        
-    if(environment.verbose)
-        time = toc;
-        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
-    end
+    glucose = replayScenario(data,modelParameters,draws,environment,model,mcmc);
     %% ====================================================================
     
     %% ================ Analyzing results =================================
-    if(environment.verbose)
-        tic;
-        fprintf(['Analyzing results...']);
-    end
-    
     analysis = analyzeResults(glucose,data,environment);
-    
-    if(environment.verbose)
-        time = toc;
-        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
-    end
     %% ====================================================================
     
     %% ================ Plotting results ==================================
-    if(environment.verbose && environment.plotMode)
-        tic;
-        fprintf(['Plotting results...']);
-    end
-
     if(environment.plotMode)
-        plotReplayBGResults(glucose,data);
-    end
-    
-    if(environment.verbose && environment.plotMode)
-        time = toc;
-        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
+        plotReplayBGResults(glucose,data,environment);
     end
     %% ====================================================================
     
@@ -283,11 +161,11 @@ function replayBG(modality, data, BW, saveName, varargin)
     
     if(strcmp(environment.modality,'identification'))
         save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName]),...
-            'data','environment','mcmc','model',...
+            'data','BW','environment','mcmc','model',...
             'glucose','analysis');
     else
-        save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName]),...
-            'data','environment','model',...
+        save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName '_' environment.saveSuffix]),...
+            'data','BW','environment','model',...
             'glucose','analysis');
     end
     

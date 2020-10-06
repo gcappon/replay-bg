@@ -1,4 +1,4 @@
-function environment = initEnvironment(modality,saveName,plotMode,verbose)
+function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,verbose)
 % initEnvironment Function that initialize the environment parameters.
 % environment = initEnvironment(saveName,plotWhileIdentifying,verbose) returns a structure containing the
 % environment parameters.
@@ -19,6 +19,7 @@ function environment = initEnvironment(modality,saveName,plotMode,verbose)
     
     environment.modality = modality; 
     environment.saveName = saveName;
+    environment.saveSuffix = saveSuffix;
     
     %Create the log file associated to the simulation.
     environment.logFile = fullfile(environment.replayBGPath,'results','logs',[datestr(datetime('now'),'yyyy-mm-dd_hh:MM') '_' environment.modality '_' environment.saveName '.txt']);

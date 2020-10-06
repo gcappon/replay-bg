@@ -38,16 +38,41 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
     theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.028, 0.014,0.18, 0.012]; %initial guess for the parameter values...
     mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3,  5e-3 ,1e-3, 1e-2, 5e-3]; %initial guess for the SD of each parameter
     
+    mcmc.thetaNames = {'SG','SI','Gb','p2','kd','ka2','kempt','kabs','r1','r2'}; %names of the parameters to identify
+    mcmc.std = [5e-4, 1e-6, 1, 1e-3,  5e-4,1e-4,5e-3, 1e-3, 1e-3, 1e-3]; %initial guess for the SD of each parameter
+    theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.028, 0.014,0.18, 0.012, 0.8, 1.44]; %initial guess for the parameter values...
+    mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3,  5e-3 ,1e-3, 1e-2, 5e-3, 1e-2, 1e-2]; %initial guess for the SD of each parameter
+    
+    
     %Test 4
     %mcmc.thetaNames = {'SG','SI','Gb','p2','kd','ka2','kempt','kabs','beta'}; %names of the parameters to identify
     %mcmc.std = [5e-4, 1e-6, 1, 1e-3,  5e-4,1e-4,5e-3, 1e-3, 0.5]; %initial guess for the SD of each parameter
     %theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.028, 0.014,0.18, 0.012, 0]; %initial guess for the parameter values...
     %mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3,  5e-3 ,1e-3, 1e-2, 5e-3, 1]; %initial guess for the SD of each parameter
     
+    %THIS WORKS WELL IN SILICO, NOT FOR BASAL MODIFICATIONS
     mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs'}; %names of the parameters to identify
     mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3]; %initial guess for the SD of each parameter
     theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.18, 0.012]; %initial guess for the parameter values...
     mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3]; %initial guess for the SD of each parameter
+    
+    %OK FOR IN SILICO AND ALSO BASAL MODIFICATIONS
+    mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','r1','r2'}; %names of the parameters to identify
+    mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3]; %initial guess for the SD of each parameter
+    theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.18, 0.012, 0.8, 1.44]; %initial guess for the parameter values...
+    mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 1e-2, 1e-2]; %initial guess for the SD of each parameter
+    
+    %REAL DATA - OK
+    mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','r1','r2','beta'}; %names of the parameters to identify
+    mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3,0.5]; %initial guess for the SD of each parameter
+    theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.18, 0.012, 0.8, 1.44,5]; %initial guess for the parameter values...
+    mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 1e-2, 1e-2,1]; %initial guess for the SD of each parameter
+    
+    mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','r1','r2','beta','Xpb'}; %names of the parameters to identify
+    mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3,1, 1e-4]; %initial guess for the SD of each parameter
+    theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.18, 0.012, 0.8, 1.44,15,0]; %initial guess for the parameter values...
+    mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 1e-2, 1e-2,1, 5e-4]; %initial guess for the SD of each parameter
+    mcmc.stdMin = [0,0,0,0,0,0,0,0,0.25,0]; %initial guess for the SD of each parameter
     
     %mcmc.thetaNames = {'SG','SI','Gb','p2','kd','ka2','kempt','kabs','Qgutb','Xpb'}; %names of the parameters to identify
     %mcmc.std = [5e-4, 1e-6, 1, 1e-3,  5e-4,1e-4,5e-3, 1e-3, 5, 1e-4]; %initial guess for the SD of each parameter
@@ -59,11 +84,10 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
         mcmc.theta0 = theta0+randn(1,length(mcmc.thetaNames)).*(0.1*theta0);
     end %while
 
-    mcmc.parBlock = [1, 1, 1, 2, 3, 3]; %block assignment of each parameter    
-    %mcmc.parBlock = [1, 1, 1, 2, 3, 3, 4, 4,5,5]; %block assignment of each parameter 
-    %mcmc.parBlock = [1, 1, 1, 2, 3, 3, 4, 4, 4]; %block assignment of each parameter 
-    mcmc.parBlock = [1, 1, 1, 2, 3, 3, 4, 4]; %block assignment of each parameter 
+
     mcmc.parBlock = [1, 1, 1, 2, 2, 2]; %block assignment of each parameter 
+    mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3]; %block assignment of each parameter 
+    mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3, 4, 5]; %block assignment of each parameter 
     %mcmc.parBlock = [1, 1, 1, 2, 3, 3, 4, 4, 3]; %block assignment of each parameter 
     %mcmc.parBlock = [1, 1, 1, 2, 3, 3, 4, 4, 5, 5]; %block assignment of each parameter 
     mcmc.nBlocks = max(mcmc.parBlock); %number of blocks

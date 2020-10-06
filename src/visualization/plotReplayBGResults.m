@@ -1,4 +1,9 @@
-function plotReplayResults(glucose,data)
+function plotReplayResults(glucose,data,environment)
+    
+    if(environment.verbose && environment.plotMode)
+        tic;
+        fprintf(['Plotting results...']);
+    end
     
     figure;
     
@@ -40,5 +45,10 @@ function plotReplayResults(glucose,data)
     
     linkaxes(ax,'x');
     set(ax,'FontSize',15)
+    
+    if(environment.verbose && environment.plotMode)
+        time = toc;
+        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
+    end
     
 end

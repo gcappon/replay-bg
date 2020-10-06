@@ -55,9 +55,10 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
     prior.CVn = @(mP) 1*(mP.CVn>0); 
     
     prior.Xpb = @(mP) 1*(mP.Xpb>=0 & mP.Xpb <= 0.01); 
+    %prior.Xpb = @(mP) 1*(mP.Xpb>=0); 
     prior.Qgutb = @(mP) 1*(mP.Qgutb>=0);
     
-    prior.beta = @(mP) 1*(mP.beta>=0);
+    prior.beta = @(mP) 1*(mP.beta>=0 && mP.beta<=60);
             
     %Prealloc variables to speed up
     blockIdxs = cell(mcmc.nBlocks,1);
@@ -176,7 +177,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
                 hold off
                 switch(mP.typeN)
                     case 'SD'
-                        title(['Run: ' num2str(run) ' of ' num2str(mcmc.n) '; LL: ' num2str(ll(run))] );
+                        title(['Run: ' num2str(run) ' of ' num2str(mcmc.n) '; LL: ' num2str(ll(run)) '; (Gb,r1,beta): ' num2str(mP.Gb) ',' num2str(mP.r1) ',' num2str(mP.beta)] );
                     case 'CV'
                         title(['Run: ' num2str(run) ' of ' num2str(mcmc.n) '; LL: ' num2str(ll(run))] );
                 end

@@ -27,6 +27,7 @@ function [mcmc] = setNewMCMCParameters(pHat,mcmc)
         Pphat = Pmp*theta; %regress the p-th component given the others
         mcmc.std(p) = 2.3*sqrt((Pp-Pphat)'*(Pp-Pphat)/(mcmc.n-2)); %compute the conditional std (by 2.3 times)
         mcmc.std = min([mcmc.std; mcmc.stdMax]); %limit std to a maximum value to avoid dangerous artifacts
+        mcmc.std = max([mcmc.std; mcmc.stdMin]); %limit std to a maximum value to avoid dangerous artifacts
         switch(mcmc.policyTheta0)
             case 'initial'
                 mcmc.theta0(p) = mcmc.theta0(p);
