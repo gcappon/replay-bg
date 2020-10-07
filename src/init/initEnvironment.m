@@ -41,7 +41,7 @@ function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,ver
     environment.saveName = saveName;
     
     %Set the save suffix
-    if(saveSuffix == '')
+    if(strcmp(saveSuffix,''))
         environment.saveSuffix = saveSuffix;
     else
         environment.saveSuffix = ['_' saveSuffix];
