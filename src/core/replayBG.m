@@ -71,57 +71,24 @@ function replayBG(modality, data, BW, saveName, varargin)
 % ---------------------------------------------------------------------
 
     %% ================ Function input parsing ============================
-    %Set the default values
-    expectedModalities = {'replay','identification'};
-    defaultMeasurementModel = 'IG';
-    expectedMeasurementModels = {'BG','IG'};
-    defaultSampleTime = 5; %[min]
-    defaultSeed = randi([1 1048576]);
-    defaultMaxETAPerMCMCRun = inf; %[hour]
-    defaultMaxMCMCIterations = inf; 
-    defaultMaxMCMCRuns = inf;
-    defaultMaxMCMCRunsWithMaxETA = 2;
-    defaultSaveSuffix = '';
-    defaultPlotMode = 1;
-    defaultVerbose = 1;
-    
     %Obtain the InputParser object
     ip = inputParser;
-    
-    %Set the validators
-    validModalities = @(x) any(validatestring(x,expectedModalities));
-    validData = @(x) istimetable(x) && ...
-        any(strcmp(x.Properties.VariableNames,'glucose')) && any(strcmp(x.Properties.VariableNames,'basal')) && ...
-        any(strcmp(x.Properties.VariableNames,'bolus')) && any(strcmp(x.Properties.VariableNames,'CHO')) && ...
-        ~any(isnan(x.glucose) | isnan(x.basal) | isnan(x.bolus) | isnan(x.CHO));
-    validBW = @(x) isnumeric(x);
-    validSaveName = @(x) ischar(x);
-    validMeasurementModel = @(x) any(validatestring(x,expectedMeasurementModels));
-    validSampleTime = @(x) isnumeric(x) && ((x - round(x)) == 0);
-    validSeed = @(x) isnumeric(x) && ((x - round(x)) == 0);
-    validMaxETAPerMCMCRun = @(x) isnumeric(x);
-    validMaxMCMCIterations = @(x) isnumeric(x) && ((x - round(x)) == 0);
-    validMaxMCMCRuns = @(x) isnumeric(x) && ((x - round(x)) == 0);
-    validMaxMCMCRunsWithMaxETA = @(x) isnumeric(x) && ((x - round(x)) == 0);
-    validSaveSuffix = @(x) ischar(x);
-    validPlotMode = @(x) x == 0 || x == 1;
-    validVerbose = @(x) x == 0 || x == 1;
-    
+        
     %Add the parameters to the InputParsers
-    addRequired(ip,'modality',validModalities);
-    addRequired(ip,'data',validData);
-    addRequired(ip,'BW',validBW);
-    addRequired(ip,'saveName',validSaveName);
-    addParameter(ip,'measurementModel',defaultMeasurementModel,validMeasurementModel);
-    addParameter(ip,'sampleTime',defaultSampleTime,validSampleTime);
-    addParameter(ip,'seed',defaultSeed,validSeed);
-    addParameter(ip,'maxETAPerMCMCRun',defaultMaxETAPerMCMCRun,validMaxETAPerMCMCRun);
-    addParameter(ip,'maxMCMCIterations',defaultMaxMCMCIterations,validMaxMCMCIterations);
-    addParameter(ip,'maxMCMCRuns',defaultMaxMCMCRuns,validMaxMCMCRuns);
-    addParameter(ip,'maxMCMCRunsWithMaxETA',defaultMaxMCMCRunsWithMaxETA,validMaxMCMCRunsWithMaxETA);
-    addParameter(ip,'saveSuffix',defaultSaveSuffix,validSaveSuffix);
-    addParameter(ip,'plotMode',defaultPlotMode,validPlotMode);
-    addParameter(ip,'verbose',defaultVerbose,validVerbose);
+    addRequired(ip,'modality',@(x) modalityValidator(x));
+    addRequired(ip,'data',@(x) dataValidator(x));
+    addRequired(ip,'BW',@(x) BWValidator(x));
+    addRequired(ip,'saveName',@(x) saveNameValidator(x));
+    addParameter(ip,'measurementModel','IG',@(x) measurementModelValidator(x)); %default = 'IG'
+    addParameter(ip,'sampleTime',5,@(x) sampleTimeValidator(x)); % default = 5
+    addParameter(ip,'seed',randi([1 1048576]),@(x) seedValidator(x)); % default = randi([1 1048576])
+    addParameter(ip,'maxETAPerMCMCRun',inf,@(x) maxETAPerMCMCRunValidator(x,modality)); % default = inf
+    addParameter(ip,'maxMCMCIterations',inf,@(x) maxMCMCIterationsValidator(x,modality)); % default = inf
+    addParameter(ip,'maxMCMCRuns',inf,@(x) maxMCMCRunsValidator(x, modality)); % default = inf
+    addParameter(ip,'maxMCMCRunsWithMaxETA',2, @(x) maxMCMCRunsWithMaxETAValidator(x,modality)); % default = 2
+    addParameter(ip,'saveSuffix','',@(x) saveSuffixValidator(x)); % default = ''
+    addParameter(ip,'plotMode',1,@(x) plotModeValidator(x)); % default = 1
+    addParameter(ip,'verbose',1,@(x) verboseValidator(x)); % default = 1
     
     %Parse the input arguments
     parse(ip,modality,data,BW,saveName,varargin{:});
@@ -160,11 +127,11 @@ function replayBG(modality, data, BW, saveName, varargin)
     end
     
     if(strcmp(environment.modality,'identification'))
-        save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName]),...
+        save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','mcmc','model',...
             'glucose','analysis');
     else
-        save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName '_' environment.saveSuffix]),...
+        save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','model',...
             'glucose','analysis');
     end

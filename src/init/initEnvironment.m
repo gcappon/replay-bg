@@ -23,7 +23,12 @@ function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,ver
     
     environment.modality = modality; 
     environment.saveName = saveName;
-    environment.saveSuffix = saveSuffix;
+    if(saveSuffix == '')
+        environment.saveSuffix = saveSuffix;
+    else
+        environment.saveSuffix = ['_' saveSuffix];
+    end
+    
     
     %Create the log file associated to the simulation.
     environment.logFile = fullfile(environment.replayBGPath,'results','logs',[datestr(datetime('now'),'yyyy-mm-dd_hh:MM') '_' environment.modality '_' environment.saveName '.txt']);
