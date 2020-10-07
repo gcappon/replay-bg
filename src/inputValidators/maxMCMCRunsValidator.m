@@ -1,6 +1,20 @@
 function valid = maxMCMCRunsValidator(maxMCMCRuns,modality)
 % function  maxMCMCRunsValidator(maxMCMCRuns,modality)
 % Validates the input parameter 'maxMCMCRuns'.
+%
+% Inputs:
+%   - maxMCMCRuns;
+%   - modality;
+% Outputs:
+%   - valid: a boolean defining if the input parameter is valid. 
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
 
     valid = isnumeric(maxMCMCRuns) && ((maxMCMCRuns - round(maxMCMCRuns)) == 0);
     if(~valid)

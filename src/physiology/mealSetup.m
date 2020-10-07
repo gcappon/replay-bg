@@ -1,26 +1,31 @@
-function [meal] = mealSetup(data,model,params)
-% mealSetup Function that generates the vector containing the CHO intake events.
-% meal = mealSetup(patient, simulation, params) returns a vector containing the 
-% carbohydrate intake at each time step.
-% * Inputs:
-%   - patient: is a table containing data coming from a simulation
-%   (i.e. carbohydrate intakes, insulin boluses, basal insulin, glucose
-%   measurements)
-%   - simulation: is a structure containing the simulation
-%   parameters.
-%   - params: is a structure contining the appropriate model parameters.
-% * Output:
+function [meal] = mealSetup(data,model,modelParameters)
+% function  mealSetup(data,model,modelParameters)
+% Generates the vector containing the CHO intake events to be used to
+% simulate the physiological model.
+%
+% Inputs:
+%   - data: a timetable which contains the data to be used by the tool;
+%   - model: a structure that contains general parameters of the
+%   physiological model;
+%   - modelParameters: a struct containing the model parameters.
+% Outputs:
 %   - meal: is a vector containing the carbohydrate intake at each time
-%   step [mg/min]
+%   step [mg/min].
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
     
-    %Set the vector length
-    TSTEPS = model.TIDSTEPS;
-    T = model.TID;
-   
-    meal = zeros(TSTEPS,1);
+    %Initialize the meal vector
+    meal = zeros(model.TIDSTEPS,1);
     
-    for time = 1:length(0:5:(T-1))
-        meal((1+(time-1)*(5/model.TS)):(time*(5/model.TS))) = data.CHO(time)*1000/params.BW; %mg/(kg*min)
+    %Set the meal vector
+    for time = 1:length(0:5:(model.TID-1))
+        meal((1+(time-1)*(5/model.TS)):(time*(5/model.TS))) = data.CHO(time)*1000/modelParameters.BW; %mg/(kg*min)
     end
     
-end %function mealSetup
+end

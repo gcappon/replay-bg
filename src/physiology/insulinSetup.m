@@ -1,32 +1,35 @@
-function [bolus, basal] = insulinSetup(data,model,params)
-% insulinSetup Function that generates the vector containing the insulin events.
-% [bolus, basal] = insulinSetup(patient, simulation, params) returns  two vectors
-% containing the insulin bolus dose and the basal insulin respectively
-% at each time step.
-% * Inputs:
-%   - patient: is a table containing data coming from a simulation
-%   (i.e. carbohydrate intakes, insulin boluses, basal insulin, glucose
-%   measurements)
-%   - simulation: is a structure containing the simulation
-%   parameters.
-%   - params: is a structure contining the appropriate model parameters.
-% * Output:
+function [bolus, basal] = insulinSetup(data,model,modelParameters)
+% function  insulinSetup(data,model,modelParameters)
+% Generates the vector containing the insulin infusions to be used to
+% simulate the physiological model.
+%
+% Inputs:
+%   - data: a timetable which contains the data to be used by the tool;
+%   - model: a structure that contains general parameters of the
+%   physiological model;
+%   - modelParameters: a struct containing the model parameters.
+% Outputs:
 %   - bolus: is a vector containing the insulin bolus dose at each time
-%   step [mU/min]
+%   step [mU/min];
 %   - basal: is a vector containing the basal insulin value at each time
-%   step [mU/min]
+%   step [mU/min].
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
 
-    %Set vector length
-    TSTEPS = model.TIDSTEPS;
-    T = model.TID;
+    %Initialize the basal and bolus vectors
+    basal = zeros(model.TIDSTEPS,1);
+    bolus = zeros(model.TIDSTEPS,1);
     
-    basal = zeros(TSTEPS,1);
-    bolus = zeros(TSTEPS,1);
-    
-    for time = 1:length(0:5:(T-1))
-        bolus((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.bolus(time)*1000/params.BW; %mU/(kg*min)
-        basal((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.basal(time)*1000/params.BW; %mU/(kg*min)
+    %Set the basal and bolus vectors
+    for time = 1:length(0:5:(model.TID-1))
+        bolus((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.bolus(time)*1000/modelParameters.BW; %mU/(kg*min)
+        basal((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.basal(time)*1000/modelParameters.BW; %mU/(kg*min)
     end
     
-    
-end %function insulinSetup
+end 

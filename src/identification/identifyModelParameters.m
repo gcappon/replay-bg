@@ -1,25 +1,29 @@
-function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, model, environment)   
-% setupModelParameters Function that identify the model parameters using MCMC.
-% modelParameters = setupModelParameters(patient, patientPhysiology, y, T, Ts, oracle) returns a struct
-% containing all the parameters needed to simulate the true system.
-% * Inputs:
-%   - patient: is a table containing data coming from a simulation
-%   (i.e. carbohydrate intakes, insulin boluses, basal insulin, glucose
-%   measurements)
-%   - mcmc: is a structure containing the parameters needed by the MCMC
-%   algorithm.
-%   - y: is a vector containing the measurement data.
-%   - sP: is a struct containing all the parameters needed to
-%   simulate the system
-%   - simulation: is a structure containing the simulation
-%   parameters.
-%   - environment: is a structure containing the simulation the
-%   environment parameters.
-% * Output:
-%   - modelParameters: is a struct containing all the identified model parameters.
-%   - pHat: is a struct containing the MCMC realizations.
-%   - ll: is a vector containing the log-likelihood values through the MCMC
-%   simulation
+function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, model, environment) 
+% function  identifyModelParameters(data, BW, mcmc, model, environment) 
+% Identifies the physiological model parameters using the MCMC.
+%
+% Inputs:
+%   - data: timetable which contains the data to be used by the tool;
+%   - BW: the patient's body weight;
+%   - mcmc: a structure that contains the hyperparameters of the MCMC
+%   identification procedure;
+%   - model: a structure that contains general parameters of the
+%   physiological model;
+%   - environment: a structure that contains general parameters to be used
+%   by ReplayBG.
+% Outputs:
+%   - modelParameters: is a struct containing all the identified model 
+%   parameters;
+%   - draws: a structure that contains the modelParameter draws obtained
+%   with MCMC.
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
 
     %% ============ Set default parameter values ==========================
     

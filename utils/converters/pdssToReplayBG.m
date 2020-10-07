@@ -1,14 +1,23 @@
 function pdssToReplayBG(Experiment,savePath,offset,cutTh)
-% Run it to convert from PDSS's format to ReplayBG's
-% * Input:
-%   - Experiment: the pdss data;
-%   - savePath: the path where to save the data in the replayBG format;
-%   - offset: the time offset in hours (e.g., 6)
-%   - cutTh: the number of hours of data to use (e.g., 12);
+% function  pdssToReplayBG(Experiment,savePath,offset,cutTh)
+% Run it to convert from PDSS's format to ReplayBG's.
 %
-%Output:
-% - data: a table containing CGM [mg/dL], insulin [U/min] and CHO [g/min], BW [kg].
-
+% Inputs:
+%   - Experiment: the pdss data;
+%   - savePath: the path where to save the data in the ReplayBG format;
+%   - offset: the time offset in hours (e.g., 6)
+%   - cutTh: the number of hours of data to use (e.g., 12).
+% Output:
+%   - data: a table containing CGM [mg/dL], insulin [U/min] and CHO 
+%   [g/min], BW [kg].
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
 
     idxPats = 1:100; %ids of the virtual patients 
     Ts = 5; %sample time

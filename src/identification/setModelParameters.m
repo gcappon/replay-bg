@@ -1,4 +1,30 @@
 function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment,mcmc,model)
+% function  setModelParameters(data,BW,environment,mcmc,model)
+% Sets the parameters of the physiological model.
+%
+% Inputs:
+%   - data: timetable which contains the data to be used by the tool;
+%   - BW: the patient's body weight;
+%   - environment: a structure that contains general parameters to be used
+%   by ReplayBG;
+%   - mcmc: a structure that contains the hyperparameters of the MCMC
+%   identification procedure;
+%   - model: a structure that contains general parameters of the
+%   physiological model.
+% Outputs:
+%   - modelParameters: a struct containing the model parameters;
+%   - mcmc: the updated structure that contains the hyperparameters of the 
+%   MCMC identification procedure;
+%   - draws: a structure that contains the modelParameter draws obtained
+%   with MCMC.
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
 
     if(strcmp(environment.modality,'identification'))
         

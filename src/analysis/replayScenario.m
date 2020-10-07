@@ -1,4 +1,29 @@
 function glucose = replayScenario(data,modelParameters,draws,environment,model,mcmc)
+% function  replayScenario(data,modelParameters,draws,environment,model,mcmc)
+% Replays the given scenario defined by the given data.
+%
+% Inputs:
+%   - data: timetable which contains the data to be used by the tool;
+%   - modelParameters: a struct containing the model parameters;
+%   - draws: a structure that contains the modelParameter draws obtained
+%   with MCMC;
+%   - environment: a structure that contains general parameters to be used
+%   by ReplayBG;
+%   - model: a structure that contains general parameters of the
+%   physiological model;
+%   - mcmc: a structure that contains the hyperparameters of the MCMC
+%   identification procedure.
+% Output:
+%   - glucose: a structure which contains the obtained glucose traces 
+%   simulated via ReplayBG.
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
 
     if(environment.verbose)
         tic;

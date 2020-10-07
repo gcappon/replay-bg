@@ -25,7 +25,7 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   specifies the random seed. For reproducibility. NOT SUPPORTED YET;
 %   - maxETAPerMCMCRun: (optional, default: inf) a number that specifies
 %   the maximum time in hours allowed for each MCMC run; 
-%   maxMCMCIterations: (optional, default: inf) an integer that specifies
+%   - maxMCMCIterations: (optional, default: inf) an integer that specifies
 %   the maximum number of iterations for each MCMC run; 
 %   - maxMCMCRuns: (optional, default: inf) an integer that specifies
 %   the maximum number of MCMC runs; 
@@ -62,7 +62,7 @@ function replayBG(modality, data, BW, saveName, varargin)
 % REFERENCES:
 % TBD...
 %
-% ----------------------------------------------------
+% ---------------------------------------------------------------------
 %
 % Copyright (C) 2020 Giacomo Cappon
 %

@@ -1,5 +1,5 @@
 function  [raftery_lewis] = raftery_lewis(runs,q,r,s)
-% function  raftery_lewis = raftery_lewis(runs,q,r,s)
+% function raftery_lewis(runs,q,r,s)
 % Computes the convergence diagnostics of Raftery and Lewis (1992), i.e. the
 % number of draws needed in MCMC to estimate the posterior cdf of the q-quantile
 % within an accuracy r with probability s
@@ -43,7 +43,13 @@ function  [raftery_lewis] = raftery_lewis(runs,q,r,s)
 %   Implementation strategies for Markov chain Monte Carlo." Statistical Science,
 %   7(4), pp. 493-497.
 %
-% ----------------------------------------------------
+% --------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
 
 [n_runs, n_vars] = size(runs);
 

@@ -1,6 +1,19 @@
 function valid = dataValidator(data)
 % function  dataValidator(data)
 % Validates the input parameter 'data'.
+%
+% Inputs:
+%   - data;
+% Outputs:
+%   - valid: a boolean defining if the input parameter is valid. 
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
 
     valid = istimetable(data);
     

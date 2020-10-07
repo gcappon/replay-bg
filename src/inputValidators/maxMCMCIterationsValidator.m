@@ -1,6 +1,20 @@
 function valid = maxMCMCIterationsValidator(maxMCMCIterations,modality)
 % function  maxMCMCIterationsValidator(maxMCMCIterations,modality)
 % Validates the input parameter 'maxMCMCIterations'.
+%
+% Inputs:
+%   - maxMCMCIterations;
+%   - modality;
+% Outputs:
+%   - valid: a boolean defining if the input parameter is valid. 
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
 
     valid = isnumeric(maxMCMCIterations) && ((maxMCMCIterations - round(maxMCMCIterations)) == 0);
     if(~valid)

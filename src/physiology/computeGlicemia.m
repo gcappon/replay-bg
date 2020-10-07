@@ -1,24 +1,27 @@
 function [G, x] = computeGlicemia(mP,data,model)
-% computeGlicemia Function that compute the CGM trace (for the MCMC procedure)
-% G = computeGlicemia(mP,basal,bolus,meal,simulation) returns the CGM trace (for the MCMC procedure)
-% given the current model parameters.
-% * Inputs:
-%   - mP: is a structure containing the model parameters.
-%   - basal: is a vector defining the basal insulin value for each time
-%   step.
-%   - bolus: is a vector defining the bolus insulin value for each time
-%   step.
-%   - meal: is a vector defining the meal intake value for each time
-%   step.
-%   - simulation: is a structure defining the simulation parameters.
-% * Output:
-%   - G: is a vector containing the glycemic trace.
-    
-    %Set the simulation length
-    TSTEPS = model.TIDSTEPS;
-        
-    %Initial conditions
-    x = zeros(model.nx,TSTEPS);
+% function  computeGlicemia(mP,data,model)
+% Generates the vector containing the CHO intake events to be used to
+% simulate the physiological model.
+%
+% Inputs:
+%   - mP: a struct containing the model parameters.
+%   - data: a timetable which contains the data to be used by the tool;
+%   - model: a structure that contains general parameters of the
+%   physiological model.
+% Outputs:
+%   - G: is a vector containing the simulated glucose trace [mg/dl]; 
+%   - x: is a matrix containing the simulated model states. 
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
+
+    %Initial model conditions
+    x = zeros(model.nx,model.TIDSTEPS);
     x(1:9,1) = [data.glucose(1);...                                                                            %G(0)
           mP.Xpb; ...                                                                                          %X(0)
           mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
@@ -29,7 +32,10 @@ function [G, x] = computeGlicemia(mP,data,model)
           mP.Qgutb; ...                                                                                        %Qgut(0)
           data.glucose(1)];                                                                                    %IG(0)                                                                                    
     
-    G = zeros(1,TSTEPS);
+    %Initialize the glucose vector
+    G = zeros(1,model.TIDSTEPS);
+    
+    %Set the initial glucose value
     switch(model.glucoseModel)
         case 'IG' 
             G(1) = x(9,1); %y(k) = IG(k)
@@ -38,7 +44,7 @@ function [G, x] = computeGlicemia(mP,data,model)
     end
     
     %initialize inputs (basal, bolus, meal) with the initial condition (meal
-    %intake + its bolus) and put them 
+    %intake + its bolus)
     [bolus, basal] = insulinSetup(data,model,mP);
     [meal] = mealSetup(data,model,mP);
     bolusDelay = floor(mP.tau/model.TS); 
@@ -47,12 +53,13 @@ function [G, x] = computeGlicemia(mP,data,model)
     bolus = [zeros(bolusDelay,1); bolus; zeros(mealDelay,1)];
     basal = [basal; ones(bolusDelay+mealDelay,1)*basal(1)];
     
-    
-    for k = 2:TSTEPS
+    %Simulate the physiological model
+    for k = 2:model.TIDSTEPS
         
         %Integration step
         x(:,k) = modelStep(x(:,k-1),basal(k) + bolus(k), meal(k), mP, x(:,k), model); %metto gli input all'istante k per dato che uso Eulero all'indietro
         
+        %Get the glucose
         switch(model.glucoseModel)
             case 'IG' 
                 G(k) = x(9,k); %y(k) = IG(k)
@@ -62,6 +69,6 @@ function [G, x] = computeGlicemia(mP,data,model)
         
         %TODO: HERE INSERT DSS
         
-    end %for k
+    end
     
-end %function computeGlicemia
+end

@@ -1,16 +1,25 @@
 function [mcmc] = setNewMCMCParameters(pHat,mcmc)
-% setNewParameters Function that compute the conditional standard deviation 
-% for all the estimated parameters (as described in MCMC in practice,
-% Gilks, pp. 123).
-% mcmc = setNewMCMCParameters(pHat,mcmc) returns a structure containing the
-% hyperparameters of the MCMC simulation. In particular, it has mcmc.std
-% updated.
-% * Inputs:
-%   - pHat: is a structure containing the parameter draws.
-%   - mcmc: is a structure containing the MCMC hyperparameters.
-% * Output:
-%   - mcmc: is the updated structure containing the MCMC hyperparameters
-%   having new mcmc.std.
+% function  setNewMCMCParameters(pHat,mcmc)
+% Computes the conditional standard deviation for all the estimated 
+% parameters (as described in MCMC in practice, Gilks, pp. 123) and sets 
+% the new values of mcmc.std and mcmc.theta0.
+%
+% Inputs:
+%   - pHat: is a structure containing the parameter chians after a run of
+%   the MCMC;
+%   - mcmc: a structure that contains the hyperparameters of the MCMC
+%   identification procedure.
+% Output:
+%   - mcmc: the updated structure that contains the hyperparameters 
+%   of the MCMC identification procedure.
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
 
     %Construct a matrix on the parameters draws
     P = [];
@@ -20,6 +29,8 @@ function [mcmc] = setNewMCMCParameters(pHat,mcmc)
     
     
     for p = 1:length(mcmc.std)
+        
+        %Set the new mcmc.std
         Pp = P(:,p);
         Pmp = P;
         Pmp(:,p) = [];
@@ -28,6 +39,8 @@ function [mcmc] = setNewMCMCParameters(pHat,mcmc)
         mcmc.std(p) = 2.3*sqrt((Pp-Pphat)'*(Pp-Pphat)/(mcmc.n-2)); %compute the conditional std (by 2.3 times)
         mcmc.std = min([mcmc.std; mcmc.stdMax]); %limit std to a maximum value to avoid dangerous artifacts
         mcmc.std = max([mcmc.std; mcmc.stdMin]); %limit std to a maximum value to avoid dangerous artifacts
+        
+        %Set the new mcmc.theta0
         switch(mcmc.policyTheta0)
             case 'initial'
                 mcmc.theta0(p) = mcmc.theta0(p);

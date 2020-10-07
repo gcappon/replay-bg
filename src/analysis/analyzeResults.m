@@ -1,11 +1,31 @@
 function analysis = analyzeResults(glucose,data,environment)
-    
+% function  analyzeResults(glucose,data,environment)
+% Analyses the simulated glucose traces obtained using ReplayBG.
+%
+% Inputs:
+%   - glucose: a structure which contains the obtained glucose traces 
+%   simulated via ReplayBG; 
+%   - data: timetable which contains the data to be used by the tool;
+%   - environment: a structure that contains general parameters to be used
+%   by ReplayBG;
+% Output:
+%   - analysis: a structure that contains the results of the analysis of
+%   the simulated glucose traces obtained using ReplayBG.
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
+
     if(environment.verbose)
         tic;
         fprintf(['Analyzing results...']);
     end
 
-    %Glucose control metrics
+    %Compute glucose control metrics
     analysis.control.tHypo.median = 100*sum(glucose.median < 70)/length(glucose.median); % [%]
     analysis.control.tHypo.ci5th = 100*sum(glucose.ci5th < 70)/length(glucose.ci5th); % [%]
     analysis.control.tHypo.ci25th = 100*sum(glucose.ci25th < 70)/length(glucose.ci25th); % [%]
@@ -24,7 +44,7 @@ function analysis = analyzeResults(glucose,data,environment)
     analysis.control.tEu.ci75th = 100 - analysis.control.tHypo.ci75th - analysis.control.tHyper.ci75th; % [%]
     analysis.control.tEu.ci95th = 100 - analysis.control.tHypo.ci95th - analysis.control.tHyper.ci95th; % [%]
     
-    %Identification metrics
+    %Compute identification metrics (if modality = 'identification')
     if(strcmp(environment.modality,'identification'))
         analysis.identification.RMSE.median = sqrt(mean((glucose.median-data.glucose).^2)); % [mg/dl]
         analysis.identification.RMSE.ci5th = sqrt(mean((glucose.ci5th-data.glucose).^2)); % [mg/dl]

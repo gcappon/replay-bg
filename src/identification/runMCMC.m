@@ -1,26 +1,31 @@
 function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
-% runMCMC Function that runs MCMC simulation.
-% [pHat, accept, ll] = runMCMC(n, y, mcmc, mP, patient, simulation) returns 
-% a structure containing the parameter draws, a vector containing the acceptance rate
-% of eack MCMC block and a vector containing the values the likelihood take 
-% through the simulation.
-% * Inputs:
-%   - n: is the number of MCMC iterations.
-%   - y: is a vector containing the measurement data.
-%   - mcmc: is a structure containing the parameters needed by the MCMC
-%   algorithm.
-%   - patient: is a table containing data coming from a simulation
-%   (i.e. carbohydrate intakes, insulin boluses, basal insulin, glucose
-%   measurements)
-%   - simulation: is a structure containing the simulation
-%   parameters.
-% * Output:
-%   - pHat: is a structure containing the parameter draws.
-%   - accept: is a vector containing the acceptance rate of eack MCMC
-%   block.
+% function  runMCMC(data,mcmc,mP,model,environment)
+% Performs a run of the MCMC identification procedure.
+%
+% Inputs:
+%   - data: a timetable which contains the data to be used by the tool;
+%   - mcmc: a structure that contains the hyperparameters of the MCMC
+%   identification procedure;
+%   - mP: a struct containing the model parameters;
+%   - model: a structure that contains general parameters of the
+%   physiological model;
+%   - environment: a structure that contains general parameters to be used
+%   by ReplayBG.
+% Outputs:
+%   - pHat: is a structure containing the parameter chains;
+%   - accept: is a vector containing the acceptance rate of each MCMC
+%   block;
 %   - ll: is a vector containing the values the likelihood take through the
 %   simulation.
-    
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
+
     %Prealloc accept and ll
     accept = zeros(mcmc.nBlocks,1);
     ll = zeros(mcmc.n,1);
@@ -165,12 +170,10 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
             if(mod(run,100)==0 || run == mcmc.n)
                 [G, x] = computeGlicemia(mP,data,model);
                 G = G(1:(model.YTS/model.TS):end);
-                %figure(1);
+
                 subplot(4,1,1:2)
                 plot(y,'b');
                 hold on
-
-
 
                 plot(G,'r');
                 legend y Ghat 
@@ -189,17 +192,6 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
                 title('Qgut')
                 pause(0.00001);
                 
-                %figure(2);
-                
-                %for p = 1:length(mcmc.theta0)
-                %    subplot(length(mcmc.theta0),1,p)
-                %    plot(pHat.(mcmc.thetaNames{p}),'b');
-                %    legend(mcmc.thetaNames{p})
-                %end %for p
-    
-                
-                %pause(0.00001);
-                
             end %if plot
         end
         % =================================================================
@@ -208,4 +200,4 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
     
     % =====================================================================
 
-end %function runMCMC
+end
