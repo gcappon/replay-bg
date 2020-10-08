@@ -36,4 +36,7 @@ function model = initModel(data,sampleTime,glucoseModel,seed)
     %Patient specific parameters
     model.seed = seed;
     
+    %Set the rng seed
+    rng(seed)
+    
 end
