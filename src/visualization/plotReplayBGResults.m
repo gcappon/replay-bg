@@ -39,7 +39,7 @@ function plotReplayBGResults(glucose,data,environment)
     plot([data.Time(1) data.Time(end)],[180 180],'m--','linewidth',2);
     grid on
     ylabel('Glucose [mg/dl]','FontWeight','bold','FontSize',18);
-    legend(hp1,'Glucose data','Replay Glucose (Median)', 'Replay Glucose (CI 5-95th)');
+    legend(hp1,'Glucose (data)','Replay Glucose (Median)', 'Replay Glucose (CI 5-95th)');
     title(['Replay results'],'fontsize',20);
     hold off
     
@@ -48,7 +48,7 @@ function plotReplayBGResults(glucose,data,environment)
     hp2(1) = stem(data.Time, data.CHO,'^','linewidth',2,'color',[70,130,180]/255);
     hold on
     grid on
-    ylabel('CHO [g/min]','FontWeight','bold','FontSize',18);
+    ylabel('CHO (data) [g/min]','FontWeight','bold','FontSize',18);
     legend(hp2,'CHO');
     hold off
     
@@ -57,7 +57,7 @@ function plotReplayBGResults(glucose,data,environment)
     hp3(1) = stem(data.Time,data.bolus,'^','linewidth',2,'color',[50,205,50]/255);
     hold on;
     hp3(2) = plot(data.Time, data.basal*60,'-','linewidth',2,'color',[0,0,0]/255);
-    legend(hp3,'Bolus insulin [U/min]','Basal insulin [U/h]');
+    legend(hp3,'Bolus insulin (data) [U/min]','Basal insulin (data) [U/h]');
     ylabel('Insulin','FontWeight','bold','FontSize',18);
     grid on
     hold off

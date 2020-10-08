@@ -1,4 +1,4 @@
-function glucose = replayScenario(data,modelParameters,draws,environment,model,mcmc)
+function [glucose, insulinBolus, insulinBasal, CHO] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
 % function  replayScenario(data,modelParameters,draws,environment,model,mcmc)
 % Replays the given scenario defined by the given data.
 %
@@ -12,10 +12,18 @@ function glucose = replayScenario(data,modelParameters,draws,environment,model,m
 %   - model: a structure that contains general parameters of the
 %   physiological model;
 %   - mcmc: a structure that contains the hyperparameters of the MCMC
-%   identification procedure.
+%   identification procedure;
+%   - dss: a structure that contains the hyperparameters of the integrated
+%   decision support system.
 % Output:
 %   - glucose: a structure which contains the obtained glucose traces 
-%   simulated via ReplayBG.
+%   simulated via ReplayBG
+%   - insulinBolus: a structure containing the input bolus insulin used to
+%   obtain glucose (U/min);
+%   - insulinBasal: a structure containing the input basal insulin used to
+%   obtain glucose (U/min);
+%   - CHO: a structure containing the input CHO used to obtain glucose
+%   (g/min);
 %
 % ---------------------------------------------------------------------
 %
@@ -33,14 +41,22 @@ function glucose = replayScenario(data,modelParameters,draws,environment,model,m
     %Obtain the glicemic realizations using the copula-generated parameter
     %samples
     glucose.realizations = zeros(height(data),length(draws.(mcmc.thetaNames{1}).samples));
+    
+    insulinBolus.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    insulinBasal.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    CHO.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    
     for r = 1:length(draws.(mcmc.thetaNames{1}).samples)
         
         for p = 1:length(mcmc.thetaNames)
             modelParameters.(mcmc.thetaNames{p}) = draws.(mcmc.thetaNames{p}).samples(r);
         end
         
-        [G, x] = computeGlicemia(modelParameters,data,model);
-        glucose.realizations(:,r) = G(1:model.YTS:end)';
+        [G, iB, ib, C, ~] = computeGlicemia(modelParameters,data,model,dss);
+        glucose.realizations(:,r) = G(1:model.YTS:end);
+        insulinBolus.realizations(:,r) = iB;
+        insulinBasal.realizations(:,r) = ib;
+        CHO.realizations(:,r) = C;
         
     end
     

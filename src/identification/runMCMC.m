@@ -1,4 +1,4 @@
-function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
+function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
 % function  runMCMC(data,mcmc,mP,model,environment)
 % Performs a run of the MCMC identification procedure.
 %
@@ -9,6 +9,8 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
 %   - mP: a struct containing the model parameters;
 %   - model: a structure that contains general parameters of the
 %   physiological model;
+%   - dss: a structure that contains the hyperparameters of the integrated
+%   decision support system;
 %   - environment: a structure that contains general parameters to be used
 %   by ReplayBG.
 % Outputs:
@@ -106,7 +108,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
             end %for p
             mP.kgri = mP.kempt; %known from the literature
     
-            G = computeGlicemia(mP,data,model)';
+            G = computeGlicemia(mP,data,model,dss);
             G = G(1:(model.YTS/model.TS):end);
             
             N = model.TID/model.YTS;
@@ -130,7 +132,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
             end %for p
             mP.kgri = mP.kempt; %known from the literature
       
-            G = computeGlicemia(mP,data,model)';
+            G = computeGlicemia(mP,data,model,dss);
             G = G(1:(model.YTS/model.TS):end);
             
             switch(mP.typeN)
@@ -168,7 +170,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
         if(environment.plotMode)
             
             if(mod(run,100)==0 || run == mcmc.n)
-                [G, x] = computeGlicemia(mP,data,model);
+                [G, ~, ~, ~, x] = computeGlicemia(mP,data,model,dss);
                 G = G(1:(model.YTS/model.TS):end);
 
                 subplot(4,1,1:2)

@@ -4,8 +4,13 @@ function xk = modelStep(xkm1,B,CHO,mP,xk,model)
 %
 % Inputs:
 %   - xkm1: is a vector containing the model state at time k-1;
-%   - ukm1: is a vector containing the input value at time k-1;
-%   - modelParameters: is a struct containing the model parameters.
+%   - B: is the insulin at time k;
+%   - CHO: is the CHO at time k;
+%   - mP: is a struct containing the model parameters;
+%   - xk: is the preallocated vector that will contain the model state at 
+%   time k;
+%   - model: a structure that contains general parameters of the
+%   physiological model.
 % Outputs:
 %   - xk: is a vector containing the model state at time k.
 %

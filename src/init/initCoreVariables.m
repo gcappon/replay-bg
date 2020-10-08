@@ -1,4 +1,4 @@
-function [environment, model, mcmc] = initCoreVariables(data,ip)
+function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
 % function  initCoreVariables(data,ip)
 % Initializes the core variables (i.e., environment, model, and mcmc) of
 % ReplayBG.
@@ -12,7 +12,9 @@ function [environment, model, mcmc] = initCoreVariables(data,ip)
 %   - model: a structure that contains general parameters of the
 %   physiological model;
 %   - mcmc: a structure that contains the hyperparameters of the MCMC
-%   identification procedure.
+%   identification procedure;
+%   - dss: a structure that contains the hyperparameters of the integrated
+%   decision support system.
 %
 % ---------------------------------------------------------------------
 %
@@ -37,6 +39,20 @@ function [environment, model, mcmc] = initCoreVariables(data,ip)
     model = initModel(data,ip.Results.sampleTime, ip.Results.glucoseModel,ip.Results.seed);
     
     if(environment.verbose)
+        time = toc;
+        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
+    end
+    
+    
+    if(environment.verbose && strcmp(environment.modality,'replay'))
+        fprintf('Setting up the Decision Support System hyperparameters...');
+        tic;
+    end
+    
+    %Initialize the decision support system hyperparameters
+    dss = initDecisionSupportSystem(ip.Results.enableHypoTreatments,ip.Results.hypoTreatmentsHandler);
+    
+    if(environment.verbose && strcmp(environment.modality,'replay'))
         time = toc;
         fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
     end

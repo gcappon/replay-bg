@@ -53,6 +53,25 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   - saveChains: (optional, default: 1) a numerical flag that specifies
 %   whether to save the resulting mcmc chains in dedicated files (one for 
 %   each MCMC run) for future analysis or not. Can be 0 or 1;
+%   - enableHypoTreatments: (optional, default: 0) a numerical flag that
+%   specifies whether to enable hypotreatments during the replay of a given
+%   scenario. Can be 0 or 1. Can be set only when modality is 'replay';
+%   - hypoTreatmentsHandler: (optional, default:
+%   'adaHypoTreatmentsHandler') a vector of characters that specifies the
+%   name of the function handler that implements an hypotreatment strategy
+%   during the replay of a given scenario. The function must have 1 output,
+%   i.e., the hypotreatments carbohydrates intake (g/min). The function
+%   must have 6 inputs, i.e., 'G' (mg/dl) the glucose concentration at 
+%   time(timeIndex), 'CHO' (g/min) a vector that contains the CHO
+%   intakes input for the whole replay simulation, 'bolus' (U/min) a 
+%   vector that contains the bolus insulin input for the whole replay 
+%   simulation, 'basal' (U/min) a vector that contains the basal insulin 
+%   input for the whole replay simulation, 'time' (datetime) a vector that 
+%   contains the time istants of current replay simulation, 'timeIndex' is
+%   a number that defines the current time istant in the replay simulation.
+%   Vectors contain one value for each integration step. The default policy
+%   is "take an hypotreatment of 10 g every 15 minutes while in
+%   hypoglycemia";
 %   - saveSuffix: (optional, default: '') a vector of char to be attached
 %   as suffix to the resulting output files' name;
 %   - plotMode: (optional, default: 1) a numerical flag that specifies
@@ -62,6 +81,10 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   
 % ---------------------------------------------------------------------
 % NOTES:   
+% - Integration step is 1 minute. Function handlers of the integrated 
+%   decision support systems works at this time step. So, input vectors of 
+%   the function handlers contain one value for each integration step.
+%
 % - Results folder
 %   Results are saved in the results/ folder, specifically:
 %   * results/distributions/: contains the identified ReplayBG model parameter distributions
@@ -114,6 +137,9 @@ function replayBG(modality, data, BW, saveName, varargin)
     addParameter(ip,'preFilterData',0, @(x) preFilterDataValidator(x,modality)); % default = 0
     addParameter(ip,'saveChains',1, @(x) saveChainsValidator(x,modality)); % default = 1
     
+    addParameter(ip,'enableHypoTreatments',0, @(x) enableHypoTreatmentsValidator(x,modality)); % default = 0
+    addParameter(ip,'hypoTreatmentsHandler','adaHypoTreatmentsHandler', @(x) hypoTreatmentsHandlerValidator(x,modality)); % default = 'adaHypoTreatmentsHandler'
+    
     addParameter(ip,'saveSuffix','',@(x) saveSuffixValidator(x)); % default = ''
     addParameter(ip,'plotMode',1,@(x) plotModeValidator(x)); % default = 1
     addParameter(ip,'verbose',1,@(x) verboseValidator(x)); % default = 1
@@ -127,15 +153,15 @@ function replayBG(modality, data, BW, saveName, varargin)
     %% ====================================================================
     
     %% ================ Initialize core variables =========================
-    [environment, model, mcmc] = initCoreVariables(data,ip);
+    [environment, model, mcmc, dss] = initCoreVariables(data,ip);
     %% ====================================================================
     
     %% ================ Set model parameters ==============================
-    [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment,mcmc,model);
+    [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment,mcmc,model,dss);
     %% ====================================================================
     
     %% ================ Replay of the scenario ============================
-    glucose = replayScenario(data,modelParameters,draws,environment,model,mcmc);
+    [glucose, insulinBolus, insulinBasal, CHO] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss);
     %% ====================================================================
     
     %% ================ Analyzing results =================================
@@ -156,12 +182,14 @@ function replayBG(modality, data, BW, saveName, varargin)
     
     if(strcmp(environment.modality,'identification'))
         save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName environment.saveSuffix]),...
-            'data','BW','environment','mcmc','model',...
-            'glucose','analysis');
+            'data','BW','environment','mcmc','model','dss',...
+            'glucose','insulinBolus', 'insulinBasal', 'CHO',...
+            'analysis');
     else
         save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName environment.saveSuffix]),...
-            'data','BW','environment','model',...
-            'glucose','analysis');
+            'data','BW','environment','model','dss',...
+            'glucose','insulinBolus', 'insulinBasal', 'CHO',...
+            'analysis');
     end
     
     if(environment.verbose)

@@ -1,4 +1,4 @@
-function [G, x] = computeGlicemia(mP,data,model)
+function [G, insulinBolus, insulinBasal, CHO, x] = computeGlicemia(mP,data,model,dss)
 % function  computeGlicemia(mP,data,model)
 % Generates the vector containing the CHO intake events to be used to
 % simulate the physiological model.
@@ -7,9 +7,16 @@ function [G, x] = computeGlicemia(mP,data,model)
 %   - mP: a struct containing the model parameters.
 %   - data: a timetable which contains the data to be used by the tool;
 %   - model: a structure that contains general parameters of the
-%   physiological model.
+%   physiological model;
+%   - dss: a structure that contains the hyperparameters of the integrated
+%   decision support system.
 % Outputs:
 %   - G: is a vector containing the simulated glucose trace [mg/dl]; 
+%   - insulinBolus: is a vector containing the input bolus insulin used to
+%   obtain G (U/min);
+%   - insulinBasal: is a vector containing the input basal insulin used to
+%   obtain G (U/min);
+%   - CHO: is a vector containing the input CHO used to obtain G (g/min);
 %   - x: is a matrix containing the simulated model states. 
 %
 % ---------------------------------------------------------------------
@@ -33,7 +40,7 @@ function [G, x] = computeGlicemia(mP,data,model)
           data.glucose(1)];                                                                                    %IG(0)                                                                                    
     
     %Initialize the glucose vector
-    G = zeros(1,model.TIDSTEPS);
+    G = zeros(model.TIDSTEPS,1);
     
     %Set the initial glucose value
     switch(model.glucoseModel)
@@ -47,17 +54,44 @@ function [G, x] = computeGlicemia(mP,data,model)
     %intake + its bolus)
     [bolus, basal] = insulinSetup(data,model,mP);
     [meal] = mealSetup(data,model,mP);
-    bolusDelay = floor(mP.tau/model.TS); 
+    
+    %Add delay of main meal absorption
     mealDelay = round(mP.beta/model.TS);
-    meal = [zeros(mealDelay,1); meal; zeros(bolusDelay,1)];
-    bolus = [zeros(bolusDelay,1); bolus; zeros(mealDelay,1)];
-    basal = [basal; ones(bolusDelay+mealDelay,1)*basal(1)];
+    mealDelayed = [zeros(mealDelay,1); meal];
+    mealDelayed = mealDelayed(1:model.TIDSTEPS);
+    
+    %Add delay in insulin absorption
+    bolusDelay = floor(mP.tau/model.TS); 
+    bolusDelayed = [zeros(bolusDelay,1); bolus];
+    bolusDelayed = bolusDelayed(1:model.TIDSTEPS);
+    basalDelayed = basal;
+    
+    %Time vector for DSS
+    time = data.Time(1):minutes(1):(data.Time(1) + minutes(length(meal) - 1));
+    
+    %Initialize the 'event' vectors
+    insulinBasal = basal/1000*mP.BW;
+    insulinBolus = bolus/1000*mP.BW;
+    CHO = meal/1000*mP.BW;
     
     %Simulate the physiological model
     for k = 2:model.TIDSTEPS
         
+        %Add hypotreatments if needed
+        if(dss.enableHypoTreatments)
+            HT = feval(dss.hypoTreatmentsHandler,G(k-1),CHO,insulinBolus,insulinBasal,time,k-1);
+            mealDelayed(k) = mealDelayed(k) + HT*1000/mP.BW;
+            
+            %Update the CHO event vector
+            CHO(k) = CHO(k) + HT;
+            
+        end
+        
+        %Add correction boluses if needed (remember to add insulin
+        %absorption delay to the boluses)
+
         %Integration step
-        x(:,k) = modelStep(x(:,k-1),basal(k) + bolus(k), meal(k), mP, x(:,k), model); %metto gli input all'istante k per dato che uso Eulero all'indietro
+        x(:,k) = modelStep(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
         
         %Get the glucose
         switch(model.glucoseModel)
@@ -67,7 +101,10 @@ function [G, x] = computeGlicemia(mP,data,model)
                 G(k) = x(1,k); %y(k) = BG(k)
         end
         
-        %TODO: HERE INSERT DSS
+        %Update the event vectors
+        %insulinBasal(k) = basalDelayed(k)/1000*mP.BW; % (U/min)
+        %insulinBolus(k) = bolusDelayed(k)/1000*mP.BW; % (U/min)
+        
         
     end
     
