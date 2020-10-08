@@ -89,6 +89,16 @@ function [G, insulinBolus, insulinBasal, CHO, x] = computeGlicemia(mP,data,model
         
         %Add correction boluses if needed (remember to add insulin
         %absorption delay to the boluses)
+        if(dss.enableCorrectionBoluses)
+            CB = feval(dss.correctionBolusesHandler,G(k-1),CHO,insulinBolus,insulinBasal,time,k-1);
+            if(k+mP.tau <= model.TIDSTEPS)
+                bolusDelayed(k+mP.tau) = bolusDelayed(k+mP.tau) + CB*1000/mP.BW;
+            end
+            
+            %Update the insulin bolus event vector
+            insulinBolus(k) = insulinBolus(k) + CB;
+            
+        end
 
         %Integration step
         x(:,k) = modelStep(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
@@ -99,12 +109,7 @@ function [G, insulinBolus, insulinBasal, CHO, x] = computeGlicemia(mP,data,model
                 G(k) = x(9,k); %y(k) = IG(k)
             case 'BG'
                 G(k) = x(1,k); %y(k) = BG(k)
-        end
-        
-        %Update the event vectors
-        %insulinBasal(k) = basalDelayed(k)/1000*mP.BW; % (U/min)
-        %insulinBolus(k) = bolusDelayed(k)/1000*mP.BW; % (U/min)
-        
+        end   
         
     end
     

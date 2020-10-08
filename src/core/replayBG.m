@@ -72,6 +72,25 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   Vectors contain one value for each integration step. The default policy
 %   is "take an hypotreatment of 10 g every 15 minutes while in
 %   hypoglycemia";
+%   - enableCorrectionBoluses: (optional, default: 0) a numerical flag that
+%   specifies whether to enable correction boluses during the replay of a 
+%   given scenario. Can be 0 or 1. Can be set only when modality is 
+%   'replay';
+%   - correctionBolusesHandler: (optional, default:
+%   'correctsAbove250Handler') a vector of characters that specifies the
+%   name of the function handler that implements a corrective bolusing strategy
+%   during the replay of a given scenario. The function must have 1 output,
+%   i.e., the correction insulin bolus (U/min). The function
+%   must have 6 inputs, i.e., 'G' (mg/dl) the glucose concentration at 
+%   time(timeIndex), 'CHO' (g/min) a vector that contains the CHO
+%   intakes input for the whole replay simulation, 'bolus' (U/min) a 
+%   vector that contains the bolus insulin input for the whole replay 
+%   simulation, 'basal' (U/min) a vector that contains the basal insulin 
+%   input for the whole replay simulation, 'time' (datetime) a vector that 
+%   contains the time istants of current replay simulation, 'timeIndex' is
+%   a number that defines the current time istant in the replay simulation.
+%   Vectors contain one value for each integration step. The default policy
+%   is "take a corrective bolus of 1 U every 1 hour while above 250 mg/dl";
 %   - saveSuffix: (optional, default: '') a vector of char to be attached
 %   as suffix to the resulting output files' name;
 %   - plotMode: (optional, default: 1) a numerical flag that specifies
@@ -139,6 +158,8 @@ function replayBG(modality, data, BW, saveName, varargin)
     
     addParameter(ip,'enableHypoTreatments',0, @(x) enableHypoTreatmentsValidator(x,modality)); % default = 0
     addParameter(ip,'hypoTreatmentsHandler','adaHypoTreatmentsHandler', @(x) hypoTreatmentsHandlerValidator(x,modality)); % default = 'adaHypoTreatmentsHandler'
+    addParameter(ip,'enableCorrectionBoluses',0, @(x) enableCorrectionBolusesValidator(x,modality)); % default = 0
+    addParameter(ip,'correctionBolusesHandler','correctsAbove250Handler', @(x) correctionBolusesHandlerValidator(x,modality)); % default = 'correctsAbove250Handler'
     
     addParameter(ip,'saveSuffix','',@(x) saveSuffixValidator(x)); % default = ''
     addParameter(ip,'plotMode',1,@(x) plotModeValidator(x)); % default = 1

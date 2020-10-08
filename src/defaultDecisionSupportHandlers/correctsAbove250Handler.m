@@ -1,7 +1,7 @@
-function HT = adaHypoTreatmentsHandler(G,CHO,bolus,basal,time,timeIndex)
-% function  adaHypoTreatmentsHandler(G,CHO,bolus,basal,time,timeIndex)
-% Implements the default hypotreatment strategy: "take an hypotreatment of 
-% 10 g every 15 minutes while in hypoglycemia".
+function CB = correctsAbove250Handler(G,CHO,bolus,basal,time,timeIndex)
+% function  correctsAbove250Handler(G,CHO,bolus,basal,time,timeIndex)
+% Implements the default correction bolus strategy: "take a correction
+% bolus of 1 U every 1 hour while above 250 mg/dl".
 %
 % Inputs:
 %   - G: the glucose concentration at time(timeIndex) 
@@ -16,7 +16,7 @@ function HT = adaHypoTreatmentsHandler(G,CHO,bolus,basal,time,timeIndex)
 %   - timeIndex: is a number that defines the current time istant in the
 %   replay simulation.
 % Outputs:
-%   - HT: the hypotreatment to administer at time(timeIndex+1) (g/min).
+%   - CB: the correction bolus to administer at time(timeIndex+1) (U/min).
 %
 % ---------------------------------------------------------------------
 %
@@ -26,14 +26,14 @@ function HT = adaHypoTreatmentsHandler(G,CHO,bolus,basal,time,timeIndex)
 %
 % ---------------------------------------------------------------------
 
-    HT = 0;
+    CB = 0;
     
-    %If glucose is lower than 70...
-    if(G < 70)
+    %If glucose is greater than 250...
+    if(G > 250)
         
-        %...and if there are no CHO intakes in the last 15 minutes, then take an HT
-        if(timeIndex > 15 && ~any(CHO((timeIndex - 15):timeIndex)))
-            HT = 10; % g/min
+        %...and if there are no boluses in the last 1 hour, then take a CB
+        if(timeIndex > 60 && ~any(bolus((timeIndex - 60):timeIndex)))
+            CB = 1; % g/min
         end
         
     end
