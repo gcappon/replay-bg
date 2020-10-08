@@ -1,9 +1,9 @@
-function valid = measurementModelValidator(measurementModel)
-% function  measurementModelValidator(measurementModel)
-% Validates the input parameter 'measurementModel'.
+function valid = glucoseModelValidator(glucoseModel)
+% function  glucoseModelValidator(glucoseModel)
+% Validates the input parameter 'glucoseModel'.
 %
 % Inputs:
-%   - measurementModel;
+%   - glucoseModel;
 % Outputs:
 %   - valid: a boolean defining if the input parameter is valid. 
 %
@@ -15,9 +15,9 @@ function valid = measurementModelValidator(measurementModel)
 %
 % ---------------------------------------------------------------------
 
-    expectedMeasurementModels = {'BG','IG'};
+    expectedGlucoseModels = {'BG','IG'};
 
-    valid = any(validatestring(measurementModel,expectedMeasurementModels));
+    valid = any(validatestring(glucoseModel,expectedGlucoseModels));
     if(~valid)
         error("Must be 'IG' or 'BG'.");
     end

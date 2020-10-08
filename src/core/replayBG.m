@@ -17,7 +17,7 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   - BW: (required) the patient body weight (kg);
 %   - saveName: (required) a vector of characters used to label, thus identify, each 
 %   output file and result;
-%   - measurementModel: (optional, default: 'IG') a vector of characters
+%   - glucoseModel: (optional, default: 'IG') a vector of characters
 %   that specifies the glucose model to use. Can be 'IG' or 'BG';
 %   - sampleTime: (optional, default: 5 (min)) an integer that specifies
 %   the data sample time;
@@ -79,7 +79,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     addRequired(ip,'data',@(x) dataValidator(x));
     addRequired(ip,'BW',@(x) BWValidator(x));
     addRequired(ip,'saveName',@(x) saveNameValidator(x));
-    addParameter(ip,'measurementModel','IG',@(x) measurementModelValidator(x)); %default = 'IG'
+    addParameter(ip,'glucoseModel','IG',@(x) glucoseModelValidator(x)); %default = 'IG'
     addParameter(ip,'sampleTime',5,@(x) sampleTimeValidator(x)); % default = 5
     addParameter(ip,'seed',randi([1 1048576]),@(x) seedValidator(x)); % default = randi([1 1048576])
     addParameter(ip,'maxETAPerMCMCRun',inf,@(x) maxETAPerMCMCRunValidator(x,modality)); % default = inf
