@@ -34,6 +34,23 @@ function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,ver
         environment.replayBGPath = fullfile(p{1:end-2});
     end
     
+    %Create the results subfolders if they do not exist
+    if(~(exist(fullfile(environment.replayBGPath,'results','distributions')) == 7))
+        mkdir(fullfile(environment.replayBGPath,'results','distributions'));
+    end
+    if(~(exist(fullfile(environment.replayBGPath,'results','logs')) == 7))
+        mkdir(fullfile(environment.replayBGPath,'results','logs'));
+    end
+    if(~(exist(fullfile(environment.replayBGPath,'results','mcmcChains')) == 7))
+        mkdir(fullfile(environment.replayBGPath,'results','mcmcChains'));
+    end
+    if(~(exist(fullfile(environment.replayBGPath,'results','modelParameters')) == 7))
+        mkdir(fullfile(environment.replayBGPath,'results','modelParameters'));
+    end
+    if(~(exist(fullfile(environment.replayBGPath,'results','workspaces')) == 7))
+        mkdir(fullfile(environment.replayBGPath,'results','workspaces'));
+    end
+    
     %Store the ReplayBG modality
     environment.modality = modality; 
     
