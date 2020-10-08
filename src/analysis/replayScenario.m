@@ -1,4 +1,4 @@
-function [glucose, insulinBolus, insulinBasal, CHO] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
+function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
 % function  replayScenario(data,modelParameters,draws,environment,model,mcmc)
 % Replays the given scenario defined by the given data.
 %
@@ -20,10 +20,14 @@ function [glucose, insulinBolus, insulinBasal, CHO] = replayScenario(data,modelP
 %   simulated via ReplayBG
 %   - insulinBolus: a structure containing the input bolus insulin used to
 %   obtain glucose (U/min);
+%   - correctionBolus: a structure containing the correction bolus insulin used to
+%   obtain glucose (U/min);
 %   - insulinBasal: a structure containing the input basal insulin used to
 %   obtain glucose (U/min);
 %   - CHO: a structure containing the input CHO used to obtain glucose
 %   (g/min);
+%   - hypotreatments: a structure containing the input hypotreatments used 
+%   to obtain glucose (g/min);
 %
 % ---------------------------------------------------------------------
 %
@@ -43,8 +47,10 @@ function [glucose, insulinBolus, insulinBasal, CHO] = replayScenario(data,modelP
     glucose.realizations = zeros(height(data),length(draws.(mcmc.thetaNames{1}).samples));
     
     insulinBolus.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    correctionBolus.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     insulinBasal.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     CHO.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    hypotreatments.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     
     for r = 1:length(draws.(mcmc.thetaNames{1}).samples)
         
@@ -52,11 +58,13 @@ function [glucose, insulinBolus, insulinBasal, CHO] = replayScenario(data,modelP
             modelParameters.(mcmc.thetaNames{p}) = draws.(mcmc.thetaNames{p}).samples(r);
         end
         
-        [G, iB, ib, C, ~] = computeGlicemia(modelParameters,data,model,dss);
+        [G, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,dss);
         glucose.realizations(:,r) = G(1:model.YTS:end);
         insulinBolus.realizations(:,r) = iB;
+        correctionBolus.realizations(:,r) = cB;
         insulinBasal.realizations(:,r) = ib;
         CHO.realizations(:,r) = C;
+        hypotreatments.realizations(:,r) = ht;
         
     end
     

@@ -1,4 +1,4 @@
-function [G, insulinBolus, insulinBasal, CHO, x] = computeGlicemia(mP,data,model,dss)
+function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x] = computeGlicemia(mP,data,model,dss)
 % function  computeGlicemia(mP,data,model)
 % Generates the vector containing the CHO intake events to be used to
 % simulate the physiological model.
@@ -14,9 +14,14 @@ function [G, insulinBolus, insulinBasal, CHO, x] = computeGlicemia(mP,data,model
 %   - G: is a vector containing the simulated glucose trace [mg/dl]; 
 %   - insulinBolus: is a vector containing the input bolus insulin used to
 %   obtain G (U/min);
-%   - insulinBasal: is a vector containing the input basal insulin used to
+%   - correctionBolus: a structure containing the correction bolus insulin used to
 %   obtain G (U/min);
-%   - CHO: is a vector containing the input CHO used to obtain G (g/min);
+%   - insulinBasal: a structure containing the input basal insulin used to
+%   obtain G (U/min);
+%   - CHO: a structure containing the input CHO used to obtain glucose
+%   (g/min);
+%   - hypotreatments: a structure containing the input hypotreatments used 
+%   to obtain G (g/min);
 %   - x: is a matrix containing the simulated model states. 
 %
 % ---------------------------------------------------------------------
@@ -72,7 +77,9 @@ function [G, insulinBolus, insulinBasal, CHO, x] = computeGlicemia(mP,data,model
     %Initialize the 'event' vectors
     insulinBasal = basal/1000*mP.BW;
     insulinBolus = bolus/1000*mP.BW;
+    correctionBolus = insulinBolus*0;
     CHO = meal/1000*mP.BW;
+    hypotreatments = CHO*0;
     
     %Simulate the physiological model
     for k = 2:model.TIDSTEPS
@@ -82,9 +89,9 @@ function [G, insulinBolus, insulinBasal, CHO, x] = computeGlicemia(mP,data,model
             HT = feval(dss.hypoTreatmentsHandler,G(k-1),CHO,insulinBolus,insulinBasal,time,k-1);
             mealDelayed(k) = mealDelayed(k) + HT*1000/mP.BW;
             
-            %Update the CHO event vector
+            %Update the CHO event vectors
             CHO(k) = CHO(k) + HT;
-            
+            hypotreatments(k) = hypotreatments(k) + HT;
         end
         
         %Add correction boluses if needed (remember to add insulin
@@ -95,9 +102,9 @@ function [G, insulinBolus, insulinBasal, CHO, x] = computeGlicemia(mP,data,model
                 bolusDelayed(k+mP.tau) = bolusDelayed(k+mP.tau) + CB*1000/mP.BW;
             end
             
-            %Update the insulin bolus event vector
+            %Update the insulin bolus event vectors
             insulinBolus(k) = insulinBolus(k) + CB;
-            
+            correctionBolus(k) = correctionBolus(k) + CB;
         end
 
         %Integration step

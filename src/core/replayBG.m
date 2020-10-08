@@ -182,11 +182,11 @@ function replayBG(modality, data, BW, saveName, varargin)
     %% ====================================================================
     
     %% ================ Replay of the scenario ============================
-    [glucose, insulinBolus, insulinBasal, CHO] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss);
+    [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss);
     %% ====================================================================
     
     %% ================ Analyzing results =================================
-    analysis = analyzeResults(glucose,data,environment);
+    analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment);
     %% ====================================================================
     
     %% ================ Plotting results ==================================

@@ -170,7 +170,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
         if(environment.plotMode)
             
             if(mod(run,100)==0 || run == mcmc.n)
-                [G, ~, ~, ~, x] = computeGlicemia(mP,data,model,dss);
+                [G, ~, ~, ~, ~, ~, x] = computeGlicemia(mP,data,model,dss);
                 G = G(1:(model.YTS/model.TS):end);
 
                 subplot(4,1,1:2)
