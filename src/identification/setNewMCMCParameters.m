@@ -41,7 +41,7 @@ function [mcmc] = setNewMCMCParameters(pHat,mcmc)
         mcmc.std = max([mcmc.std; mcmc.stdMin]); %limit std to a maximum value to avoid dangerous artifacts
         
         %Set the new mcmc.theta0
-        switch(mcmc.policyTheta0)
+        switch(mcmc.MCMCTheta0Policy)
             case 'initial'
                 mcmc.theta0(p) = mcmc.theta0(p);
             case 'mean'

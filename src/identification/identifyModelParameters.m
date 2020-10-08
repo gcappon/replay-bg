@@ -203,8 +203,8 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         draws = struct();
         paramsForCopula = zeros(length(pHat.(mcmc.thetaNames{1})(max(conv.M_burn):max(conv.k_ind):end)),mcmc.nPar);
                 
-        switch(mcmc.estimator)
-            case "mean"
+        switch(mcmc.bayesianEstimator)
+            case 'mean'
                 
                 for p = 1:length(mcmc.thetaNames)
                     
@@ -221,7 +221,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                 end %for p
                 modelParameters.kgri = modelParameters.kempt;
                 
-            case "map"
+            case 'map'
                 
                 for p = 1:length(mcmc.thetaNames)                    
                     
@@ -235,12 +235,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                     distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p})(conv.M_burn(p):conv.k_ind(p):end);
                     kernel = histfit(distributions.(mcmc.thetaNames{p}),round(length(distributions.(mcmc.thetaNames{p}))/3),'kernel');
                     modelParameters.(mcmc.thetaNames{p}) = kernel(2).XData(find(kernel(2).YData == max(kernel(2).YData),1','first'));
-                    
-                    %edges = histogram(par,round(length(par)/3)).BinEdges;
-                    %counts = histogram(par,round(length(par)/3)).BinCounts;
-                    %imax = find(max(counts)==counts,1,'first');
-                    %modelParameters.(mcmc.thetaNames{p}) = (edges(imax)+edges(imax+1))/2;
-
+                  
                 end %for p
                 modelParameters.kgri = modelParameters.kempt;
                 

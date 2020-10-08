@@ -88,7 +88,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,environment)
     y = data.glucose; %Measurement vector
     
     %Filter training data
-    if(mcmc.filter)
+    if(mcmc.preFilterData)
         [bFilt,aFilt] = butter(4,0.2);
         y = filtfilt(bFilt,aFilt,y);
     end

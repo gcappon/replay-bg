@@ -31,6 +31,28 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   the maximum number of MCMC runs; 
 %   - maxMCMCRunsWithMaxETA: (optional, default: 2) an integer that 
 %   specifies the maximum number of MCMC runs having maximum ETA; 
+%   - MCMCTheta0Policy: (optional, default: 'mean') a vector of characters 
+%   defining the policy used by the MCMC procedure to set the initial MCMC 
+%   chain values. Can be 'mean' or 'last' or 'initial'. Using 'mean', the 
+%   mean value of the MCMC chain obtained from the last MCMC run will be 
+%   set as initial MCMC chain value to be used in the next MCMC run. Using 
+%   'last', the last value of the MCMC chain obtained from the last MCMC 
+%   run will be set as initial MCMC chain value to be used in the next MCMC
+%   run. Using 'initial', the same initial value will be used for every run 
+%   of MCMC;
+%   - bayesianEstimator: (optional, default: 'mean') a vector of characters
+%   defining which Bayesian estimator to use to obtain a point estimate of
+%   model parameters. Can be 'mean' or 'map'. Using 'mean' the posterior
+%   mean estimater will be used. Using 'map', the marginalized
+%   maximum-a-posteriori estimator will be used;
+%   - preFilterData: (optional, default: 0) a numerical flag that specifies
+%   whether to filter the glucose data before performing the model
+%   identification or not. Can be 0 or 1. This might help the identification
+%   procedure. Filtering is performed using a non-causal fourth-order 
+%   Butterworth filter having 0.1*sampleTime cutOff frequency;
+%   - saveChains: (optional, default: 1) a numerical flag that specifies
+%   whether to save the resulting mcmc chains in dedicated files (one for 
+%   each MCMC run) for future analysis or not. Can be 0 or 1;
 %   - saveSuffix: (optional, default: '') a vector of char to be attached
 %   as suffix to the resulting output files' name;
 %   - plotMode: (optional, default: 1) a numerical flag that specifies
@@ -86,6 +108,12 @@ function replayBG(modality, data, BW, saveName, varargin)
     addParameter(ip,'maxMCMCIterations',inf,@(x) maxMCMCIterationsValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCRuns',inf,@(x) maxMCMCRunsValidator(x, modality)); % default = inf
     addParameter(ip,'maxMCMCRunsWithMaxETA',2, @(x) maxMCMCRunsWithMaxETAValidator(x,modality)); % default = 2
+    
+    addParameter(ip,'MCMCTheta0Policy','mean', @(x) MCMCTheta0PolicyValidator(x,modality)); % default = 'mean'
+    addParameter(ip,'bayesianEstimator','mean', @(x) bayesianEstimatorValidator(x,modality)); % default = 'mean'
+    addParameter(ip,'preFilterData',0, @(x) preFilterDataValidator(x,modality)); % default = 0
+    addParameter(ip,'saveChains',1, @(x) saveChainsValidator(x,modality)); % default = 1
+    
     addParameter(ip,'saveSuffix','',@(x) saveSuffixValidator(x)); % default = ''
     addParameter(ip,'plotMode',1,@(x) plotModeValidator(x)); % default = 1
     addParameter(ip,'verbose',1,@(x) verboseValidator(x)); % default = 1

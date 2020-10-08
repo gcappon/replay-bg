@@ -1,5 +1,5 @@
-function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA)
-% function  initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA)
+function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy, bayesianEstimator,preFilterData, saveChains)
+% function  initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy)
 % Initializes the 'mcmc' core variable. 
 %
 % Inputs:
@@ -11,6 +11,15 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
 %   runs; 
 %   - maxMCMCRunsWithMaxETA: an integer that specifies the maximum number 
 %   of MCMC runs having maximum ETA; 
+%   - MCMCTheta0Policy: a vector of characters defining the policy used by
+%   the MCMC procedure to set the initial MCMC chains values;
+%   - bayesianEstimator: a vector of characters defining which Bayesian
+%   estimator to use to obtain a point estimate of model parameters;
+%   - preFilterData: a numerical flag that specifies whether to filter the 
+%   glucose data before performing the model identification;
+%   - saveChains: a numerical flag that specifies whether to save the 
+%   resulting mcmc chains in dedicated files (one for each MCMC run) for 
+%   future analysis or not.
 % Outputs:
 %   - mcmc: a structure that contains the hyperparameters of the MCMC
 %   identification procedure.
@@ -79,18 +88,18 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
     mcmc.maxMCMCRunsWithMaxETA = maxMCMCRunsWithMaxETA;
     
     %Set the policy for choosing the theta0 for the next run can be {'initial', 'last', 'mean'} 
-    mcmc.policyTheta0 = "mean"; 
+    mcmc.MCMCTheta0Policy = MCMCTheta0Policy; 
     
     %Set the Bayesian estimator used to compute the parameter point estimates
-    mcmc.estimator = "map"; 
+    mcmc.bayesianEstimator = bayesianEstimator; 
     
     %Set the number of parameters to be identified
     mcmc.nPar = length(mcmc.thetaNames);
     
-    %Do you want to lightly smooth training data? (it could help)
-    mcmc.filter = 0; 
+    %Do you want to lightly filter training data? (it could help)
+    mcmc.preFilterData = preFilterData; 
     
     %Do you want to save the intermediate mcmc chains 
-    mcmc.saveChains = 1; 
+    mcmc.saveChains = saveChains; 
     
 end
