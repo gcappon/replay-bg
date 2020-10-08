@@ -35,6 +35,9 @@ function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,ver
     end
     
     %Create the results subfolders if they do not exist
+    if(~(exist(fullfile(environment.replayBGPath,'results')) == 7))
+        mkdir(fullfile(environment.replayBGPath,'results'));
+    end
     if(~(exist(fullfile(environment.replayBGPath,'results','distributions')) == 7))
         mkdir(fullfile(environment.replayBGPath,'results','distributions'));
     end
