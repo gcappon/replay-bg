@@ -21,7 +21,7 @@ function valid = maxETAPerMCMCRunValidator(maxETAPerMCMCRun,modality)
         error("Must be a number.");
     end
     if(strcmp(modality,'replay'))
-        disp("WARNING: you are trying to set the parameter 'maxETAPerMCMCRun' while using the 'replay' modality. It won't be used.");
+        warning("You are trying to set the parameter 'maxETAPerMCMCRun' while using the 'replay' modality. It won't be used.");
     end
     
 end

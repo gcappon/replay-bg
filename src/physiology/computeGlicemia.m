@@ -1,7 +1,7 @@
 function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x] = computeGlicemia(mP,data,model,dss)
 % function  computeGlicemia(mP,data,model)
-% Generates the vector containing the CHO intake events to be used to
-% simulate the physiological model.
+% Compute the glycemic profile obtained with the ReplayBG physiological
+% model using the given inputs and model parameters.
 %
 % Inputs:
 %   - mP: a struct containing the model parameters.
@@ -14,13 +14,13 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
 %   - G: is a vector containing the simulated glucose trace [mg/dl]; 
 %   - insulinBolus: is a vector containing the input bolus insulin used to
 %   obtain G (U/min);
-%   - correctionBolus: a structure containing the correction bolus insulin used to
+%   - correctionBolus: a vector containing the correction bolus insulin used to
 %   obtain G (U/min);
-%   - insulinBasal: a structure containing the input basal insulin used to
+%   - insulinBasal: a vector containing the input basal insulin used to
 %   obtain G (U/min);
-%   - CHO: a structure containing the input CHO used to obtain glucose
+%   - CHO: a vector containing the input CHO used to obtain glucose
 %   (g/min);
-%   - hypotreatments: a structure containing the input hypotreatments used 
+%   - hypotreatments: a vector containing the input hypotreatments used 
 %   to obtain G (g/min);
 %   - x: is a matrix containing the simulated model states. 
 %

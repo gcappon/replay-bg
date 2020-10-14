@@ -136,7 +136,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
             limitETA = mcmc.maxETAPerMCMCRun*60; %[min]
             if(ETA > limitETA)
                 limitedN = (limitETA * 600)/timeFor600;
-                limitedN = ceil(limitedN)
+                limitedN = ceil(limitedN);
                 if(environment.verbose)
                     disp(['*** WARNING: ETA greater than the maximum allowed ETA per MCMC run. Setting the number of MCMC iterations so that ETA is equal to the maximum allowed ETA. (Originally: ' num2str(mcmc.n) ', now: ' num2str(limitedN) ')']);
                 end
@@ -206,6 +206,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         paramsForCopula = zeros(length(pHat.(mcmc.thetaNames{1})(max(conv.M_burn):max(conv.k_ind):end)),mcmc.nPar);
                 
         switch(mcmc.bayesianEstimator)
+            %TODO: salva tutto in un vettore 
             case 'mean'
                 
                 for p = 1:length(mcmc.thetaNames)
@@ -236,6 +237,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                     %Obtain a point-estimate of model parameters
                     distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p})(conv.M_burn(p):conv.k_ind(p):end);
                     kernel = histfit(distributions.(mcmc.thetaNames{p}),round(length(distributions.(mcmc.thetaNames{p}))/3),'kernel');
+                    %TODO: lancia warning se ci sono due massimi
                     modelParameters.(mcmc.thetaNames{p}) = kernel(2).XData(find(kernel(2).YData == max(kernel(2).YData),1','first'));
                   
                 end %for p

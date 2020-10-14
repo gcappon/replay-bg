@@ -23,7 +23,7 @@ function valid = preFilterDataValidator(preFilterData,modality)
     end
     
     if(strcmp(modality,'replay'))
-        disp("WARNING: you are trying to set the parameter 'preFilterData' while using the 'replay' modality. It won't be used.");
+        warning("You are trying to set the parameter 'preFilterData' while using the 'replay' modality. It won't be used.");
     end
     
 end

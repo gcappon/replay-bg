@@ -10,7 +10,7 @@ function [meal] = mealSetup(data,model,modelParameters)
 %   - modelParameters: a struct containing the model parameters.
 % Outputs:
 %   - meal: is a vector containing the carbohydrate intake at each time
-%   step [mg/min].
+%   step [mg/min*kg].
 %
 % ---------------------------------------------------------------------
 %

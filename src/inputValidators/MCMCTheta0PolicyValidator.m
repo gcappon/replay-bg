@@ -24,7 +24,7 @@ function valid = MCMCTheta0PolicyValidator(MCMCTheta0Policy,modality)
     end
     
     if(strcmp(modality,'replay'))
-        disp("WARNING: you are trying to set the parameter 'MCMCTheta0Policy' while using the 'replay' modality. It won't be used.");
+        warning("You are trying to set the parameter 'MCMCTheta0Policy' while using the 'replay' modality. It won't be used.");
     end
     
 end

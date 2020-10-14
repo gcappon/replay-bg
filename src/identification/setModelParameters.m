@@ -17,8 +17,7 @@ function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment
 %   - modelParameters: a struct containing the model parameters;
 %   - mcmc: the updated structure that contains the hyperparameters of the 
 %   MCMC identification procedure;
-%   - draws: a structure that contains the modelParameter draws obtained
-%   with MCMC.
+%   - draws: a structure that contains 1000 realizations of modelParameter obtained with MCMC.
 %
 % ---------------------------------------------------------------------
 %

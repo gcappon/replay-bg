@@ -10,9 +10,9 @@ function [bolus, basal] = insulinSetup(data,model,modelParameters)
 %   - modelParameters: a struct containing the model parameters.
 % Outputs:
 %   - bolus: is a vector containing the insulin bolus dose at each time
-%   step [mU/min];
+%   step [mU/min*kg];
 %   - basal: is a vector containing the basal insulin value at each time
-%   step [mU/min].
+%   step [mU/min*kg].
 %
 % ---------------------------------------------------------------------
 %

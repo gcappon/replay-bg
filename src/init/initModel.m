@@ -5,7 +5,7 @@ function model = initModel(data,sampleTime,glucoseModel,seed)
 % Inputs:
 %   - data: timetable which contains the data to be used by the tool;
 %   - sampleTime: an integer that specifies the data sample time;
-%   - measurementModel: a vector of characters that specifies the glucose 
+%   - glucoseModel: a vector of characters that specifies the glucose 
 %   model to use;
 %   - seed: an integer that specifies the random seed. For reproducibility. 
 % Outputs:

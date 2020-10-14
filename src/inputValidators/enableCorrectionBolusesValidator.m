@@ -27,7 +27,7 @@ function valid = enableCorrectionBolusesValidator(enableCorrectionBoluses,modali
     end
     
     if(strcmp(modality,'identification'))
-        disp("WARNING: you are trying to set the parameter 'enableCorrectionBoluses' to 0 while using the 'identification' modality. It won't be used.");
+        warning("You are trying to set the parameter 'enableCorrectionBoluses' to 0 while using the 'identification' modality. It won't be used.");
     end
     
 end

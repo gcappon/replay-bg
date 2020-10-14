@@ -14,7 +14,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
 %   - environment: a structure that contains general parameters to be used
 %   by ReplayBG.
 % Outputs:
-%   - pHat: is a structure containing the parameter chains;
+%   - pHat: is a structure containing the MCMC chain realizations;
 %   - accept: is a vector containing the acceptance rate of each MCMC
 %   block;
 %   - ll: is a vector containing the values the likelihood take through the

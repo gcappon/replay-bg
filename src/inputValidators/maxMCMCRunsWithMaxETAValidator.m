@@ -21,7 +21,7 @@ function valid = maxMCMCRunsWithMaxETAValidator(maxMCMCRunsWithMaxETA,modality)
         error("Must be an integer number.");
     end
     if(strcmp(modality,'replay'))
-        disp("WARNING: you are trying to set the parameter 'maxMCMCRunsWithMaxETA' while using the 'replay' modality. It won't be used.");
+        warning("You are trying to set the parameter 'maxMCMCRunsWithMaxETA' while using the 'replay' modality. It won't be used.");
     end
     
 end

@@ -15,7 +15,7 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
 %   identification procedure;
 %   - dss: a structure that contains the hyperparameters of the integrated
 %   decision support system.
-% Output:
+% Outputs:
 %   - glucose: a structure which contains the obtained glucose traces 
 %   simulated via ReplayBG
 %   - insulinBolus: a structure containing the input bolus insulin used to

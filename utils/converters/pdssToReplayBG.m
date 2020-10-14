@@ -34,7 +34,7 @@ function pdssToReplayBG(Experiment,savePath,offset,cutTh)
 
             %set the CHO
             CHO = zeros(length(time),1);
-            CHO1Min = Experiment.SimResults.MealIngested((offset*60+1):((offset+cutTh)*60),p) + Experiment.SimResults.HypoTreatment((offset*60+1):((offset+cutTh)*60),p);
+            CHO1Min = Experiment.SimResults.MealAnnounced((offset*60+1):((offset+cutTh)*60),p) + Experiment.SimResults.HypoTreatment((offset*60+1):((offset+cutTh)*60),p);
             CHOTimes = find(CHO1Min>0);
             for c = 1:length(CHOTimes)
                 idx = round(CHOTimes(c)/Ts);

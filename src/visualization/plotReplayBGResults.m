@@ -58,7 +58,7 @@ function plotReplayBGResults(glucose,data,environment)
     hold on;
     hp3(2) = plot(data.Time, data.basal*60,'-','linewidth',2,'color',[0,0,0]/255);
     legend(hp3,'Bolus insulin (data) [U/min]','Basal insulin (data) [U/h]');
-    ylabel('Insulin','FontWeight','bold','FontSize',18);
+    ylabel('Insulin (data)','FontWeight','bold','FontSize',18);
     grid on
     hold off
     
