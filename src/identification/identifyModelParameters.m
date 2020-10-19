@@ -246,9 +246,12 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         end
         
         %Fit the copula
-        [Rho,nu] = copulafit('Gaussian',paramsForCopula,'Method','ApproximateML');
+        %[Rho,nu] = copulafit('t',paramsForCopula,'Method','ApproximateML');
+        [Rho] = copulafit('Gaussian',paramsForCopula,'Method','ML');
         %Generate 1000 samples
-        r = copularnd('t',Rho,nu,1000);
+        %r = copularnd('t',Rho,nu,1000);
+        r = copularnd('Gaussian',Rho,1000);
+        
         %Scale the samples back to the original scale of the data
         for p = 1:length(mcmc.thetaNames)       
             draws.(mcmc.thetaNames{p}).samples = ksdensity(draws.(mcmc.thetaNames{p}).chain,r(:,p),'function','icdf');
