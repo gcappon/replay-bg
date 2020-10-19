@@ -45,19 +45,7 @@ function xk = modelStep(xkm1,B,CHO,mP,xk,model)
     Ipb = (mP.ka1/mP.ke)*(mP.u2ss)/(mP.ka1+mP.kd) + (mP.ka2/mP.ke)*(mP.kd/mP.ka2)*(mP.u2ss)/(mP.ka1+mP.kd); %from eq. 5 steady-state    
 
     %Compute the hypoglycemic risk
-    Gth = 60;
-    risk = abs(exp((G/mP.Gb).^mP.r2)-exp(1))*(G<mP.Gb & G>Gth) + abs(exp((Gth/mP.Gb).^mP.r2)-exp(1))*(G<=Gth);
-    if(isnan(risk))
-        risk = 0;
-    end
-    %risk = 0;
-    
-    %Decrease the SI when glucose is above the hyperglycemic threshold
-    %(NOT ACTIVATED YET)
-    %factorHyper = 0.3;
-    %if(G>180)
-    %    SI = SI*(1-factorHyper*(1-exp(-(G-180)/8)));
-    %end
+    risk = computeHypoglycemicRisk(G,mP);
         
     %Compute the model state at time k using backward Euler method
     xk(6) = (Qsto1 + model.TS*CHO)/(1+model.TS*mP.kgri);

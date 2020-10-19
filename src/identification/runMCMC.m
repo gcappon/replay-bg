@@ -44,8 +44,8 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
     prior.p2 = @(mP) lognpdf(mP.p2,-4.3,0.35);
     prior.Gb = @(mP) normpdf(mP.Gb,120,10);
     
-    prior.r1 = @(mP) lognpdf(mP.r1,0,0.3);
-    prior.r2 = @(mP) lognpdf(mP.r2,0.7,0.25);
+    prior.r1 = @(mP) (mP.r1>=0)*normpdf(mP.r1,1.4407,0.0562);
+    prior.r2 = @(mP) (mP.r2>=0)*normpdf(mP.r2,0.8124,0.0171);
     
     prior.VI = @(mP) lognpdf(mP.VI,-2.0568,0.1128);
     prior.ke = @(mP) lognpdf(mP.ke,-2.0811,0.2977);

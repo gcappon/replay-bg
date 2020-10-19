@@ -40,8 +40,8 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         modelParameters.VG = 1.7; %dl/kg
         modelParameters.SG = 1.7e-2; %1/min
         modelParameters.Gb = 120; %mg/dL
-        modelParameters.r1 = 0.8; %unitless
-        modelParameters.r2 = 1.44; %unitless
+        modelParameters.r1 = 1.44; %unitless
+        modelParameters.r2 = 0.8; %unitless
 
         %Interstitial glucose kinetics
         modelParameters.alpha = 7; %1/min
@@ -138,7 +138,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                 limitedN = (limitETA * 600)/timeFor600;
                 limitedN = ceil(limitedN);
                 if(environment.verbose)
-                    disp(['*** WARNING: ETA greater than the maximum allowed ETA per MCMC run. Setting the number of MCMC iterations so that ETA is equal to the maximum allowed ETA. (Originally: ' num2str(mcmc.n) ', now: ' num2str(limitedN) ')']);
+                    warning(['*** ETA greater than the maximum allowed ETA per MCMC run. Setting the number of MCMC iterations so that ETA is equal to the maximum allowed ETA. (Originally: ' num2str(mcmc.n) ', now: ' num2str(limitedN) ')']);
                 end
                 mcmc.n = limitedN;
                 runWithMaxETA = runWithMaxETA + 1;
@@ -146,7 +146,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
             
             if(mcmc.n > mcmc.maxMCMCIterations)
                 if(environment.verbose)
-                    disp(['*** WARNING: Number of MCMC iterations greater than the maximum allowed number of MCMC iterations. Setting the number of MCMC iterations to the maximum allowed ETA. (Originally: ' num2str(mcmc.n) ', now: ' num2str(mcmc.maxMCMCIterations) ')']);
+                    warning(['*** Number of MCMC iterations greater than the maximum allowed number of MCMC iterations. Setting the number of MCMC iterations to the maximum allowed ETA. (Originally: ' num2str(mcmc.n) ', now: ' num2str(mcmc.maxMCMCIterations) ')']);
                 end
                 mcmc.n = mcmc.maxMCMCIterations;
                 ETA = timeFor600*mcmc.n/600;
@@ -192,10 +192,10 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
             disp('ReplayBG model was successfully identified.');
         else
             if(runWithMaxETA == mcmc.maxMCMCRunsWithMaxETA && nextN > (mcmc.n*1.1))
-                disp('WARNING: Identification procedure stopped because the maximum number of MCMC runs having maximum allowed ETA reached.');
+                warning('Identification procedure stopped because the maximum number of MCMC runs having maximum allowed ETA reached.');
             end
             if(nIterations == mcmc.maxMCMCRuns)
-                disp('WARNING: Identification procedure stopped because the maximum allowed number of MCMC iterations was reached.');
+                warning('Identification procedure stopped because the maximum allowed number of MCMC iterations was reached.');
             end
         end
     % =====================================================================
@@ -246,7 +246,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         end
         
         %Fit the copula
-        [Rho,nu] = copulafit('t',paramsForCopula,'Method','ApproximateML');
+        [Rho,nu] = copulafit('Gaussian',paramsForCopula,'Method','ApproximateML');
         %Generate 1000 samples
         r = copularnd('t',Rho,nu,1000);
         %Scale the samples back to the original scale of the data

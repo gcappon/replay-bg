@@ -40,11 +40,11 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
     mcmc.stdMin = [0, 0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
     
     %It works on in silico data (for bolus and CHO modfications) NEEDS TO BE TESTED FOR BASAL MODIFICATIONS"
-    mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','r1','r2'}; %names of the parameters to identify
-    mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3]; %initial guess of the SD of each parameter
-    theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.18, 0.012, 0.8, 1.44]; %initial guess of the parameter values...
-    mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 1e-2, 1e-2]; %initial guess of the SD of each parameter
-    mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
+    %mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','r1','r2'}; %names of the parameters to identify
+    %mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3]; %initial guess of the SD of each parameter
+    %theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.18, 0.012, 1.44, 0.8]; %initial guess of the parameter values...
+    %mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 1e-2, 1e-2]; %initial guess of the SD of each parameter
+    %mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
     
     %REAL DATA - seems OK (wait for Giulia's assessment)
     %mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','r1','r2','beta'}; %names of the parameters to identify
@@ -68,7 +68,7 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
 
     %Assign the block of each parameter (for Single-Component M-H)
     mcmc.parBlock = [1, 1, 1, 2, 2, 2]; 
-    mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3]; 
+    %mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3]; 
     %mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3, 4];
     %mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3, 4, 5];
 
