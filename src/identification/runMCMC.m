@@ -39,10 +39,16 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
     end %for p
         
     %Set the prior probability functions
-    prior.SI = @(mP) gampdf(mP.SI*mP.VG,2.5,4.5e-4);
-    prior.SG = @(mP) lognpdf(mP.SG,-3.6,0.5);
-    prior.p2 = @(mP) lognpdf(mP.p2,-4.3,0.35);
-    prior.Gb = @(mP) normpdf(mP.Gb,120,10);
+    prior.SI = @(mP) gampdf(mP.SI*mP.VG,3.3,5e-4); % From: Dalla Man et
+    %al.,Minimal model estimation of glucose absorption and insulin
+    %sensitivity from oral test: validation with a tracer method.
+    
+    prior.SG = @(mP) lognpdf(mP.SG,-3.8,0.5);
+    
+    %prior.p2 = @(mP) lognpdf(mP.p2,-4.3,0.35);
+    prior.p2 = @(mP) normpdf(sqrt(mP.p2),0.11,0.004)*(mP.p2>0);
+    
+    prior.Gb = @(mP) normpdf(mP.Gb,119.13,7.11);
     
     prior.r1 = @(mP) (mP.r1>=0)*normpdf(mP.r1,1.4407,0.0562);
     prior.r2 = @(mP) (mP.r2>=0)*normpdf(mP.r2,0.8124,0.0171);
@@ -182,7 +188,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
                 hold off
                 switch(mP.typeN)
                     case 'SD'
-                        title(['Run: ' num2str(run) ' of ' num2str(mcmc.n) '; LL: ' num2str(ll(run))] );
+                        title(['Run: ' num2str(run) ' of ' num2str(mcmc.n) '; LL: ' num2str(ll(run)) '; SI: ' num2str(mP.SI)] );
                     case 'CV'
                         title(['Run: ' num2str(run) ' of ' num2str(mcmc.n) '; LL: ' num2str(ll(run))] );
                 end

@@ -57,6 +57,7 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
         for p = 1:length(mcmc.thetaNames)
             modelParameters.(mcmc.thetaNames{p}) = draws.(mcmc.thetaNames{p}).samples(r);
         end
+        modelParameters.kgri = modelParameters.kempt;
         
         [G, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,dss);
         glucose.realizations(:,r) = G(1:model.YTS:end);

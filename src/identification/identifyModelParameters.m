@@ -37,9 +37,9 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         modelParameters.beta = 0;
 
         %Glucose kinetics parameters
-        modelParameters.VG = 1.7; %dl/kg
-        modelParameters.SG = 1.7e-2; %1/min
-        modelParameters.Gb = 120; %mg/dL
+        modelParameters.VG = 1.45; %dl/kg
+        modelParameters.SG = 2.5e-2; %1/min
+        modelParameters.Gb = 119.13; %mg/dL
         modelParameters.r1 = 1.44; %unitless
         modelParameters.r2 = 0.8; %unitless
 
@@ -47,15 +47,15 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         modelParameters.alpha = 7; %1/min
 
         %Insulin kinetic parameters 
-        modelParameters.SI = 5e-4; %mL/(uU*min)
-        modelParameters.p2 = 0.01; %1/min
+        modelParameters.SI = 10.35e-4/modelParameters.VG; %mL/(uU*min)
+        modelParameters.p2 = 0.012; %1/min
         modelParameters.u2ss = mean(data.basal)*1000/BW; %mU/(kg*min)
 
         %Subcutaneous insulin absorption parameters
         modelParameters.VI = 0.126; %L/kg
         modelParameters.ke = 0.127; %1/min
         modelParameters.kd = 0.028; %1/min
-        modelParameters.ka1 = 0.0034; %1/min
+        modelParameters.ka1 = 0.0034; %1/min (virtually 0 in 77% of the cases)
         modelParameters.ka2 = 0.014; %1/min
         modelParameters.tau = 8; %min
 
@@ -110,8 +110,8 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         end
         [mcmc] = setNewMCMCParameters(pHat,mcmc); %Set new std and theta0
         
-        %Set the ETA for 600 iterations
-        timeFor600 = (timeFirstRun/60 + timeSecondRun/60)/2; %[min]
+        %Set the ETA for Nmin iterations
+        timeForNmin = (timeFirstRun/60 + timeSecondRun/60)/2; %[min]
         
         %Compute the MCMC number of iterations using Raftery Lewis
         draws = zeros(mcmc.n,length(mcmc.thetaNames));
@@ -132,10 +132,10 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
             nIterations = nIterations + 1;
             
             %Set the maximum ETA to limitETA hours and 
-            ETA = timeFor600*mcmc.n/600;
+            ETA = timeForNmin*mcmc.n/mcmc.raftLewNmin;
             limitETA = mcmc.maxETAPerMCMCRun*60; %[min]
             if(ETA > limitETA)
-                limitedN = (limitETA * 600)/timeFor600;
+                limitedN = (limitETA * mcmc.raftLewNmin)/timeForNmin;
                 limitedN = ceil(limitedN);
                 if(environment.verbose)
                     warning(['*** ETA greater than the maximum allowed ETA per MCMC run. Setting the number of MCMC iterations so that ETA is equal to the maximum allowed ETA. (Originally: ' num2str(mcmc.n) ', now: ' num2str(limitedN) ')']);
@@ -149,7 +149,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                     warning(['*** Number of MCMC iterations greater than the maximum allowed number of MCMC iterations. Setting the number of MCMC iterations to the maximum allowed ETA. (Originally: ' num2str(mcmc.n) ', now: ' num2str(mcmc.maxMCMCIterations) ')']);
                 end
                 mcmc.n = mcmc.maxMCMCIterations;
-                ETA = timeFor600*mcmc.n/600;
+                ETA = timeForNmin*mcmc.n/mcmc.raftLewNmin;
             end
     
             if(environment.verbose)
@@ -203,7 +203,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
     %% ========== Parameter estimates  ====================================  
     
         draws = struct();
-        paramsForCopula = zeros(length(pHat.(mcmc.thetaNames{1})(max(conv.M_burn):max(conv.k_ind):end)),mcmc.nPar);
+        paramsForCopula = zeros(length(pHat.(mcmc.thetaNames{1})(max(conv.M_burn):max(conv.k_thin):end)),mcmc.nPar);
                 
         switch(mcmc.bayesianEstimator)
             %TODO: salva tutto in un vettore 
@@ -211,14 +211,14 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                 
                 for p = 1:length(mcmc.thetaNames)
                     
-                    draws.(mcmc.thetaNames{p}).chain = pHat.(mcmc.thetaNames{p})(max(conv.M_burn):max(conv.k_ind):end);
+                    draws.(mcmc.thetaNames{p}).chain = pHat.(mcmc.thetaNames{p})(max(conv.M_burn):max(conv.k_thin):end);
                     draws.(mcmc.thetaNames{p}).min = min(draws.(mcmc.thetaNames{p}).chain);
                     draws.(mcmc.thetaNames{p}).max = max(draws.(mcmc.thetaNames{p}).chain);
 
                     paramsForCopula(:,p) = ksdensity(draws.(mcmc.thetaNames{p}).chain,draws.(mcmc.thetaNames{p}).chain,'function','cdf');        
                     
                     %Obtain a point-estimate of model parameters
-                    distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p})(conv.M_burn(p):conv.k_ind(p):end);
+                    distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p})(conv.M_burn(p):conv.k_thin(p):end);
                     modelParameters.(mcmc.thetaNames{p}) = mean(distributions.(mcmc.thetaNames{p}));
                     
                 end %for p
@@ -228,17 +228,21 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                 
                 for p = 1:length(mcmc.thetaNames)                    
                     
-                    draws.(mcmc.thetaNames{p}).chain = pHat.(mcmc.thetaNames{p})(max(conv.M_burn):max(conv.k_ind):end);
+                    draws.(mcmc.thetaNames{p}).chain = pHat.(mcmc.thetaNames{p})(max(conv.M_burn):max(conv.k_thin):end);
                     draws.(mcmc.thetaNames{p}).min = min(draws.(mcmc.thetaNames{p}).chain);
                     draws.(mcmc.thetaNames{p}).max = max(draws.(mcmc.thetaNames{p}).chain);
                     
                     paramsForCopula(:,p) = ksdensity(draws.(mcmc.thetaNames{p}).chain,draws.(mcmc.thetaNames{p}).chain,'function','cdf');
                     
                     %Obtain a point-estimate of model parameters
-                    distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p})(conv.M_burn(p):conv.k_ind(p):end);
+                    distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p})(conv.M_burn(p):conv.k_thin(p):end);
                     kernel = histfit(distributions.(mcmc.thetaNames{p}),round(length(distributions.(mcmc.thetaNames{p}))/3),'kernel');
-                    %TODO: lancia warning se ci sono due massimi
-                    modelParameters.(mcmc.thetaNames{p}) = kernel(2).XData(find(kernel(2).YData == max(kernel(2).YData),1','first'));
+
+                    maxs = find(kernel(2).YData == max(kernel(2).YData));
+                    if(length(maxs) > 1)
+                        warning('MAP estimate: Found two points having maximum probability. Setting the point estimate to the first one.');
+                    end
+                    modelParameters.(mcmc.thetaNames{p}) = kernel(2).XData(find(kernel(2).YData == max(kernel(2).YData),1,'first'));
                   
                 end %for p
                 modelParameters.kgri = modelParameters.kempt;
@@ -246,11 +250,11 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         end
         
         %Fit the copula
-        %[Rho,nu] = copulafit('t',paramsForCopula,'Method','ApproximateML');
-        [Rho] = copulafit('Gaussian',paramsForCopula,'Method','ML');
+        [Rho,nu] = copulafit('t',paramsForCopula,'Method','ApproximateML');
+        %[Rho] = copulafit('Gaussian',paramsForCopula,'Method','ML');
         %Generate 1000 samples
-        %r = copularnd('t',Rho,nu,1000);
-        r = copularnd('Gaussian',Rho,1000);
+        r = copularnd('t',Rho,nu,1000);
+        %r = copularnd('Gaussian',Rho,1000);
         
         %Scale the samples back to the original scale of the data
         for p = 1:length(mcmc.thetaNames)       

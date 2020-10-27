@@ -158,6 +158,12 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
         analysis.identification.MARD.ci25th = mean(abs(glucose.ci25th-data.glucose)./data.glucose)*100; % [%]
         analysis.identification.MARD.ci75th = mean(abs(glucose.ci75th-data.glucose)./data.glucose)*100; % [%]
         analysis.identification.MARD.ci95th = mean(abs(glucose.ci95th-data.glucose)./data.glucose)*100; % [%]
+        
+        analysis.identification.CEGA.median = clarke(data.glucose,glucose.median); % [%]
+        analysis.identification.CEGA.ci5th = clarke(data.glucose,glucose.ci5th); % [%]
+        analysis.identification.CEGA.ci25th = clarke(data.glucose,glucose.ci25th); % [%]
+        analysis.identification.CEGA.ci75th = clarke(data.glucose,glucose.ci75th); % [%]
+        analysis.identification.CEGA.ci95th = clarke(data.glucose,glucose.ci95th); % [%]
     end
     
     if(environment.verbose)
