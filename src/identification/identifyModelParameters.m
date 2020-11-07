@@ -40,8 +40,8 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         modelParameters.VG = 1.45; %dl/kg
         modelParameters.SG = 2.5e-2; %1/min
         modelParameters.Gb = 119.13; %mg/dL
-        modelParameters.r1 = 1.44; %unitless
-        modelParameters.r2 = 0.8; %unitless
+        modelParameters.r1 = 1.4407; %unitless
+        modelParameters.r2 = 0.8124; %unitless
 
         %Interstitial glucose kinetics
         modelParameters.alpha = 7; %1/min
@@ -54,8 +54,9 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         %Subcutaneous insulin absorption parameters
         modelParameters.VI = 0.126; %L/kg
         modelParameters.ke = 0.127; %1/min
-        modelParameters.kd = 0.028; %1/min
+        modelParameters.kd = 0.026; %1/min
         modelParameters.ka1 = 0.0034; %1/min (virtually 0 in 77% of the cases)
+        modelParameters.ka1 = 0;
         modelParameters.ka2 = 0.014; %1/min
         modelParameters.tau = 8; %min
 

@@ -22,32 +22,46 @@ function [mcmc] = setNewMCMCParameters(pHat,mcmc)
 % ---------------------------------------------------------------------
 
     %Construct a matrix on the parameters draws
-    P = [];
-    for p = 1:length(mcmc.std)
-        P(:,p) = pHat.(mcmc.thetaNames{p});
-    end
+    %P = [];
+    %for p = 1:length(mcmc.std)
+    %    P(:,p) = pHat.(mcmc.thetaNames{p});
+    %end
     
+    %Set the new mcmc.covar
+    for b = 1:mcmc.nBlocks
+        blockIdxs = find(mcmc.parBlock == b);
+        
+        %Create realization matrix
+        K = zeros(length(pHat.(mcmc.thetaNames{1})),length(blockIdxs));
+       
+        for p = 1:length(blockIdxs)
+            K(:,p) = pHat.(mcmc.thetaNames{blockIdxs(p)});
+        end %for p
+        mcmc.covar{b} = cov(K);
+        
+    end
     
     for p = 1:length(mcmc.std)
         
         %Set the new mcmc.std
-        Pp = P(:,p);
-        Pmp = P;
-        Pmp(:,p) = [];
-        theta = Pmp\Pp; 
-        Pphat = Pmp*theta; %regress the p-th component given the others
-        mcmc.std(p) = 2.3*sqrt((Pp-Pphat)'*(Pp-Pphat)/(mcmc.n-2)); %compute the conditional std (by 2.3 times)
-        mcmc.std = min([mcmc.std; mcmc.stdMax]); %limit std to a maximum value to avoid dangerous artifacts
-        mcmc.std = max([mcmc.std; mcmc.stdMin]); %limit std to a maximum value to avoid dangerous artifacts
+        %Pp = P(:,p);
+        %Pmp = P;
+        %Pmp(:,p) = [];
+        %theta = Pmp\Pp; 
+        %Pphat = Pmp*theta; %regress the p-th component given the others
+        %mcmc.std(p) = 2.3*sqrt((Pp-Pphat)'*(Pp-Pphat)/(mcmc.n-2)); %compute the conditional std (by 2.3 times)
+        %mcmc.std = min([mcmc.std; mcmc.stdMax]); %limit std to a maximum value to avoid dangerous artifacts
+        %mcmc.std = max([mcmc.std; mcmc.stdMin]); %limit std to a maximum value to avoid dangerous artifacts
+        
         
         %Set the new mcmc.theta0
         switch(mcmc.MCMCTheta0Policy)
             case 'initial'
                 mcmc.theta0(p) = mcmc.theta0(p);
             case 'mean'
-                mcmc.theta0(p) = mean(Pp); %new starting point: mean
+                mcmc.theta0(p) = mean(pHat.(mcmc.thetaNames{p})); %new starting point: mean
             case 'last'
-                mcmc.theta0(p) = Pp(end); %new starting point: last value
+                mcmc.theta0(p) = pHat.(mcmc.thetaNames{p})(end); %new starting point: last value
         end
     end
     

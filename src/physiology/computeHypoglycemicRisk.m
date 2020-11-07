@@ -20,7 +20,10 @@ function risk = computeHypoglycemicRisk(G,mP)
     Gth = 60;
     
     %UVa/Padova model v2017
-    risk = 10*(log(G)^mP.r2 - log(mP.Gb)^mP.r2)^2*(G<mP.Gb & G>=Gth) + ...
-        10*(log(Gth)^mP.r2 - log(mP.Gb)^mP.r2)^2*(G<Gth);
+    %risk = 10*(log(G)^mP.r2 - log(mP.Gb)^mP.r2)^2*(G<mP.Gb & G>=Gth) + ...
+    %    10*(log(Gth)^mP.r2 - log(mP.Gb)^mP.r2)^2*(G<Gth);
     
+    %(Modified) UVa/Padova model v2017
+    risk = 10*(log(G)^mP.r2 - log(119.13)^mP.r2)^2*(G<119.13 & G>=Gth) + ...
+        10*(log(Gth)^mP.r2 - log(119.13)^mP.r2)^2*(G<Gth);
 end
