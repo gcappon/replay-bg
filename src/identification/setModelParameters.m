@@ -1,5 +1,5 @@
 function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment,mcmc,model,dss)
-% function  setModelParameters(data,BW,environment,mcmc,model)
+% function  setModelParameters(data,BW,environment,mcmc,model,dss)
 % Sets the parameters of the physiological model.
 %
 % Inputs:

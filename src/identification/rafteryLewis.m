@@ -1,4 +1,4 @@
-function  [raftery_lewis] = raftery_lewis(runs,q,r,s)
+function  [raftery_lewis] = rafteryLewis(runs,q,r,s)
 % function raftery_lewis(runs,q,r,s)
 % Computes the convergence diagnostics of Raftery and Lewis (1992), i.e. the
 % number of draws needed in MCMC to estimate the posterior cdf of the q-quantile
@@ -12,15 +12,15 @@ function  [raftery_lewis] = raftery_lewis(runs,q,r,s)
 %
 % Output:
 %   raftery_lewis   [structure]     containing the fields:
-%   - M_burn    [n_draws by 1]      number of draws required for burn-in
-%   - N_prec    [n_draws by 1]      number of draws required to achieve desired precision r
-%   - k_thin    [n_draws by 1]      thinning required to get 1st order MC
-%   - k_ind     [n_draws by 1]      thinning required to get independence
-%   - I_stat    [n_draws by 1]      I-statistic of Raftery/Lewis (1992b)
+%   - M_burn    [n_var by 1]      number of draws required for burn-in
+%   - N_prec    [n_var by 1]      number of draws required to achieve desired precision r
+%   - k_thin    [n_var by 1]      thinning required to get 1st order MC
+%   - k_ind     [n_var by 1]      thinning required to get independence
+%   - I_stat    [n_var by 1]      I-statistic of Raftery/Lewis (1992b)
 %                                   measures increase in required
 %                                   iterations due to dependence in chain
 %   - N_min     [scalar]            # draws if the chain is white noise
-%   - N_total   [n_draws by 1]      nburn + nprec
+%   - N_total   [n_var by 1]      nburn + nprec
 %
 
 % ---------------------------------------------------------------------

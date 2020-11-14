@@ -49,7 +49,7 @@ function plotReplayBGResults(glucose,data,environment)
     hold on
     grid on
     ylabel('CHO (data) [g/min]','FontWeight','bold','FontSize',18);
-    legend(hp2,'CHO');
+    legend(hp2,'CHO (data) [g/min]');
     hold off
     
     %Plot insulin data

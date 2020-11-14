@@ -37,6 +37,6 @@ function model = initModel(data,sampleTime,glucoseModel,seed)
     model.seed = seed;
     
     %Set the rng seed
-    rng(seed)
+    rng(seed,'twister')
     
 end

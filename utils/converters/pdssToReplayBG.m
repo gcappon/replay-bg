@@ -40,10 +40,12 @@ function pdssToReplayBG(Experiment,savePath,offset,cutTh)
                 idx = round(CHOTimes(c)/Ts);
                 CHO(idx) = CHO(idx)+CHO1Min(CHOTimes(c))/Ts; % converted: g --> g/min
             end
+            %CHO(61) = CHO(61) + 25/Ts;
 
             %set the bolus insulin
             bolus = zeros(length(time),1);
             bolus1Min = Experiment.SimResults.PumpInsulinBolus((offset*60+1):((offset+cutTh)*60),p);
+            bolus1Min = bolus1Min + Experiment.SimResults.AddedCorrectionBolus((offset*60+1):((offset+cutTh)*60),p);
             bolusTimes = find(bolus1Min>0);
             for b = 1:length(bolusTimes)
                 idx = round(bolusTimes(b)/Ts);

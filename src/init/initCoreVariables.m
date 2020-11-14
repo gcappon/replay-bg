@@ -25,11 +25,13 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
 % ---------------------------------------------------------------------
 
     %Initialize the environment parameters
-    environment = initEnvironment(ip.Results.modality,ip.Results.saveName,ip.Results.saveSuffix, ip.Results.plotMode,ip.Results.verbose);
+    environment = initEnvironment(ip.Results.modality,ip.Results.saveName,ip.Results.saveSuffix, ip.Results.plotMode,ip.Results.enableLog,ip.Results.verbose);
     
     %Start the log file
-    diary(environment.logFile);
-
+    if(environment.enableLog)
+        diary(environment.logFile);
+    end
+    
     if(environment.verbose)
         fprintf('Setting up the model hyperparameters...');
         tic;
@@ -67,7 +69,7 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
         end
 
         mcmc = initMarkovChainMonteCarlo(ip.Results.maxETAPerMCMCRun,ip.Results.maxMCMCIterations,ip.Results.maxMCMCRuns,ip.Results.maxMCMCRunsWithMaxETA,...
-            ip.Results.MCMCTheta0Policy, ip.Results.bayesianEstimator, ip.Results.preFilterData, ip.Results.saveChains);
+            ip.Results.MCMCTheta0Policy, ip.Results.bayesianEstimator, ip.Results.preFilterData, ip.Results.saveChains, ip.Results.adaptiveSCMH);
 
         if(environment.verbose)
             time = toc;

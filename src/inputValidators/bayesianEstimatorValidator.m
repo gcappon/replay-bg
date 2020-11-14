@@ -5,7 +5,7 @@ function valid = bayesianEstimatorValidator(bayesianEstimator,modality)
 % Inputs:
 %   - bayesianEstimator;
 %   - modality;
-% Outputs:
+% Output:
 %   - valid: a boolean defining if the input parameter is valid. 
 %
 % ---------------------------------------------------------------------

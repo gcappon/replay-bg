@@ -1,4 +1,4 @@
-function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy, bayesianEstimator,preFilterData, saveChains)
+function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy, bayesianEstimator,preFilterData, saveChains, adaptiveSCMH)
 % function  initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy)
 % Initializes the 'mcmc' core variable. 
 %
@@ -20,6 +20,9 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
 %   - saveChains: a numerical flag that specifies whether to save the 
 %   resulting mcmc chains in dedicated files (one for each MCMC run) for 
 %   future analysis or not.
+%   - adaptiveSCMH: a numerical flag that specifies whether to make the 
+%   Single Components Metropolis Hastings algorithm adaptive or 
+%   non-adaptive. 
 % Outputs:
 %   - mcmc: a structure that contains the hyperparameters of the MCMC
 %   identification procedure.
@@ -38,90 +41,43 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
     p20 = 0.012;
     kempt0 = 0.18;
     kabs0 = 0.012;
-    r10 = 1.4407;
-    r20 = 0.8124;
     ka20 = 0.014;
     kd0 = 0.026;
+    beta0 = 15;
     
-    %It works on in silico data
-    mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs'}; %names of the parameters to identify
-    mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3]; %initial guess for the SD of each parameter
-    mcmc.theta0 = [SG0, SI0, Gb0, p20, kempt0, kabs0]; %initial guess for the parameter values...
-    mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3]; %initial guess for the SD of each parameter
-    mcmc.stdMin = [0, 0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
-    
-    
-    
-    %Does it work?
     mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','kd','ka2'}; %names of the parameters to identify
     mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3]; %initial guess for the SD of each parameter
     mcmc.theta0 = [SG0, SI0, Gb0, p20, kempt0, kabs0, kd0, ka20]; %initial guess for the parameter values...
     mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 5e-3, 5e-3]*inf; %initial guess for the SD of each parameter
     mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
     
-    %It works on pete-jacobs data
+    %It works on pete-jacobs simulator data
     %mcmc.thetaNames = {'SG','SI','p2','kempt','kabs'}; %names of the parameters to identify
     %mcmc.std = [5e-4, 1e-6, 1e-3, 5e-3, 1e-3]; %initial guess for the SD of each parameter
     %mcmc.theta0 = [SG0, SI0, p20, kempt0, kabs0]; %initial guess for the parameter values...
     %mcmc.stdMax = [1e-3, 1e-5, 2e-3, 1e-2, 5e-3]; %initial guess for the SD of each parameter
     %mcmc.stdMin = [0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
     
-    %It works on in silico data (for bolus and CHO modfications) NOT FOR BASAL MODIFICATIONS
-    %mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','kd'}; %names of the parameters to identify
-    %mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3,1e-3]; %initial guess for the SD of each parameter
-    %theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.18, 0.012,0.028]; %initial guess for the parameter values...
-    %mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3,5e-3]; %initial guess for the SD of each parameter
-    %mcmc.stdMin = [0, 0, 0, 0, 0, 0,0]; %minimum allowed SD of each parameter
-    
-    %It works on in silico data (for bolus and CHO modfications) NEEDS TO BE TESTED FOR BASAL MODIFICATIONS"
-    %mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','r1','r2'}; %names of the parameters to identify
-    %mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3]; %initial guess of the SD of each parameter
-    %theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.18, 0.012, 1.44, 0.8]; %initial guess of the parameter values...
-    %mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 1e-2, 1e-2]; %initial guess of the SD of each parameter
-    %mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
-    
-    %It works on in silico data (for bolus and CHO modfications) NEEDS TO BE TESTED FOR BASAL MODIFICATIONS"
-    %mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','r1','r2','kd'}; %names of the parameters to identify
-    %mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 2e-3, 2e-3,1e-3]; %initial guess of the SD of each parameter
-    %mcmc.theta0 = [1.7e-2, 6e-4, 120, 1e-2, 0.18, 0.012, 1.44, 0.8,0.028]; %initial guess of the parameter values...
-    %mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 1e-2, 1e-2, 5e-3]; %initial guess of the SD of each parameter
-    %mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
-    
-    %It works on in silico data (for bolus and CHO modfications) NEEDS TO BE TESTED FOR BASAL MODIFICATIONS"
-    %mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','r1','r2'}; %names of the parameters to identify
-    %mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 2e-3, 2e-3]; %initial guess of the SD of each parameter
-    %mcmc.theta0 = [1.7e-2, 6e-4, 120, 1e-2, 0.18, 0.012, 1.44, 0.8]; %initial guess of the parameter values...
-    %mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 1e-2, 1e-2]; %initial guess of the SD of each parameter
-    %mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
-    
-    %REAL DATA - seems OK (wait for Giulia's assessment)
-    %mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','r1','r2','beta'}; %names of the parameters to identify
-    %mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3,0.5]; %initial guess of the SD of each parameter
-    %theta0 = [1.7e-2, 2e-4, 120, 1e-2, 0.18, 0.012,  1.44, 0.8,5]; %initial guess of the parameter values...
-    %mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 1e-2, 1e-2,1]; %initial guess of the SD of each parameter
+    %REAL DATA 
+    %mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','kd','ka2','beta'}; %names of the parameters to identify
+    %mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3, 0.5]; %initial guess for the SD of each parameter
+    %mcmc.theta0 = [SG0, SI0, Gb0, p20, kempt0, kabs0, kd0, ka20, beta0]; %initial guess for the parameter values...
+    %mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 5e-3, 5e-3, 1]*inf; %initial guess for the SD of each parameter
     %mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0, 0.25]; %minimum allowed SD of each parameter
     
-    %Randomize the initial guess of the parameter values
-    %mcmc.theta0 = theta0+randn(1,length(mcmc.thetaNames)).*(0.2*theta0); %...plus a random variation
-    %while(sum(mcmc.theta0>=0) < length(mcmc.theta0)) %cant be negative, if so resample
-    %    mcmc.theta0 = theta0+randn(1,length(mcmc.thetaNames)).*(0.1*theta0);
-    %end %while
 
     %Assign the block of each parameter (for Single-Component M-H)
-    %mcmc.parBlock = [1, 1, 1, 2, 2, 2]; 
     mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3]; 
-    mcmc.parBlock = [1, 1, 1, 1, 1, 1, 1, 1]; 
-    %mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3]; 
-    %mcmc.parBlock = [1, 1, 1, 2, 2, 3, 3, 3]; 
-    %mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3, 4];
+    %mcmc.parBlock = [1, 1, 1, 2, 2]; 
+    %mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3, 2]; 
     
     %Set the number of blocks
     mcmc.nBlocks = max(mcmc.parBlock);
-    
+
+    %Initialize the covariance matrix
     for b = 1:mcmc.nBlocks
         mcmc.covar{b} = diag(mcmc.std(mcmc.parBlock == b).^2);
     end
-
 
     %Parameters of the Raftery-Lewis criterion
     mcmc.raftLewQ = 0.025; 
@@ -151,7 +107,8 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
     mcmc.saveChains = saveChains; 
     
     %Do you want to make Metroplis Adaptive?
-    mcmc.adaptiveMetropolis = 1;
+    mcmc.adaptiveSCMH = adaptiveSCMH;
+    mcmc.adaptationFrequency = 1000;
     
     
     

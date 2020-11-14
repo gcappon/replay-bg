@@ -1,4 +1,4 @@
-function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,verbose)
+function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,enableLog,verbose)
 % function  initEnvironment(modality,saveName,saveSuffix,plotMode,verbose)
 % Initializes the 'environment' core variable.
 %
@@ -12,10 +12,12 @@ function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,ver
 %   resulting output files' name;
 %   - plotMode: a numerical flag that specifies whether to show the plot 
 %   of the results or not;
+%   - enableLog: (optional, default: 1) a numerical flag that specifies
+%   whether to log the output of ReplayBG not;
 %   - verbose: a numerical flag that specifies the verbosity of ReplayBG.
-% Outputs:
+% Output:
 %   - environment: a structure that contains general parameters to be used
-%   by ReplayBG;
+%   by ReplayBG.
 %
 % ---------------------------------------------------------------------
 %
@@ -75,6 +77,7 @@ function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,ver
     
     %Set the verbosity
     environment.plotMode = plotMode; % if 0 do not plot 
+    environment.enableLog = enableLog; % if 0 do not log 
     environment.verbose = verbose; % if 0 do not display stuff
     
 end

@@ -31,6 +31,9 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   the maximum number of MCMC runs; 
 %   - maxMCMCRunsWithMaxETA: (optional, default: 2) an integer that 
 %   specifies the maximum number of MCMC runs having maximum ETA; 
+%   - adaptiveSCMH: (optional, default: 1) a numerical flag that specifies 
+%   whether to make the Single Components Metropolis Hastings algorithm 
+%   adaptive or non-adaptive. Can be 0 or 1.
 %   - MCMCTheta0Policy: (optional, default: 'mean') a vector of characters 
 %   defining the policy used by the MCMC procedure to set the initial MCMC 
 %   chain values. Can be 'mean' or 'last' or 'initial'. Using 'mean', the 
@@ -95,6 +98,8 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   as suffix to the resulting output files' name;
 %   - plotMode: (optional, default: 1) a numerical flag that specifies
 %   whether to show the plot of the results or not. Can be 0 or 1;
+%   - enableLog: (optional, default: 1) a numerical flag that specifies
+%   whether to log the output of ReplayBG not. Can be 0 or 1;
 %   - verbose: (optional, default: 1) a numerical flag that specifies
 %   the verbosity of ReplayBG. Can be 0 or 1.
 %   
@@ -108,7 +113,7 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   Results are saved in the results/ folder, specifically:
 %   * results/distributions/: contains the identified ReplayBG model parameter distributions
 %   obtained via MCMC;
-%   * logs/: contains .txt files that log the command window output of
+%   * results/logs/: contains .txt files that log the command window output of
 %   ReplayBG. NB: .txt files will be empty if verbose = 0;
 %   * results/mcmcChains/: contains the MCMC chains, for each unknown parameter,
 %   obtained in each MCMC run;
@@ -150,6 +155,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     addParameter(ip,'maxMCMCIterations',inf,@(x) maxMCMCIterationsValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCRuns',inf,@(x) maxMCMCRunsValidator(x, modality)); % default = inf
     addParameter(ip,'maxMCMCRunsWithMaxETA',2, @(x) maxMCMCRunsWithMaxETAValidator(x,modality)); % default = 2
+    addParameter(ip,'adaptiveSCMH',1, @(x) adaptiveSCMHValidator(x,modality)); % default = 1
     
     addParameter(ip,'MCMCTheta0Policy','mean', @(x) MCMCTheta0PolicyValidator(x,modality)); % default = 'mean'
     addParameter(ip,'bayesianEstimator','mean', @(x) bayesianEstimatorValidator(x,modality)); % default = 'mean'
@@ -163,6 +169,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     
     addParameter(ip,'saveSuffix','',@(x) saveSuffixValidator(x)); % default = ''
     addParameter(ip,'plotMode',1,@(x) plotModeValidator(x)); % default = 1
+    addParameter(ip,'enableLog',1,@(x) enableLogValidator(x)); % default = 1
     addParameter(ip,'verbose',1,@(x) verboseValidator(x)); % default = 1
     
     %Parse the input arguments
@@ -192,6 +199,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     %% ================ Plotting results ==================================
     if(environment.plotMode)
         plotReplayBGResults(glucose,data,environment);
+        plotCEGA(glucose.median,data.glucose,0);
     end
     %% ====================================================================
     
@@ -218,7 +226,9 @@ function replayBG(modality, data, BW, saveName, varargin)
         fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
     end
     
-    diary off;
+    if(environment.enableLog)
+        diary off;
+    end
     %% ====================================================================
     
 end

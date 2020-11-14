@@ -15,7 +15,7 @@ function HT = adaHypoTreatmentsHandler(G,CHO,bolus,basal,time,timeIndex)
 %   simulation. Contains one value for each integration step;
 %   - timeIndex: is a number that defines the current time istant in the
 %   replay simulation.
-% Outputs:
+% Output:
 %   - HT: the hypotreatment to administer at time(timeIndex+1) (g/min).
 %
 % ---------------------------------------------------------------------

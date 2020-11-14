@@ -15,7 +15,7 @@ function CB = correctsAbove250Handler(G,CHO,bolus,basal,time,timeIndex)
 %   simulation. Contains one value for each integration step;
 %   - timeIndex: is a number that defines the current time istant in the
 %   replay simulation.
-% Outputs:
+% Output:
 %   - CB: the correction bolus to administer at time(timeIndex+1) (U/min).
 %
 % ---------------------------------------------------------------------

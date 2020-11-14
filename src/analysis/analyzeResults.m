@@ -32,138 +32,88 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
 
     if(environment.verbose)
         tic;
-        fprintf(['Analyzing results...']);
+        fprintf('Analyzing results...');
     end
-
+    
     %Compute glucose control metrics
-    analysis.control.tHypo.median = 100*sum(glucose.median < 70)/length(glucose.median); % [%]
-    analysis.control.tHypo.ci5th = 100*sum(glucose.ci5th < 70)/length(glucose.ci5th); % [%]
-    analysis.control.tHypo.ci25th = 100*sum(glucose.ci25th < 70)/length(glucose.ci25th); % [%]
-    analysis.control.tHypo.ci75th = 100*sum(glucose.ci75th < 70)/length(glucose.ci75th); % [%]
-    analysis.control.tHypo.ci95th = 100*sum(glucose.ci95th < 70)/length(glucose.ci95th); % [%]
     
-    analysis.control.tHyper.median = 100*sum(glucose.median > 180)/length(glucose.median); % [%]
-    analysis.control.tHyper.ci5th = 100*sum(glucose.ci5th > 180)/length(glucose.ci5th); % [%]
-    analysis.control.tHyper.ci25th = 100*sum(glucose.ci25th > 180)/length(glucose.ci25th); % [%]
-    analysis.control.tHyper.ci75th = 100*sum(glucose.ci75th > 180)/length(glucose.ci75th); % [%]
-    analysis.control.tHyper.ci95th = 100*sum(glucose.ci95th > 180)/length(glucose.ci95th); % [%]
+    %Fields to evaluate 
+    fields = {'median','ci5th','ci25th','ci75th','ci95th'};
+    
+    
+    for field = fields
         
-    analysis.control.tEu.median = 100 - analysis.control.tHypo.median - analysis.control.tHyper.median; % [%]
-    analysis.control.tEu.ci5th = 100 - analysis.control.tHypo.ci5th - analysis.control.tHyper.ci5th; % [%]
-    analysis.control.tEu.ci25th = 100 - analysis.control.tHypo.ci25th - analysis.control.tHyper.ci25th; % [%]
-    analysis.control.tEu.ci75th = 100 - analysis.control.tHypo.ci75th - analysis.control.tHyper.ci75th; % [%]
-    analysis.control.tEu.ci95th = 100 - analysis.control.tHypo.ci95th - analysis.control.tHyper.ci95th; % [%]
+        %Time spent in glycemic zones
+        analysis.control.tHypo.(field) = 100*sum(glucose.(field) < 70)/length(glucose.(field)); % [%]
+        analysis.control.tHyper.(field) = 100*sum(glucose.(field) > 180)/length(glucose.(field)); % [%]  
+        analysis.control.tEu.(field) = 100 - analysis.control.tHypo.(field) - analysis.control.tHyper.(field); % [%]
+        
+        %Glycemic variability
+        analysis.control.meanGlucose.(field) = mean(glucose.(field)); % [mg/dl]
+        analysis.control.stdGlucose.(field) = std(glucose.(field)); % [mg/dl]
+        analysis.control.cvGlucose.(field) = 100*analysis.control.stdGlucose.(field)/analysis.control.meanGlucose.(field); % [%]
     
-    analysis.control.meanGlucose.median = mean(glucose.median); % [mg/dl]
-    analysis.control.meanGlucose.ci5th = mean(glucose.ci5th); % [mg/dl]
-    analysis.control.meanGlucose.ci25th = mean(glucose.ci25th); % [mg/dl]
-    analysis.control.meanGlucose.ci75th = mean(glucose.ci75th); % [mg/dl]
-    analysis.control.meanGlucose.ci95th = mean(glucose.ci95th); % [mg/dl]
-    
-    analysis.control.stdGlucose.median = std(glucose.median); % [mg/dl]
-    analysis.control.stdGlucose.ci5th = std(glucose.ci5th); % [mg/dl]
-    analysis.control.stdGlucose.ci25th = std(glucose.ci25th); % [mg/dl]
-    analysis.control.stdGlucose.ci75th = std(glucose.ci75th); % [mg/dl]
-    analysis.control.stdGlucose.ci95th = std(glucose.ci95th); % [mg/dl]
+    end
     
     %Compute "events" metrics
+    
+    %Initialize insulin amount variables 
     totalInsulin = zeros(length(insulinBolus.realizations),1);
     totalBolusInsulin = zeros(length(insulinBolus.realizations),1);
     totalCorrectionBolusInsulin = zeros(length(insulinBolus.realizations),1);
     totalBasalInsulin = zeros(length(insulinBolus.realizations),1);
-    
+    %Initialize CHO amount variables 
     totalCHO = zeros(length(insulinBolus.realizations),1);
     totalHypotreatments = zeros(length(insulinBolus.realizations),1);
-    
+    %Initialize counting variables
     correctionBolusInsulinNumber = zeros(length(insulinBolus.realizations),1);
     hypotreatmentNumber = zeros(length(insulinBolus.realizations),1);
     
     for r = 1:length(insulinBolus.realizations)
         
-        %Compute insulin amounts
+        %Compute insulin amounts for each realization
         totalInsulin(r) = sum(insulinBolus.realizations(:,r)) + sum(insulinBasal.realizations(:,r));
         totalBolusInsulin(r) = sum(insulinBolus.realizations(:,r));
         totalCorrectionBolusInsulin(r) = sum(correctionBolus.realizations(:,r));
         totalBasalInsulin(r) = sum(insulinBasal.realizations(:,r));
         
-        %Compute CHO amounts
+        %Compute CHO amounts for each realization
         totalCHO(r) = sum(CHO.realizations(:,r));
         totalHypotreatments(r) = sum(hypotreatments.realizations(:,r));
         
-        %Compute numbers 
+        %Compute numbers for each realization
         correctionBolusInsulinNumber(r) = length(find(correctionBolus.realizations(:,r)));
         hypotreatmentNumber(r) = length(find(hypotreatments.realizations(:,r)));
         
     end
     
-    analysis.events.totalInsulin.median = median(totalInsulin); %[U]
-    analysis.events.totalInsulin.ci5th = prctile(totalInsulin,5);%[U]
-    analysis.events.totalInsulin.ci25th = prctile(totalInsulin,25);%[U]
-    analysis.events.totalInsulin.ci75th = prctile(totalInsulin,75);%[U]
-    analysis.events.totalInsulin.ci95th = prctile(totalInsulin,95);%[U]
-    
-    analysis.events.totalBolusInsulin.median = median(totalBolusInsulin);      %[U]
-    analysis.events.totalBolusInsulin.ci5th = prctile(totalBolusInsulin,5);%[U]
-    analysis.events.totalBolusInsulin.ci25th = prctile(totalBolusInsulin,25);%[U]
-    analysis.events.totalBolusInsulin.ci75th = prctile(totalBolusInsulin,75);%[U]
-    analysis.events.totalBolusInsulin.ci95th = prctile(totalBolusInsulin,95);%[U]
-    
-    analysis.events.totalCorrectionBolusInsulin.median = median(totalCorrectionBolusInsulin);%[U]
-    analysis.events.totalCorrectionBolusInsulin.ci5th = prctile(totalCorrectionBolusInsulin,5);%[U]
-    analysis.events.totalCorrectionBolusInsulin.ci25th = prctile(totalCorrectionBolusInsulin,25);%[U]
-    analysis.events.totalCorrectionBolusInsulin.ci75th = prctile(totalCorrectionBolusInsulin,75);%[U]
-    analysis.events.totalCorrectionBolusInsulin.ci95th = prctile(totalCorrectionBolusInsulin,95);%[U]
-    
-    analysis.events.totalBasalInsulin.median = median(totalBasalInsulin);%[U]
-    analysis.events.totalBasalInsulin.ci5th = prctile(totalBasalInsulin,5);%[U]
-    analysis.events.totalBasalInsulin.ci25th = prctile(totalBasalInsulin,25);%[U]
-    analysis.events.totalBasalInsulin.ci75th = prctile(totalBasalInsulin,75);%[U]
-    analysis.events.totalBasalInsulin.ci95th = prctile(totalBasalInsulin,95);%[U]
-    
-    analysis.events.totalCHO.median = median(totalCHO);%[g]
-    analysis.events.totalCHO.ci5th = prctile(totalCHO,5);%[g]
-    analysis.events.totalCHO.ci25th = prctile(totalCHO,25);%[g]
-    analysis.events.totalCHO.ci75th = prctile(totalCHO,75);%[g]
-    analysis.events.totalCHO.ci95th = prctile(totalCHO,95);%[g]
-    
-    analysis.events.totalHypotreatments.median = median(totalHypotreatments);%[g]
-    analysis.events.totalHypotreatments.ci5th = prctile(totalHypotreatments,5);%[g]
-    analysis.events.totalHypotreatments.ci25th = prctile(totalHypotreatments,25);%[g]
-    analysis.events.totalHypotreatments.ci75th = prctile(totalHypotreatments,75);%[g]
-    analysis.events.totalHypotreatments.ci95th = prctile(totalHypotreatments,95);%[g]
-    
-    analysis.events.correctionBolusInsulinNumber.median = median(correctionBolusInsulinNumber);%[#]
-    analysis.events.correctionBolusInsulinNumber.ci5th = prctile(correctionBolusInsulinNumber,5);%[#]
-    analysis.events.correctionBolusInsulinNumber.ci25th = prctile(correctionBolusInsulinNumber,25);%[#]
-    analysis.events.correctionBolusInsulinNumber.ci75th = prctile(correctionBolusInsulinNumber,75);%[#]
-    analysis.events.correctionBolusInsulinNumber.ci95th = prctile(correctionBolusInsulinNumber,95);%[#]
-    
-    analysis.events.hypotreatmentNumber.median = median(hypotreatmentNumber);%[#]
-    analysis.events.hypotreatmentNumber.ci5th = prctile(hypotreatmentNumber,5);%[#]
-    analysis.events.hypotreatmentNumber.ci25th = prctile(hypotreatmentNumber,25);%[#]
-    analysis.events.hypotreatmentNumber.ci75th = prctile(hypotreatmentNumber,75);%[#]
-    analysis.events.hypotreatmentNumber.ci95th = prctile(hypotreatmentNumber,95);%[#]
-    
+    p = [50, 5, 25, 75, 95];
+    for f = 1:length(fields)
+        
+        analysis.events.totalInsulin.(fields{f}) = prctile(totalInsulin,p(f)); %[U]
+        analysis.events.totalBolusInsulin.(fields{f})  = prctile(totalBolusInsulin,p(f));%[U]
+        analysis.events.totalCorrectionBolusInsulin.(fields{f}) = prctile(totalCorrectionBolusInsulin,p(f));%[U]
+        analysis.events.totalBasalInsulin.(fields{f}) = prctile(totalBasalInsulin,p(f));%[U]
+        
+        analysis.events.totalCHO.(fields{f}) = prctile(totalCHO,p(f));%[g]
+        analysis.events.totalHypotreatments.(fields{f}) = prctile(totalHypotreatments,p(f));%[g]
+        
+        analysis.events.correctionBolusInsulinNumber.(fields{f}) = prctile(correctionBolusInsulinNumber,p(f));%[#]
+        analysis.events.hypotreatmentNumber.(fields{f}) = prctile(hypotreatmentNumber,p(f));%[#]
+        
+    end
     
     %Compute identification metrics (if modality = 'identification')
     if(strcmp(environment.modality,'identification'))
-        analysis.identification.RMSE.median = sqrt(mean((glucose.median-data.glucose).^2)); % [mg/dl]
-        analysis.identification.RMSE.ci5th = sqrt(mean((glucose.ci5th-data.glucose).^2)); % [mg/dl]
-        analysis.identification.RMSE.ci25th = sqrt(mean((glucose.ci25th-data.glucose).^2)); % [mg/dl]
-        analysis.identification.RMSE.ci75th = sqrt(mean((glucose.ci75th-data.glucose).^2)); % [mg/dl]
-        analysis.identification.RMSE.ci95th = sqrt(mean((glucose.ci95th-data.glucose).^2)); % [mg/dl]
         
-    	analysis.identification.MARD.median = mean(abs(glucose.median-data.glucose)./data.glucose)*100; % [%]
-        analysis.identification.MARD.ci5th = mean(abs(glucose.ci5th-data.glucose)./data.glucose)*100; % [%]
-        analysis.identification.MARD.ci25th = mean(abs(glucose.ci25th-data.glucose)./data.glucose)*100; % [%]
-        analysis.identification.MARD.ci75th = mean(abs(glucose.ci75th-data.glucose)./data.glucose)*100; % [%]
-        analysis.identification.MARD.ci95th = mean(abs(glucose.ci95th-data.glucose)./data.glucose)*100; % [%]
+        for f = fields
         
-        analysis.identification.CEGA.median = clarke(data.glucose,glucose.median); % [%]
-        analysis.identification.CEGA.ci5th = clarke(data.glucose,glucose.ci5th); % [%]
-        analysis.identification.CEGA.ci25th = clarke(data.glucose,glucose.ci25th); % [%]
-        analysis.identification.CEGA.ci75th = clarke(data.glucose,glucose.ci75th); % [%]
-        analysis.identification.CEGA.ci95th = clarke(data.glucose,glucose.ci95th); % [%]
+            analysis.identification.RMSE.(f) = sqrt(mean((glucose.(f)-data.glucose).^2)); % [mg/dl]
+            analysis.identification.MARD.(f) = mean(abs(glucose.(f)-data.glucose)./data.glucose)*100; % [%]
+            analysis.identification.CEGA.(f) = clarke(data.glucose,glucose.(f)); % [%]
+
+        end
+    
     end
     
     if(environment.verbose)

@@ -27,7 +27,7 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
 %   - CHO: a structure containing the input CHO used to obtain glucose
 %   (g/min);
 %   - hypotreatments: a structure containing the input hypotreatments used 
-%   to obtain glucose (g/min);
+%   to obtain glucose (g/min).
 %
 % ---------------------------------------------------------------------
 %
@@ -42,23 +42,26 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
         fprintf(['Replaying scenario...']);
     end
 
-    %Obtain the glicemic realizations using the copula-generated parameter
-    %samples
-    glucose.realizations = zeros(height(data),length(draws.(mcmc.thetaNames{1}).samples));
+    %Obtain the glicemic realizations using the copula-generated parameter samples
     
+    %Initialize the structures
+    glucose.realizations = zeros(height(data),length(draws.(mcmc.thetaNames{1}).samples));
     insulinBolus.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     correctionBolus.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     insulinBasal.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     CHO.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     hypotreatments.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     
+    %For each parameter set...
     for r = 1:length(draws.(mcmc.thetaNames{1}).samples)
         
+        %...set the modelParameter structure to such a set...
         for p = 1:length(mcmc.thetaNames)
             modelParameters.(mcmc.thetaNames{p}) = draws.(mcmc.thetaNames{p}).samples(r);
         end
         modelParameters.kgri = modelParameters.kempt;
         
+        %...and simulate the scenario using the given data
         [G, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,dss);
         glucose.realizations(:,r) = G(1:model.YTS:end);
         insulinBolus.realizations(:,r) = iB;
@@ -69,25 +72,24 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
         
     end
     
-    %Obtain the confidence intervals
+    %Obtain the median glucose trace and confidence intervals
+    glucose.median = zeros(height(data),1);
     glucose.ci25th = zeros(height(data),1);
     glucose.ci75th = zeros(height(data),1);
-    
-    glucose.median = zeros(height(data),1);
-    
     glucose.ci5th = zeros(height(data),1);
     glucose.ci95th = zeros(height(data),1);
     
     for g = 1:length(glucose.median)
-        glucose.ci25th(g) = prctile(glucose.realizations(g,:),25);
-        glucose.ci75th(g) = prctile(glucose.realizations(g,:),75);
         
         glucose.median(g) = prctile(glucose.realizations(g,:),50);
-        
+        glucose.ci25th(g) = prctile(glucose.realizations(g,:),25);
+        glucose.ci75th(g) = prctile(glucose.realizations(g,:),75);
         glucose.ci5th(g) = prctile(glucose.realizations(g,:),5);
         glucose.ci95th(g) = prctile(glucose.realizations(g,:),95);
-    end
         
+    end
+    
+    
     if(environment.verbose)
         time = toc;
         fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
