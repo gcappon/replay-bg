@@ -1,0 +1,3 @@
+[submodule "libs/agata"]
+	path = libs/agata
+	url = https://github.com/gcappon/agata.git
