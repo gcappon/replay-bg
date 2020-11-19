@@ -24,8 +24,8 @@ function [meal] = mealSetup(data,model,modelParameters)
     meal = zeros(model.TIDSTEPS,1);
     
     %Set the meal vector
-    for time = 1:length(0:5:(model.TID-1))
-        meal((1+(time-1)*(5/model.TS)):(time*(5/model.TS))) = data.CHO(time)*1000/modelParameters.BW; %mg/(kg*min)
+    for time = 1:length(0:model.YTS:(model.TID-1))
+        meal((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.CHO(time)*1000/modelParameters.BW; %mg/(kg*min)
     end
     
 end

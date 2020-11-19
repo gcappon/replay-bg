@@ -27,7 +27,7 @@ function [bolus, basal] = insulinSetup(data,model,modelParameters)
     bolus = zeros(model.TIDSTEPS,1);
     
     %Set the basal and bolus vectors
-    for time = 1:length(0:5:(model.TID-1))
+    for time = 1:length(0:model.YTS:(model.TID-1))
         bolus((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.bolus(time)*1000/modelParameters.BW; %mU/(kg*min)
         basal((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.basal(time)*1000/modelParameters.BW; %mU/(kg*min)
     end
