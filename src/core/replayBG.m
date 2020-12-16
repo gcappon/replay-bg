@@ -1,4 +1,4 @@
-function replayBG(modality, data, BW, saveName, varargin)
+function replayBG(modality, data, BW, CR, CF, saveName, varargin)
 % function  replayBG(modality, data, BW, saveName, varargin)
 % Core function of ReplayBG. Can be used to identify ReplayBG model on the
 % given data or to "replay" specific scenarios specified by the given data.
@@ -147,6 +147,9 @@ function replayBG(modality, data, BW, saveName, varargin)
     addRequired(ip,'modality',@(x) modalityValidator(x));
     addRequired(ip,'data',@(x) dataValidator(x));
     addRequired(ip,'BW',@(x) BWValidator(x));
+    addRequired(ip,'CR',@(x) BWValidator(x));
+    addRequired(ip,'CF',@(x) BWValidator(x));
+    
     addRequired(ip,'saveName',@(x) saveNameValidator(x));
     addParameter(ip,'glucoseModel','IG',@(x) glucoseModelValidator(x)); %default = 'IG'
     addParameter(ip,'sampleTime',5,@(x) sampleTimeValidator(x)); % default = 5
@@ -173,7 +176,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     addParameter(ip,'verbose',1,@(x) verboseValidator(x)); % default = 1
     
     %Parse the input arguments
-    parse(ip,modality,data,BW,saveName,varargin{:});
+    parse(ip,modality,data,BW,CR,CF,saveName,varargin{:});
     
     %Isolate data and BW from the results
     data = ip.Results.data;

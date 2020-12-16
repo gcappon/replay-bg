@@ -31,9 +31,9 @@ function valid = correctionBolusesHandlerValidator(correctionBolusesHandler,moda
         error("Handler does not have the proper number of inputs (must be 1).");
     end
     
-    valid = valid && nargin(correctionBolusesHandler) == 6;
+    valid = valid && nargin(correctionBolusesHandler) == 7;
     if(~valid)
-        error("Handler does not have the proper number of outputs (must be 6).");
+        error("Handler does not have the proper number of outputs (must be 7).");
     end
     
 end

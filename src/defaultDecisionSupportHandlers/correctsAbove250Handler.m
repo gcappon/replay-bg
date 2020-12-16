@@ -1,4 +1,4 @@
-function CB = correctsAbove250Handler(G,CHO,bolus,basal,time,timeIndex)
+function CB = correctsAbove250Handler(G,CHO,bolus,basal,time,timeIndex,dss)
 % function  correctsAbove250Handler(G,CHO,bolus,basal,time,timeIndex)
 % Implements the default correction bolus strategy: "take a correction
 % bolus of 1 U every 1 hour while above 250 mg/dl".
@@ -29,11 +29,11 @@ function CB = correctsAbove250Handler(G,CHO,bolus,basal,time,timeIndex)
     CB = 0;
     
     %If glucose is greater than 250...
-    if(G > 250)
+    if(G(timeIndex) > 250)
         
         %...and if there are no boluses in the last 1 hour, then take a CB
         if(timeIndex > 60 && ~any(bolus((timeIndex - 60):timeIndex)))
-            CB = 1; % g/min
+            CB = 1; % U/min
         end
         
     end

@@ -59,17 +59,17 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
     %mcmc.stdMin = [0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
     
     %REAL DATA 
-    %mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','kd','ka2','beta'}; %names of the parameters to identify
-    %mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3, 0.5]; %initial guess for the SD of each parameter
-    %mcmc.theta0 = [SG0, SI0, Gb0, p20, kempt0, kabs0, kd0, ka20, beta0]; %initial guess for the parameter values...
-    %mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 5e-3, 5e-3, 1]*inf; %initial guess for the SD of each parameter
-    %mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0, 0.25]; %minimum allowed SD of each parameter
+    mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','kd','ka2','beta'}; %names of the parameters to identify
+    mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3, 0.5]; %initial guess for the SD of each parameter
+    mcmc.theta0 = [SG0, SI0, Gb0, p20, kempt0, kabs0, kd0, ka20, beta0]; %initial guess for the parameter values...
+    mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 5e-3, 5e-3, 1]*inf; %initial guess for the SD of each parameter
+    mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0, 0.25]; %minimum allowed SD of each parameter
     
 
     %Assign the block of each parameter (for Single-Component M-H)
     mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3]; 
     %mcmc.parBlock = [1, 1, 1, 2, 2]; 
-    %mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3, 2]; 
+    mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3, 2]; 
     
     %Set the number of blocks
     mcmc.nBlocks = max(mcmc.parBlock);

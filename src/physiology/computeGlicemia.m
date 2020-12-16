@@ -45,7 +45,7 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
           data.glucose(1)];                                                                                    %IG(0)                                                                                    
     
     %Initialize the glucose vector
-    G = zeros(model.TIDSTEPS,1);
+    G = nan(model.TIDSTEPS,1);
     
     %Set the initial glucose value
     switch(model.glucoseModel)
@@ -80,13 +80,14 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
     correctionBolus = insulinBolus*0;
     CHO = meal/1000*mP.BW;
     hypotreatments = CHO*0;
+    glucose = CHO*nan;
     
     %Simulate the physiological model
     for k = 2:model.TIDSTEPS
         
         %Add hypotreatments if needed
         if(dss.enableHypoTreatments)
-            HT = feval(dss.hypoTreatmentsHandler,G(k-1),CHO,insulinBolus,insulinBasal,time,k-1);
+            HT = feval(dss.hypoTreatmentsHandler,G,CHO,insulinBolus,insulinBasal,time,k-1,dss);
             mealDelayed(k) = mealDelayed(k) + HT*1000/mP.BW;
             
             %Update the CHO event vectors
@@ -97,7 +98,7 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
         %Add correction boluses if needed (remember to add insulin
         %absorption delay to the boluses)
         if(dss.enableCorrectionBoluses)
-            CB = feval(dss.correctionBolusesHandler,G(k-1),CHO,insulinBolus,insulinBasal,time,k-1);
+            CB = feval(dss.correctionBolusesHandler,G,CHO,insulinBolus,insulinBasal,time,k-1,dss);
             if(k+mP.tau <= model.TIDSTEPS)
                 bolusDelayed(k+mP.tau) = bolusDelayed(k+mP.tau) + CB*1000/mP.BW;
             end

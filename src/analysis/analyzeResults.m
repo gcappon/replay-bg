@@ -44,14 +44,14 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
     for field = fields
         
         %Time spent in glycemic zones
-        analysis.control.tHypo.(field) = 100*sum(glucose.(field) < 70)/length(glucose.(field)); % [%]
-        analysis.control.tHyper.(field) = 100*sum(glucose.(field) > 180)/length(glucose.(field)); % [%]  
-        analysis.control.tEu.(field) = 100 - analysis.control.tHypo.(field) - analysis.control.tHyper.(field); % [%]
+        analysis.control.tHypo.(field{:}) = 100*sum(glucose.(field{:}) < 70)/length(glucose.(field{:})); % [%]
+        analysis.control.tHyper.(field{:}) = 100*sum(glucose.(field{:}) > 180)/length(glucose.(field{:})); % [%]  
+        analysis.control.tEu.(field{:}) = 100 - analysis.control.tHypo.(field{:}) - analysis.control.tHyper.(field{:}); % [%]
         
         %Glycemic variability
-        analysis.control.meanGlucose.(field) = mean(glucose.(field)); % [mg/dl]
-        analysis.control.stdGlucose.(field) = std(glucose.(field)); % [mg/dl]
-        analysis.control.cvGlucose.(field) = 100*analysis.control.stdGlucose.(field)/analysis.control.meanGlucose.(field); % [%]
+        analysis.control.meanGlucose.(field{:}) = mean(glucose.(field{:})); % [mg/dl]
+        analysis.control.stdGlucose.(field{:}) = std(glucose.(field{:})); % [mg/dl]
+        analysis.control.cvGlucose.(field{:}) = 100*analysis.control.stdGlucose.(field{:})/analysis.control.meanGlucose.(field{:}); % [%]
     
     end
     

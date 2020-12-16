@@ -1,4 +1,4 @@
-function dss = initDecisionSupportSystem(enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler)
+function dss = initDecisionSupportSystem(enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,CR,CF)
 % function  initDecisionSupportSystem(enableHypoTreatments)
 % Initializes the 'dss' core variable.
 %
@@ -32,5 +32,10 @@ function dss = initDecisionSupportSystem(enableHypoTreatments,hypoTreatmentsHand
     %Correction bolus module parameters
     dss.enableCorrectionBoluses = enableCorrectionBoluses;
     dss.correctionBolusesHandler = correctionBolusesHandler;
+    
+    %DSS therapy parameters
+    dss.CR = CR;
+    dss.CF = CF;
+    dss.GT = 120;
     
 end
