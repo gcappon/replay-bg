@@ -34,7 +34,10 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
         tic;
         fprintf('Analyzing results...');
     end    
-    
+
+    %Add libs to the current path
+    addpath(genpath(fullfile(environment.replayBGPath,'libs','agata','src'))); %AGATA will be used to analyze the resulting glucose profile
+
     %Fields to evaluate 
     fields = {'median','ci5th','ci25th','ci75th','ci95th'};
 
@@ -118,6 +121,9 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
     
     end
     
+    %remove AGATA to avoid conflicts
+    rmpath(genpath(fullfile(environment.replayBGPath,'libs','agata','src'))); %AGATA will be used to analyze the resulting glucose profile
+
     if(environment.verbose)
         time = toc;
         fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);

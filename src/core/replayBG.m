@@ -240,6 +240,7 @@ function replayBG(modality, data, BW, CR, CF, saveName, varargin)
     
     if(environment.enableLog)
         diary off;
+        
     end
     %% ====================================================================
     
