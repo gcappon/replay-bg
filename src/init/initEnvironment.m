@@ -75,6 +75,9 @@ function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,ena
         delete(environment.logFile);
     end % if log
     
+    %Add libs to the current path
+    addpath(genpath(fullfile(environment.replayBGPath,'libs','agata','src'))); %AGATA will be used to analyze the resulting glucose profile
+
     %Set the verbosity
     environment.plotMode = plotMode; % if 0 do not plot 
     environment.enableLog = enableLog; % if 0 do not log 

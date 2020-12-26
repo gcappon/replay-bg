@@ -201,8 +201,16 @@ function replayBG(modality, data, BW, CR, CF, saveName, varargin)
     
     %% ================ Plotting results ==================================
     if(environment.plotMode)
+        
+        %Replay overview
         plotReplayBGResults(glucose,data,environment);
-        plotCEGA(glucose.median,data.glucose,0);
+        
+        %Convert the profile to a timetable to comply with AGATA
+        dataHat = glucoseVectorToTimetable(glucose.median,minutes(data.Time(2)-data.Time(1)),data.Time(1));
+        
+        %Clarke's Error Grid
+        plotClarkeErrorGrid(data,dataHat,0);
+        
     end
     %% ====================================================================
     
@@ -221,6 +229,7 @@ function replayBG(modality, data, BW, CR, CF, saveName, varargin)
         save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','model','dss',...
             'glucose','insulinBolus', 'insulinBasal', 'CHO',...
+            'correctionBolus', 'hypotreatments',...
             'analysis');
     end
     

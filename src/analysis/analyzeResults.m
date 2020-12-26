@@ -33,29 +33,23 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
     if(environment.verbose)
         tic;
         fprintf('Analyzing results...');
-    end
-    
-    %Compute glucose control metrics
+    end    
     
     %Fields to evaluate 
     fields = {'median','ci5th','ci25th','ci75th','ci95th'};
-    
-    
+
+    %Evaluate
     for field = fields
         
-        %Time spent in glycemic zones
-        analysis.control.tHypo.(field{:}) = 100*sum(glucose.(field{:}) < 70)/length(glucose.(field{:})); % [%]
-        analysis.control.tHyper.(field{:}) = 100*sum(glucose.(field{:}) > 180)/length(glucose.(field{:})); % [%]  
-        analysis.control.tEu.(field{:}) = 100 - analysis.control.tHypo.(field{:}) - analysis.control.tHyper.(field{:}); % [%]
+        %Transform the glucose profile under examination into a timetable
+        glucoseProfile = glucoseVectorToTimetable(glucose.(field{:}),minutes(data.Time(2)-data.Time(1)));
         
-        %Glycemic variability
-        analysis.control.meanGlucose.(field{:}) = mean(glucose.(field{:})); % [mg/dl]
-        analysis.control.stdGlucose.(field{:}) = std(glucose.(field{:})); % [mg/dl]
-        analysis.control.cvGlucose.(field{:}) = 100*analysis.control.stdGlucose.(field{:})/analysis.control.meanGlucose.(field{:}); % [%]
-    
+        %Analyze the glucose profile
+        analysis.(field{:}) = analyzeGlucoseProfile(glucoseProfile);
+        
     end
     
-    %Compute "events" metrics
+    % ---------- Compute also insulin and meal "events" metrics
     
     %Initialize insulin amount variables 
     totalInsulin = zeros(length(insulinBolus.realizations),1);
@@ -90,27 +84,35 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
     p = [50, 5, 25, 75, 95];
     for f = 1:length(fields)
         
-        analysis.events.totalInsulin.(fields{f}) = prctile(totalInsulin,p(f)); %[U]
-        analysis.events.totalBolusInsulin.(fields{f})  = prctile(totalBolusInsulin,p(f));%[U]
-        analysis.events.totalCorrectionBolusInsulin.(fields{f}) = prctile(totalCorrectionBolusInsulin,p(f));%[U]
-        analysis.events.totalBasalInsulin.(fields{f}) = prctile(totalBasalInsulin,p(f));%[U]
+        analysis.(fields{f}).event.totalInsulin = prctile(totalInsulin,p(f)); %[U]
+        analysis.(fields{f}).event.totalBolusInsulin  = prctile(totalBolusInsulin,p(f));%[U]
+        analysis.(fields{f}).event.totalCorrectionBolusInsulin = prctile(totalCorrectionBolusInsulin,p(f));%[U]
+        analysis.(fields{f}).event.totalBasalInsulin = prctile(totalBasalInsulin,p(f));%[U]
         
-        analysis.events.totalCHO.(fields{f}) = prctile(totalCHO,p(f));%[g]
-        analysis.events.totalHypotreatments.(fields{f}) = prctile(totalHypotreatments,p(f));%[g]
+        analysis.(fields{f}).event.totalCHO = prctile(totalCHO,p(f));%[g]
+        analysis.(fields{f}).event.totalHypotreatments = prctile(totalHypotreatments,p(f));%[g]
         
-        analysis.events.correctionBolusInsulinNumber.(fields{f}) = prctile(correctionBolusInsulinNumber,p(f));%[#]
-        analysis.events.hypotreatmentNumber.(fields{f}) = prctile(hypotreatmentNumber,p(f));%[#]
+        analysis.(fields{f}).event.correctionBolusInsulinNumber = prctile(correctionBolusInsulinNumber,p(f));%[#]
+        analysis.(fields{f}).event.hypotreatmentNumber = prctile(hypotreatmentNumber,p(f));%[#]
         
     end
     
-    %Compute identification metrics (if modality = 'identification')
+    %  ---------- Compute identification error metrics (if modality = 'identification')
+    
     if(strcmp(environment.modality,'identification'))
         
-        for f = fields
-        
-            analysis.identification.RMSE.(f) = sqrt(mean((glucose.(f)-data.glucose).^2)); % [mg/dl]
-            analysis.identification.MARD.(f) = mean(abs(glucose.(f)-data.glucose)./data.glucose)*100; % [%]
-            analysis.identification.CEGA.(f) = clarke(data.glucose,glucose.(f)); % [%]
+        for field = fields
+            
+            %Transform the glucose profile under examination into a timetable
+            dataHat = glucoseVectorToTimetable(glucose.(field{:}),minutes(data.Time(2)-data.Time(1)),data.Time(1));
+            
+            analysis.(field{:}).identification.RMSE = rmse(data,dataHat); % [mg/dl]
+            analysis.(field{:}).identification.MARD = mard(data,dataHat); 
+            analysis.(field{:}).identification.CEGA = clarke(data,dataHat); % [%]
+            analysis.(field{:}).identification.MAD = mad(data,dataHat); % [%]
+            analysis.(field{:}).identification.COD = cod(data,dataHat); % [%]
+            analysis.(field{:}).identification.GRMSE = gRMSE(data,dataHat); % [%]
+            analysis.(field{:}).identification.DELAY = timeDelay(data,dataHat); % [%]
 
         end
     
