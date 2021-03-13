@@ -112,7 +112,6 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
             analysis.(field{:}).identification.RMSE = rmse(data,dataHat); % [mg/dl]
             analysis.(field{:}).identification.MARD = mard(data,dataHat); 
             analysis.(field{:}).identification.CEGA = clarke(data,dataHat); % [%]
-            analysis.(field{:}).identification.MAD = mad(data,dataHat); % [%]
             analysis.(field{:}).identification.COD = cod(data,dataHat); % [%]
             analysis.(field{:}).identification.GRMSE = gRMSE(data,dataHat); % [%]
             analysis.(field{:}).identification.DELAY = timeDelay(data,dataHat); % [%]
@@ -120,9 +119,6 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
         end
     
     end
-    
-    %remove AGATA to avoid conflicts
-    rmpath(genpath(fullfile(environment.replayBGPath,'libs','agata','src'))); %AGATA will be used to analyze the resulting glucose profile
 
     if(environment.verbose)
         time = toc;

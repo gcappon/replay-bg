@@ -20,7 +20,7 @@ function prior = definePriorPDF()
     %sensitivity from oral test: validation with a tracer method.
     prior.SG = @(mP) lognpdf(mP.SG,-3.8,0.5);
     prior.p2 = @(mP) normpdf(sqrt(mP.p2),0.11,0.004)*(mP.p2>0);
-    prior.Gb = @(mP) normpdf(mP.Gb,119.13,7.11)*(mP.Gb<=140)*(mP.Gb>=100);
+    prior.Gb = @(mP) normpdf(mP.Gb,119.13,7.11)*(mP.Gb<=180)*(mP.Gb>=70);
     prior.r1 = @(mP) (mP.r1>=0)*normpdf(mP.r1,1.4407,0.0562);
     prior.r2 = @(mP) (mP.r2>=0)*normpdf(mP.r2,0.8124,0.0171);
     prior.alpha = @(mP) 1*(mP.alpha>0);
