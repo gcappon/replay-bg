@@ -167,8 +167,8 @@ function replayBG(modality, data, BW, saveName, varargin)
     addParameter(ip,'preFilterData',0, @(x) preFilterDataValidator(x,modality)); % default = 0
     addParameter(ip,'saveChains',1, @(x) saveChainsValidator(x,modality)); % default = 1
     
-    addParameter(ip,'CR',nan, @(x) crValidator(x,modality)); % default = nan
-    addParameter(ip,'CF',nan, @(x) cfValidator(x,modality)); % default = nan
+    addParameter(ip,'CR',nan, @(x) crValidator(x)); % default = nan
+    addParameter(ip,'CF',nan, @(x) cfValidator(x)); % default = nan
     
     addParameter(ip,'enableHypoTreatments',0, @(x) enableHypoTreatmentsValidator(x,modality)); % default = 0
     addParameter(ip,'hypoTreatmentsHandler','adaHypoTreatmentsHandler', @(x) hypoTreatmentsHandlerValidator(x,modality)); % default = 'adaHypoTreatmentsHandler'
