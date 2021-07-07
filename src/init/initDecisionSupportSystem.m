@@ -1,8 +1,12 @@
-function dss = initDecisionSupportSystem(enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler)
+function dss = initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler)
 % function  initDecisionSupportSystem(enableHypoTreatments)
 % Initializes the 'dss' core variable.
 %
 % Inputs:
+%   - CR: the carbohydrate-to-insulin ratio of the patient in g/U to be 
+%   used by the integrated decision support system;
+%   - CF: the correction factor of the patient in mg/dl/U to be used by the 
+%   integrated decision support system;
 %   - enableHypoTreatments: a numerical flag that specifies whether to 
 %   enable hypotreatments during the replay of a given scenario;
 %   - hypoTreatmentsHandler: a vector of characters that specifies the
@@ -24,6 +28,10 @@ function dss = initDecisionSupportSystem(enableHypoTreatments,hypoTreatmentsHand
 % This file is part of ReplayBG.
 %
 % ---------------------------------------------------------------------
+    
+    %Patient therapy parameters
+    dss.CR = CR;
+    dss.CF = CF;
     
     %Hypotreatment module parameters
     dss.enableHypoTreatments = enableHypoTreatments;

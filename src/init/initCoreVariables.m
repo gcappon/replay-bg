@@ -52,7 +52,8 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
     end
     
     %Initialize the decision support system hyperparameters
-    dss = initDecisionSupportSystem(ip.Results.enableHypoTreatments,ip.Results.hypoTreatmentsHandler,...
+    dss = initDecisionSupportSystem(ip.Results.CR, ip.Results.CF,...
+        ip.Results.enableHypoTreatments,ip.Results.hypoTreatmentsHandler,...
         ip.Results.enableCorrectionBoluses,ip.Results.correctionBolusesHandler);
     
     if(environment.verbose && strcmp(environment.modality,'replay'))

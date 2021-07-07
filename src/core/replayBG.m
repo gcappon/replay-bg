@@ -59,6 +59,10 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   - enableHypoTreatments: (optional, default: 0) a numerical flag that
 %   specifies whether to enable hypotreatments during the replay of a given
 %   scenario. Can be 0 or 1. Can be set only when modality is 'replay';
+%   - CR: (optional, default: nan) the carbohydrate-to-insulin ratio of the
+%   patient in g/U to be used by the integrated decision support system;
+%   - CF: (optional, default: nan) the correction factor of the
+%   patient in mg/dl/U to be used by the integrated decision support system;
 %   - hypoTreatmentsHandler: (optional, default:
 %   'adaHypoTreatmentsHandler') a vector of characters that specifies the
 %   name of the function handler that implements an hypotreatment strategy
@@ -162,6 +166,9 @@ function replayBG(modality, data, BW, saveName, varargin)
     addParameter(ip,'bayesianEstimator','mean', @(x) bayesianEstimatorValidator(x,modality)); % default = 'mean'
     addParameter(ip,'preFilterData',0, @(x) preFilterDataValidator(x,modality)); % default = 0
     addParameter(ip,'saveChains',1, @(x) saveChainsValidator(x,modality)); % default = 1
+    
+    addParameter(ip,'CR',nan, @(x) crValidator(x,modality)); % default = nan
+    addParameter(ip,'CF',nan, @(x) cfValidator(x,modality)); % default = nan
     
     addParameter(ip,'enableHypoTreatments',0, @(x) enableHypoTreatmentsValidator(x,modality)); % default = 0
     addParameter(ip,'hypoTreatmentsHandler','adaHypoTreatmentsHandler', @(x) hypoTreatmentsHandlerValidator(x,modality)); % default = 'adaHypoTreatmentsHandler'
