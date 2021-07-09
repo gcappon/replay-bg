@@ -1,4 +1,4 @@
-function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
+function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, physioCheck] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
 % function  replayScenario(data,modelParameters,draws,environment,model,mcmc)
 % Replays the given scenario defined by the given data.
 %
@@ -52,6 +52,7 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
     CHO.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     hypotreatments.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     
+    physioCheck = zeros(length(draws.(mcmc.thetaNames{1}).samples),1);
     %For each parameter set...
     for r = 1:length(draws.(mcmc.thetaNames{1}).samples)
         
@@ -60,6 +61,10 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
             modelParameters.(mcmc.thetaNames{p}) = draws.(mcmc.thetaNames{p}).samples(r);
         end
         modelParameters.kgri = modelParameters.kempt;
+        
+        %...check model parameter physiological plausibility...
+        check = checkIdentifiedParameters(modelParameters);
+        physioCheck(r) = all(struct2array(check));
         
         %...and simulate the scenario using the given data
         [G, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,dss);

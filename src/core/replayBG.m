@@ -197,7 +197,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     %% ====================================================================
     
     %% ================ Replay of the scenario ============================
-    [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss);
+    [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,physioCheck] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss);
     %% ====================================================================
     
     %% ================ Analyzing results =================================
@@ -229,13 +229,13 @@ function replayBG(modality, data, BW, saveName, varargin)
         save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','mcmc','model','dss',...
             'glucose','insulinBolus', 'insulinBasal', 'CHO',...
-            'analysis');
+            'analysis','physioCheck');
     else
         save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','model','dss',...
             'glucose','insulinBolus', 'insulinBasal', 'CHO',...
             'correctionBolus', 'hypotreatments',...
-            'analysis');
+            'analysis','physioCheck');
     end
     
     if(environment.verbose)
