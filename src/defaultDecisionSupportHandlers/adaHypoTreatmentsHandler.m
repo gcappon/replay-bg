@@ -33,7 +33,7 @@ function HT = adaHypoTreatmentsHandler(G,CHO,bolus,basal,time,timeIndex,dss)
         
         %...and if there are no CHO intakes in the last 15 minutes, then take an HT
         if(timeIndex > 15 && ~any(CHO((timeIndex - 15):timeIndex)))
-            HT = 10; % g/min
+            HT = 15; % g/min
         end
         
     end

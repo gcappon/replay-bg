@@ -176,7 +176,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
                 [G, ~, ~, ~, ~, ~, x] = computeGlicemia(mP,data,model,dss);
                 G = G(1:(model.YTS/model.TS):end);
 
-                subplot(3,1,1:2)
+                subplot(5,1,1:3)
                 plot(data.Time,y,'r-*','linewidth',2);
                 hold on
 
@@ -189,16 +189,25 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
                 xlabel('Time');
                 ylabel('Glucose (mg/dl)');
                 
-                subplot(3,1,3)
-                plot(pHat.SI(1:run),'-*','linewidth',2);
+                subplot(5,1,4)
+                
+                
+                stem(data.Time,data.bolus,'k^','linewidth',2);
+                ylabel('Bolus (U/min))');
                 hold on
-                legend SI 
+                legend Bolus 
                 hold off
-                title(['SI: ' num2str(mP.SI) '; stdSI: ' num2str(mcmc.covar{1}(2,2))] );
                 grid on
                 
-                xlabel('Run #');
-                ylabel('SI (mL/(uU*min))');
+                subplot(5,1,5)
+                stem(data.Time,data.CHO,'k^','linewidth',2);
+                hold on
+                legend CHO 
+                hold off
+                grid on
+                
+                xlabel('Iteration #');
+                ylabel('CHO (g/min)');
                 
                 pause(1e-6);
                 
