@@ -1,4 +1,4 @@
-function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy, bayesianEstimator,preFilterData, saveChains, adaptiveSCMH)
+function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy, bayesianEstimator,preFilterData, saveChains, adaptiveSCMH,environment,model)
 % function  initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy)
 % Initializes the 'mcmc' core variable. 
 %
@@ -22,7 +22,11 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
 %   future analysis or not.
 %   - adaptiveSCMH: a numerical flag that specifies whether to make the 
 %   Single Components Metropolis Hastings algorithm adaptive or 
-%   non-adaptive. 
+%   non-adaptive;
+%   - environment: a structure that contains general parameters to be used
+%   by ReplayBG;
+%   - model: a structure that contains general parameters of the
+%   physiological model.
 % Outputs:
 %   - mcmc: a structure that contains the hyperparameters of the MCMC
 %   identification procedure.
@@ -35,41 +39,88 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
 %
 % ---------------------------------------------------------------------
     
-    SG0 = 2.5e-2;
-    SI0 = 10.35e-4/1.45;
-    Gb0 = 119.13;
-    p20 = 0.012;
-    kempt0 = 0.18;
-    kabs0 = 0.012;
-    ka20 = 0.014;
-    kd0 = 0.026;
-    beta0 = 15;
+    %Type 1 diabetes initial conditions
     
-    mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','kd','ka2'}; %names of the parameters to identify
-    mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3]; %initial guess for the SD of each parameter
-    mcmc.theta0 = [SG0, SI0, Gb0, p20, kempt0, kabs0, kd0, ka20]; %initial guess for the parameter values...
-    mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 5e-3, 5e-3]*inf; %initial guess for the SD of each parameter
-    mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
-    
-    %It works on pete-jacobs simulator data
-    %mcmc.thetaNames = {'SG','SI','p2','kempt','kabs'}; %names of the parameters to identify
-    %mcmc.std = [5e-4, 1e-6, 1e-3, 5e-3, 1e-3]; %initial guess for the SD of each parameter
-    %mcmc.theta0 = [SG0, SI0, p20, kempt0, kabs0]; %initial guess for the parameter values...
-    %mcmc.stdMax = [1e-3, 1e-5, 2e-3, 1e-2, 5e-3]; %initial guess for the SD of each parameter
-    %mcmc.stdMin = [0, 0, 0, 0, 0]; %minimum allowed SD of each parameter
-    
-    %REAL DATA 
-    mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','kd','ka2','beta'}; %names of the parameters to identify
-    mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3, 0.5]; %initial guess for the SD of each parameter
-    mcmc.theta0 = [SG0, SI0, Gb0, p20, kempt0, kabs0, kd0, ka20, beta0]; %initial guess for the parameter values...
-    mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 5e-3, 5e-3, 1]*inf; %initial guess for the SD of each parameter
-    mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0, 0.25]; %minimum allowed SD of each parameter
-    
+    switch(model.pathology)
+        case 't1d'
+            
+            switch(environment.scenario)
+                case 'single-meal'
+                    SG0 = 2.5e-2;
+                    SI0 = 10.35e-4/1.45;
+                    Gb0 = 119.13;
+                    p20 = 0.012;
+                    kempt0 = 0.18;
+                    kabs0 = 0.012;
+                    ka20 = 0.014;
+                    kd0 = 0.026;
+                    beta0 = 15;
 
-    %Assign the block of each parameter (for Single-Component M-H)
-    mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3]; 
-    %mcmc.parBlock = [1, 1, 1, 2, 2]; 
-    mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3, 2]; 
+                    %MCMC vectors assignment
+                    mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','kd','ka2','beta'}; %names of the parameters to identify
+                    mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3, 0.5]; %initial guess for the SD of each parameter
+                    mcmc.theta0 = [SG0, SI0, Gb0, p20, kempt0, kabs0, kd0, ka20, beta0]; %initial guess for the parameter values...
+                    mcmc.stdMax = [1e-3, 1e-5, 2, 2e-3, 1e-2, 5e-3, 5e-3, 5e-3, 1]*inf; %initial guess for the SD of each parameter
+                    mcmc.stdMin = [0, 0, 0, 0, 0, 0, 0, 0, 0.25]; %minimum allowed SD of each parameter
+                    
+                    %Assign the block of each parameter (for Single-Component M-H)
+                    mcmc.parBlock = [1, 1, 1, 2, 2, 2, 3, 3, 2]; 
+    
+                case 'multi-meal'
+                    SG0 = 2.5e-2;
+                    SIB0 = 10.35e-4/1.45;
+                    SIL0 = 10.35e-4/1.45;
+                    SID0 = 10.35e-4/1.45;
+                    Gb0 = 119.13;
+                    p20 = 0.012;
+                    kempt0 = 0.18;
+                    kabsB0 = 0.012;
+                    kabsL0 = 0.012;
+                    kabsD0 = 0.012;
+                    kabsS0 = 0.012;
+                    kabsH0 = 0.012;
+                    ka20 = 0.014;
+                    kd0 = 0.026;
+                    betaB0 = 15;
+                    betaL0 = 15;
+                    betaD0 = 15;
+                    betaS0 = 15;
+                    betaH0 = 15;
+
+                    %MCMC vectors assignment
+                    mcmc.thetaNames = {'SG','SIB','SIL','SID','Gb','p2',...
+                        'kempt','kabsB','kabsL','kabsD','kabsS','kabsH',...
+                        'kd','ka2',...
+                        'betaB'}; %names of the parameters to identify
+                    mcmc.std = [5e-4, 1e-6, 1e-6, 1e-6, 1, 1e-3,...
+                        5e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3,...
+                        1e-3, 1e-3,...
+                        0.5]; %initial guess for the SD of each parameter
+                    mcmc.theta0 = [SG0, SIB0, SIL0, SID0, Gb0, p20,...
+                        kempt0, kabsB0, kabsL0, kabsD0, kabsS0, kabsH0,...
+                        kd0, ka20,...
+                        betaB0,betaL0,betaD0,betaS0,betaH0]; %initial guess for the parameter values...
+                    mcmc.stdMax = [1e-3, 1e-5, 1e-5, 1e-5, 2, 2e-3,...
+                        1e-2, 5e-3, 5e-3, 5e-3, 5e-3, 5e-3,...
+                        5e-3, 5e-3,...
+                        1, 1, 1, 1, 1]*inf; %initial guess for the SD of each parameter
+                    mcmc.stdMin = [0, 0, 0, 0, 0, 0,...
+                        0, 0, 0, 0, 0, 0,...
+                        0, 0,...
+                        0.25, 0.25, 0.25, 0.25, 0.25]; %minimum allowed SD of each parameter
+                    
+                    %Assign the block of each parameter (for Single-Component M-H)
+                    mcmc.parBlock = [1, 1, 1, 1, 1, 2,...
+                        2, 2, 2, 2, 2, 2,...
+                        3, 3,...
+                        4, 4, 4, 4, 4]; 
+            end
+            
+        case 't2d'
+            %TODO: implement t2d model
+        case 'pbh'
+            %TODO: implement pbh model
+    end
     
     %Set the number of blocks
     mcmc.nBlocks = max(mcmc.parBlock);
@@ -108,8 +159,11 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
     
     %Do you want to make Metroplis Adaptive?
     mcmc.adaptiveSCMH = adaptiveSCMH;
-    mcmc.adaptationFrequency = 1000;
-    
-    
+    switch(environment.scenario)
+        case 'single-meal'
+            mcmc.adaptationFrequency = 1000;
+        case 'multi-meal'
+            mcmc.adaptationFrequency = 2000;
+    end
     
 end

@@ -70,7 +70,8 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
         end
 
         mcmc = initMarkovChainMonteCarlo(ip.Results.maxETAPerMCMCRun,ip.Results.maxMCMCIterations,ip.Results.maxMCMCRuns,ip.Results.maxMCMCRunsWithMaxETA,...
-            ip.Results.MCMCTheta0Policy, ip.Results.bayesianEstimator, ip.Results.preFilterData, ip.Results.saveChains, ip.Results.adaptiveSCMH);
+            ip.Results.MCMCTheta0Policy, ip.Results.bayesianEstimator, ip.Results.preFilterData, ip.Results.saveChains, ip.Results.adaptiveSCMH,...
+            environment, model);
 
         if(environment.verbose)
             time = toc;
