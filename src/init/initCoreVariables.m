@@ -38,7 +38,7 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
     end
     
     %Initialize the model hyperparameters
-    model = initModel(data,ip.Results.sampleTime, ip.Results.glucoseModel,ip.Results.pathology, ip.Results.seed);
+    model = initModel(data,ip.Results.sampleTime, ip.Results.glucoseModel,ip.Results.pathology, ip.Results.seed, environment);
     
     if(environment.verbose)
         time = toc;

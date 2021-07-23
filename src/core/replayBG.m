@@ -24,7 +24,7 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   - glucoseModel: (optional, default: 'IG') a vector of characters
 %   that specifies the glucose model to use. Can be 'IG' or 'BG';
 %   - pathology: (optional, default: 't1d') a vector of characters that
-%   specifies the patient pathology. Can be 't1d', 't2d', 'pbh'.
+%   specifies the patient pathology. Can be 't1d', 't2d', 'pbh', 'healthy'.
 %   - scenario: (optional, default: 'single-meal') a vector of characters
 %   that specifies whether the given scenario refers to a single-meal
 %   scenario or a multi-meal scenario. Can be 'single-meal' or

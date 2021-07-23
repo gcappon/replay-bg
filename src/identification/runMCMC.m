@@ -51,15 +51,10 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
     end
     
     %Define the prior probability density functions
-    prior = definePriorPDF();
+    prior = definePriorPDF(model, environment);
     
-    %Parameter starting condition constraints
-    if(mP.kabs>mP.kempt)
-        mP.kabs = mP.kempt;
-    end
-    if(mP.ka2>mP.kd)
-        mP.ka2 = mP.kd;
-    end
+    %Enforce parameter starting condition constraints
+    mP = enforceConstraints(mP);
     
     %Set the measurement vector
     y = data.glucose; 
@@ -82,7 +77,9 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             for p = 1:nPar{block}
                 X{block}(p) = mP.(mcmc.thetaNames{blockIdx(p)});
             end %for p
-            mP.kgri = mP.kempt; %known from the literature
+            
+            %Enforce parameter constraints
+            mP = enforceConstraints(mP,model,environment);
             
             %Compute glicemia given the data and model parameters
             G = computeGlicemia(mP,data,model,dss);
@@ -122,7 +119,9 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             for p = 1:nPar{block}
                 mP.(mcmc.thetaNames{blockIdx(p)}) = Y{block}(p);
             end %for p
-            mP.kgri = mP.kempt; %known from the literature
+
+            %Enforce parameter constraints
+            mP = enforceConstraints(mP,model,environment);
             
             %Compute glicemia given the data and model parameters
             G = computeGlicemia(mP,data,model,dss);
@@ -161,7 +160,9 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
                 mP.(mcmc.thetaNames{blockIdx(p)}) = X{block}(p);
                 pHat.(mcmc.thetaNames{blockIdx(p)})(run) = X{block}(p);
             end %for p
-            mP.kgri = mP.kempt;
+            
+            %Enforce parameter constraints
+            mP = enforceConstraints(mP,model,environment);
             % =============================================================
 
         end %for block

@@ -120,6 +120,8 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
             %TODO: implement t2d model
         case 'pbh'
             %TODO: implement pbh model
+        case 'healthy'
+            %TODO: implement healthy model
     end
     
     %Set the number of blocks

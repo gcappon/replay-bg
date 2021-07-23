@@ -29,43 +29,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
 
     %% ============ Set default parameter values ==========================
     
-        %Initial conditions
-        modelParameters.Xpb = 0; %Insulin action initial condition
-        modelParameters.Qgutb = 0; %Intestinal content initial condition
-
-        %Glucose-insulin submodel parameters
-        modelParameters.VG = 1.45; %dl/kg
-        modelParameters.SG = 2.5e-2; %1/min
-        modelParameters.Gb = 119.13; %mg/dL
-        modelParameters.r1 = 1.4407; %unitless
-        modelParameters.r2 = 0.8124; %unitless
-        modelParameters.alpha = 7; %1/min
-        modelParameters.SI = 10.35e-4/modelParameters.VG; %mL/(uU*min)
-        modelParameters.p2 = 0.012; %1/min
-        modelParameters.u2ss = mean(data.basal)*1000/BW; %mU/(kg*min)
-
-        %Subcutaneous insulin absorption submodel parameters
-        modelParameters.VI = 0.126; %L/kg
-        modelParameters.ke = 0.127; %1/min
-        modelParameters.kd = 0.026; %1/min
-        modelParameters.ka1 = 0.0034; %1/min (virtually 0 in 77% of the cases)
-        modelParameters.ka1 = 0;
-        modelParameters.ka2 = 0.014; %1/min
-        modelParameters.tau = 8; %min
-
-        %Oral glucose absorption submodel parameters
-        modelParameters.kabs = 0.012; % 1/min
-        modelParameters.kgri = 0.18; %=kmax % 1/min
-        modelParameters.kempt = 0.18; %1/min 
-        modelParameters.beta = 0; %min
-        modelParameters.f = 0.9; %dimensionless
-
-        %Patient specific parameters
-        modelParameters.BW = BW; %kg
-
-        %Measurement noise specifics
-        modelParameters.typeN = 'SD';
-        modelParameters.SDn = 5;
+        modelParameters = setDefaultModelParameters(model,enviroment);
     
     %% ========== Run MCMC  ===============================================
         %1. Explorative run to roughly estimate std and initial values
@@ -223,7 +187,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                 end
                 
                 %Remeber to set kgri = kempt (known from the literature)
-                modelParameters.kgri = modelParameters.kempt;
+                modelParameters = enforceConstraints(modelParameters,model,environment);
                 
             case 'map'
                 
@@ -252,7 +216,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                 end
                 
                 %Remeber to set kgri = kempt (known from the literature)
-                modelParameters.kgri = modelParameters.kempt;
+                modelParameters = enforceConstraints(modelParameters,model,environment);
                 
         end
         

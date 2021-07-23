@@ -33,16 +33,7 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
 % ---------------------------------------------------------------------
 
     %Initial model conditions
-    x = zeros(model.nx,model.TIDSTEPS);
-    x(1:9,1) = [data.glucose(1);...                                                                            %G(0)
-          mP.Xpb; ...                                                                                          %X(0)
-          mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
-          (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
-          (mP.ka1/mP.ke)*mP.u2ss/(mP.ka1+mP.kd) + (mP.ka2/mP.ke)*(mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...    %Ip(0) 
-          0; ...                                                                                               %Qsto1(0)
-          0; ...                                                                                               %Qsto2(0)
-          mP.Qgutb; ...                                                                                        %Qgut(0)
-          data.glucose(1)];                                                                                    %IG(0)                                                                                    
+    x = setModelInitialConditions(mP,model,environment);
     
     %Initialize the glucose vector
     G = nan(model.TIDSTEPS,1);
@@ -50,11 +41,12 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
     %Set the initial glucose value
     switch(model.glucoseModel)
         case 'IG' 
-            G(1) = x(9,1); %y(k) = IG(k)
+            G(1) = x(model.nx,1); %y(k) = IG(k)
         case 'BG'
             G(1) = x(1,1); %y(k) = BG(k)
     end
     
+    %% TODO: change all of this to account for different delayes
     %initialize inputs (basal, bolus, meal) with the initial condition (meal
     %intake + its bolus)
     [bolus, basal] = insulinSetup(data,model,mP);
@@ -70,9 +62,13 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
     bolusDelayed = [zeros(bolusDelay,1); bolus];
     bolusDelayed = bolusDelayed(1:model.TIDSTEPS);
     basalDelayed = basal;
+    %%
     
     %Time vector for DSS
     time = data.Time(1):minutes(1):(data.Time(1) + minutes(length(meal) - 1));
+    
+    %Hour of the day vector for multi-meal simulations
+    hourOfTheDay = hour(data.Time(1):minutes(1):(data.Time(1) + minutes(length(meal) - 1)));
     
     %Initialize the 'event' vectors
     insulinBasal = basal/1000*mP.BW;
@@ -109,12 +105,27 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
         end
 
         %Integration step
-        x(:,k) = modelStep(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
-        
+        switch(model.pathology)
+            case 't1d'
+            
+                switch(environment.scenario)
+                    case 'single-meal'
+                        x(:,k) = modelStepSingleMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                    case 'multi-meal'
+                        x(:,k) = modelStepMultiMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), hourOfTheDay(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                end
+
+            case 't2d'
+                %TODO: implement t2d model
+            case 'pbh'
+                %TODO: implement pbh model
+            case 'healthy'
+                %TODO: implement healthy model
+        end     
         %Get the glucose
         switch(model.glucoseModel)
             case 'IG' 
-                G(k) = x(9,k); %y(k) = IG(k)
+                G(k) = x(model.nx,k); %y(k) = IG(k)
             case 'BG'
                 G(k) = x(1,k); %y(k) = BG(k)
         end   

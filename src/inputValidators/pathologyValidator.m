@@ -28,11 +28,11 @@ function valid = pathologyValidator(pathology)
         error("Must contain a label for every CHO and they must be 'B', 'L', 'D', 'S', or 'H'.");
     end
     
-    expectedPathologies = {'t1d','t2d','pbh'};
+    expectedPathologies = {'t1d','t2d','pbh','healthy'};
 
     valid = any(validatestring(pathology,expectedPathologies));
     if(~valid)
-        error("Must be 't1d', 't2d', or 'pbh'.");
+        error("Must be 't1d', 't2d', 'pbh', or 'healthy'.");
     end
     
     

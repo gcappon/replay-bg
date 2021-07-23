@@ -1,4 +1,4 @@
-function model = initModel(data,sampleTime,glucoseModel, pathology, seed)
+function model = initModel(data,sampleTime,glucoseModel, pathology, seed, environment)
 % function  initModel(data,sampleTime,glucoseModel,seed)
 % Initializes the 'model' core variable.
 %
@@ -9,7 +9,9 @@ function model = initModel(data,sampleTime,glucoseModel, pathology, seed)
 %   model to use;
 %   - pathology: a vector of characters that specifies the pathology 
 %   related to the given data;
-%   - seed: an integer that specifies the random seed. For reproducibility. 
+%   - seed: an integer that specifies the random seed. For reproducibility;
+%   - environment: a structure that contains general parameters to be used
+%   by ReplayBG.
 % Outputs:
 %   - model: a structure that contains general parameters of the
 %   physiological model.
@@ -34,7 +36,23 @@ function model = initModel(data,sampleTime,glucoseModel, pathology, seed)
     model.pathology = pathology; %model selection {'t1d','t2d','pbh'}
     
     %Model dimensionality
-    model.nx = 9; %number of states
+    switch(model.pathology)
+        case 't1d'
+            
+            switch(environment.scenario)
+                case 'single-meal'
+                    model.nx = 9; %number of states
+                case 'multi-meal'
+                    model.nx = 21; %number of states
+            end
+            
+        case 't2d'
+            %TODO: implement t2d model
+        case 'pbh'
+            %TODO: implement pbh model
+        case 'healthy'
+            %TODO: implement healthy model
+    end
     
     %Patient specific parameters
     model.seed = seed;
