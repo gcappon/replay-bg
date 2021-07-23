@@ -1,4 +1,4 @@
-function model = initModel(data,sampleTime,glucoseModel,seed)
+function model = initModel(data,sampleTime,glucoseModel, pathology, seed)
 % function  initModel(data,sampleTime,glucoseModel,seed)
 % Initializes the 'model' core variable.
 %
@@ -7,6 +7,8 @@ function model = initModel(data,sampleTime,glucoseModel,seed)
 %   - sampleTime: an integer that specifies the data sample time;
 %   - glucoseModel: a vector of characters that specifies the glucose 
 %   model to use;
+%   - pathology: a vector of characters that specifies the pathology 
+%   related to the given data;
 %   - seed: an integer that specifies the random seed. For reproducibility. 
 % Outputs:
 %   - model: a structure that contains general parameters of the
@@ -29,6 +31,7 @@ function model = initModel(data,sampleTime,glucoseModel,seed)
     
     %Data hyperparameters
     model.glucoseModel = glucoseModel; %glucose selection {'BG','IG'}
+    model.pathology = pathology; %model selection {'t1d','t2d','pbh'}
     
     %Model dimensionality
     model.nx = 9; %number of states

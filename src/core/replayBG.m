@@ -13,12 +13,22 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   U/min), a column 'bolus' that contains the bolus insulin data (in
 %   U/min), a column 'CHO' that contains the CHO intake data (in
 %   g/min). data MUST be sampled on a homogeneous time grid and MUST not 
-%   contain Nan values. ;
+%   contain Nan values. In case of scenario = 'multi-meal' data MUST also 
+%   contain a column of strings 'choLabel' that contains for each non-zero
+%   value of the 'CHO' column, a character that specifies the type of CHO
+%   intake ('B' for breakfast, 'L' for lunch, 'D' for dinner, 'S' for
+%   snack, 'H' for hypotreatment);
 %   - BW: (required) the patient body weight (kg);
 %   - saveName: (required) a vector of characters used to label, thus identify, each 
 %   output file and result;
 %   - glucoseModel: (optional, default: 'IG') a vector of characters
 %   that specifies the glucose model to use. Can be 'IG' or 'BG';
+%   - pathology: (optional, default: 't1d') a vector of characters that
+%   specifies the patient pathology. Can be 't1d', 't2d', 'pbh'.
+%   - scenario: (optional, default: 'single-meal') a vector of characters
+%   that specifies whether the given scenario refers to a single-meal
+%   scenario or a multi-meal scenario. Can be 'single-meal' or
+%   'multi-meal';
 %   - sampleTime: (optional, default: 5 (min)) an integer that specifies
 %   the data sample time;
 %   - seed: (optional, default: randi([1 1048576])) an integer that
@@ -156,6 +166,10 @@ function replayBG(modality, data, BW, saveName, varargin)
     addParameter(ip,'glucoseModel','IG',@(x) glucoseModelValidator(x)); %default = 'IG'
     addParameter(ip,'sampleTime',5,@(x) sampleTimeValidator(x)); % default = 5
     addParameter(ip,'seed',randi([1 1048576]),@(x) seedValidator(x)); % default = randi([1 1048576])
+    
+    addParameter(ip,'scenario','single-meal',@(x) scenarioValidator(x,data)); %default = 'single-meal'
+    addParameter(ip,'pathology','t1d',@(x) pathologyValidator(x)); %default = 't1d'
+    
     addParameter(ip,'maxETAPerMCMCRun',inf,@(x) maxETAPerMCMCRunValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCIterations',inf,@(x) maxMCMCIterationsValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCRuns',inf,@(x) maxMCMCRunsValidator(x, modality)); % default = inf

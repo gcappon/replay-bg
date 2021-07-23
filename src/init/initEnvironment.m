@@ -1,4 +1,4 @@
-function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,enableLog,verbose)
+function environment = initEnvironment(modality,saveName,saveSuffix,scenario, plotMode,enableLog,verbose)
 % function  initEnvironment(modality,saveName,saveSuffix,plotMode,verbose)
 % Initializes the 'environment' core variable.
 %
@@ -10,6 +10,8 @@ function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,ena
 %   output file and result;
 %   - saveSuffix: a vector of characters to be attached as suffix to the 
 %   resulting output files' name;
+%   - scenario: a vector of characters that specifies if the scenario is
+%   single-meal or multi-meal;
 %   - plotMode: a numerical flag that specifies whether to show the plot 
 %   of the results or not;
 %   - enableLog: (optional, default: 1) a numerical flag that specifies
@@ -75,6 +77,8 @@ function environment = initEnvironment(modality,saveName,saveSuffix,plotMode,ena
         delete(environment.logFile);
     end % if log
     
+    %Single-meal or multi-meal scenario?
+    environment.scenario = scenario;
     
     %Set the verbosity
     environment.plotMode = plotMode; % if 0 do not plot 

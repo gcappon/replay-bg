@@ -25,7 +25,7 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
 % ---------------------------------------------------------------------
 
     %Initialize the environment parameters
-    environment = initEnvironment(ip.Results.modality,ip.Results.saveName,ip.Results.saveSuffix, ip.Results.plotMode,ip.Results.enableLog,ip.Results.verbose);
+    environment = initEnvironment(ip.Results.modality,ip.Results.saveName,ip.Results.saveSuffix, ip.Results.scenario, ip.Results.plotMode,ip.Results.enableLog,ip.Results.verbose);
     
     %Start the log file
     if(environment.enableLog)
@@ -38,7 +38,7 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
     end
     
     %Initialize the model hyperparameters
-    model = initModel(data,ip.Results.sampleTime, ip.Results.glucoseModel,ip.Results.seed);
+    model = initModel(data,ip.Results.sampleTime, ip.Results.glucoseModel,ip.Results.pathology, ip.Results.seed);
     
     if(environment.verbose)
         time = toc;
