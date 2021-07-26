@@ -54,7 +54,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
     prior = definePriorPDF(model, environment);
     
     %Enforce parameter starting condition constraints
-    mP = enforceConstraints(mP);
+    mP = enforceConstraints(mP,model,environment);
     
     %Set the measurement vector
     y = data.glucose; 
@@ -82,7 +82,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             mP = enforceConstraints(mP,model,environment);
             
             %Compute glicemia given the data and model parameters
-            G = computeGlicemia(mP,data,model,dss);
+            G = computeGlicemia(mP,data,model,dss,environment);
             G = G(1:(model.YTS/model.TS):end);
             
             %Compute the log-likelihood lX
@@ -124,7 +124,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             mP = enforceConstraints(mP,model,environment);
             
             %Compute glicemia given the data and model parameters
-            G = computeGlicemia(mP,data,model,dss);
+            G = computeGlicemia(mP,data,model,dss,environment);
             G = G(1:(model.YTS/model.TS):end);
             
             %Compute the log-likelihood lY
@@ -174,7 +174,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             
             if(mod(run,100)==0 || run == mcmc.n)
                 
-                [G, ~, ~, ~, ~, ~, x] = computeGlicemia(mP,data,model,dss);
+                [G, ~, ~, ~, ~, ~, x] = computeGlicemia(mP,data,model,dss,environment);
                 G = G(1:(model.YTS/model.TS):end);
 
                 subplot(5,1,1:3)

@@ -1,8 +1,10 @@
-function modelParameters = setDefaultModelParameters(model,environment)
+function modelParameters = setDefaultModelParameters(data,BW,model,environment)
 % function  modelParameters(model, environment)
 % Function that sets the default model parameter values.
 %
 % Input:
+%   - data: timetable which contains the data to be used by the tool;
+%   - BW: the patient's body weight;
 %   - model: a structure that contains general parameters of the
 %   physiological model;
 %   - environment: a structure that contains general parameters to be used

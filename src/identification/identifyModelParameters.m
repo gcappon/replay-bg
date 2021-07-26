@@ -29,7 +29,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
 
     %% ============ Set default parameter values ==========================
     
-        modelParameters = setDefaultModelParameters(model,enviroment);
+        modelParameters = setDefaultModelParameters(data,BW,model,environment);
     
     %% ========== Run MCMC  ===============================================
         %1. Explorative run to roughly estimate std and initial values

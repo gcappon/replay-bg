@@ -1,4 +1,4 @@
-function prior = definePriorPDF(model, enviroment)
+function prior = definePriorPDF(model, environment)
 % function  definePriorPDF()
 % Defines the a priori probability density functions of model parameters.
 %
@@ -49,11 +49,12 @@ function prior = definePriorPDF(model, enviroment)
                         prior.beta = @(mP) 1*(mP.beta>=0 && mP.beta<=60);
                     case 'multi-meal'
                         %Glucose-insulin submodel parameters
-                        prior.SIB = @(mP) gampdf(mP.SI*mP.VG,3.3,5e-4);
-                        prior.SIL = @(mP) gampdf(mP.SI*mP.VG,3.3,5e-4);
-                        prior.SID = @(mP) gampdf(mP.SI*mP.VG,3.3,5e-4); % From: Dalla Man et
+                        prior.SIB = @(mP) gampdf(mP.SIB*mP.VG,3.3,5e-4);
+                        prior.SIL = @(mP) gampdf(mP.SIL*mP.VG,3.3,5e-4);
+                        prior.SID = @(mP) gampdf(mP.SID*mP.VG,3.3,5e-4); % From: Dalla Man et
                         %al.,Minimal model estimation of glucose absorption and insulin
                         %sensitivity from oral test: validation with a tracer method.
+                        
                         prior.SG = @(mP) lognpdf(mP.SG,-3.8,0.5);
                         prior.p2 = @(mP) normpdf(sqrt(mP.p2),0.11,0.004)*(mP.p2>0);
                         prior.Gb = @(mP) normpdf(mP.Gb,119.13,7.11)*(mP.Gb<=180)*(mP.Gb>=70);
@@ -75,7 +76,7 @@ function prior = definePriorPDF(model, enviroment)
                         prior.kabsD = @(mP) lognpdf(mP.kabsD,-5.4591,1.4396)*(mP.kempt>=mP.kabsD);
                         prior.kabsS = @(mP) lognpdf(mP.kabsS,-5.4591,1.4396)*(mP.kempt>=mP.kabsS);
                         prior.kabsH = @(mP) lognpdf(mP.kabsH,-5.4591,1.4396)*(mP.kempt>=mP.kabsH);
-                        prior.kempt = @(mP) lognpdf(mP.kempt,-1.9646,0.7069)*(mP.kempt>=mP.kabs);
+                        prior.kempt = @(mP) lognpdf(mP.kempt,-1.9646,0.7069);
                         prior.betaB = @(mP) 1*(mP.betaB>=0 && mP.betaB<=60);
                         prior.betaL = @(mP) 1*(mP.betaL>=0 && mP.betaL<=60);
                         prior.betaD = @(mP) 1*(mP.betaD>=0 && mP.betaD<=60);

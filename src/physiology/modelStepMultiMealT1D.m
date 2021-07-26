@@ -1,11 +1,15 @@
-function xk = modelStepMultiMealT1D(xkm1,B,CHO,hourOfTheDay,mP,xk,model)
+function xk = modelStepMultiMealT1D(xkm1,B,CHOB,CHOL,CHOD,CHOS,CHOH,hourOfTheDay,mP,xk,model)
 % function  modelStepMultiMealT1D(xkm1,B,CHO,mP,xk,model)
 % Simulates a step of the multi-meal t1d physiological model.
 %
 % Inputs:
 %   - xkm1: is a vector containing the model state at time k-1;
 %   - B: is the insulin at time k;
-%   - CHO: is the CHO at time k;
+%   - CHOB: is the CHO breakfast at time k;
+%   - CHOL: is the CHO lunch at time k;
+%   - CHOD: is the CHO dinner at time k;
+%   - CHOS: is the CHO snack at time k;
+%   - CHOH: is the CHO hypotreatment at time k;
 %   - hourOfTheDay: the hour of the day of the current time step;
 %   - mP: is a struct containing the model parameters;
 %   - xk: is the preallocated vector that will contain the model state at 
@@ -83,31 +87,31 @@ function xk = modelStepMultiMealT1D(xkm1,B,CHO,hourOfTheDay,mP,xk,model)
     risk = computeHypoglycemicRisk(G,mP);
         
     %Compute the model state at time k using backward Euler method
-    xk(6) = (Qsto1B + model.TS*CHO)/(1+model.TS*mP.kgri);
+    xk(6) = (Qsto1B + model.TS*CHOB)/(1+model.TS*mP.kgri);
     xk(7) = (Qsto2B + model.TS*mP.kgri*xk(6))/(1+model.TS*mP.kempt);
     xk(8) = (QgutB + model.TS*mP.kempt*xk(7))/(1+model.TS*mP.kabsB);
     
-    xk(9) = (Qsto1L + model.TS*CHO)/(1+model.TS*mP.kgri);
+    xk(9) = (Qsto1L + model.TS*CHOL)/(1+model.TS*mP.kgri);
     xk(10) = (Qsto2L + model.TS*mP.kgri*xk(9))/(1+model.TS*mP.kempt);
     xk(11) = (QgutL + model.TS*mP.kempt*xk(10))/(1+model.TS*mP.kabsL);
     
-    xk(12) = (Qsto1D + model.TS*CHO)/(1+model.TS*mP.kgri);
+    xk(12) = (Qsto1D + model.TS*CHOD)/(1+model.TS*mP.kgri);
     xk(13) = (Qsto2D + model.TS*mP.kgri*xk(12))/(1+model.TS*mP.kempt);
     xk(14) = (QgutD + model.TS*mP.kempt*xk(13))/(1+model.TS*mP.kabsD);
     
-    xk(15) = (Qsto1S + model.TS*CHO)/(1+model.TS*mP.kgri);
+    xk(15) = (Qsto1S + model.TS*CHOS)/(1+model.TS*mP.kgri);
     xk(16) = (Qsto2S + model.TS*mP.kgri*xk(15))/(1+model.TS*mP.kempt);
     xk(17) = (QgutS + model.TS*mP.kempt*xk(16))/(1+model.TS*mP.kabsS);
     
-    xk(18) = (Qsto1H + model.TS*CHO)/(1+model.TS*mP.kgri);
+    xk(18) = (Qsto1H + model.TS*CHOH)/(1+model.TS*mP.kgri);
     xk(19) = (Qsto2H + model.TS*mP.kgri*xk(18))/(1+model.TS*mP.kempt);
     xk(20) = (QgutH + model.TS*mP.kempt*xk(19))/(1+model.TS*mP.kabsH);
     
-    RaB = mP.f*mP.kabs*xk(8);
-    RaL = mP.f*mP.kabs*xk(11);
-    RaD = mP.f*mP.kabs*xk(14);
-    RaS = mP.f*mP.kabs*xk(17);
-    RaH = mP.f*mP.kabs*xk(20);
+    RaB = mP.f*mP.kabsB*xk(8);
+    RaL = mP.f*mP.kabsL*xk(11);
+    RaD = mP.f*mP.kabsD*xk(14);
+    RaS = mP.f*mP.kabsS*xk(17);
+    RaH = mP.f*mP.kabsH*xk(20);
     
     xk(3) = (Isc1 + model.TS*B)/(1+model.TS*(mP.ka1+mP.kd));
     xk(4) = (Isc2 + model.TS*mP.kd*xk(3))/(1+model.TS*mP.ka2);

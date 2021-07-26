@@ -1,9 +1,10 @@
-function x = setModelInitialConditions(modelParameters,model,environment)
+function x = setModelInitialConditions(data,modelParameters,model,environment)
 % function  setModelInitialConditions(modelParameters,model,environment)
 % Compute the glycemic profile obtained with the ReplayBG physiological
 % model using the given inputs and model parameters.
 %
 % Inputs:
+%   - data: a timetable which contains the data to be used by the tool;
 %   - modelParameters: a struct containing the model parameters;
 %   - model: a structure that contains general parameters of the
 %   physiological model;

@@ -1,4 +1,4 @@
-function HT = adaHypoTreatmentsHandler(G,CHO,bolus,basal,time,timeIndex,dss)
+function HT = adaHypoTreatmentsHandler(G,CHO,hypotreatments,bolus,basal,time,timeIndex,dss)
 % function  adaHypoTreatmentsHandler(G,CHO,bolus,basal,time,timeIndex)
 % Implements the default hypotreatment strategy: "take an hypotreatment of 
 % 10 g every 15 minutes while in hypoglycemia".
@@ -32,7 +32,7 @@ function HT = adaHypoTreatmentsHandler(G,CHO,bolus,basal,time,timeIndex,dss)
     if(G(timeIndex) < 70)
         
         %...and if there are no CHO intakes in the last 15 minutes, then take an HT
-        if(timeIndex > 15 && ~any(CHO((timeIndex - 15):timeIndex)))
+        if(timeIndex > 15 && ~any(hypotreatments((timeIndex - 15):timeIndex)))
             HT = 15; % g/min
         end
         
