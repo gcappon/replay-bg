@@ -65,6 +65,9 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
         y = filtfilt(bFilt,aFilt,y);
     end
     
+    %Identify the non-nan values
+    nonNanIdx = find(~isnan(y));
+    
     %Run MCMC
     for run = 1:mcmc.n
 
@@ -89,9 +92,9 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             N = model.TID/model.YTS;
             switch(mP.typeN)
                 case 'CV'
-                    lX = -(N/2)*log(2*pi)-(N/2)*log(((y.*mP.CVn)^2))-0.5*sum(((G-y)/(y.*mP.CVn)).^2);
+                    lX = -(N/2)*log(2*pi)-(N/2)*log(((y(nonNanIdx).*mP.CVn)^2))-0.5*sum(((G(nonNanIdx)-y(nonNanIdx))/(y(nonNanIdx).*mP.CVn)).^2);
                 case 'SD'
-                    lX = -(N/2)*log(2*pi)-(N/2)*log((mP.SDn^2))-0.5*sum(((G-y)/mP.SDn).^2);
+                    lX = -(N/2)*log(2*pi)-(N/2)*log((mP.SDn^2))-0.5*sum(((G(nonNanIdx)-y(nonNanIdx))/mP.SDn).^2);
             end
             
             %Compute pi(X) by adding the log-prior to lX
@@ -130,9 +133,9 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             %Compute the log-likelihood lY
             switch(mP.typeN)
                 case 'CV'
-                    lY = -(N/2)*log(2*pi)-(N/2)*log(((y.*mP.CVn)^2))-0.5*sum(((G-y)/(y.*mP.CVn)).^2);
+                    lY = -(N/2)*log(2*pi)-(N/2)*log(((y(nonNanIdx).*mP.CVn)^2))-0.5*sum(((G(nonNanIdx)-y(nonNanIdx))/(y(nonNanIdx).*mP.CVn)).^2);
                 case 'SD'
-                    lY = -(N/2)*log(2*pi)-(N/2)*log((mP.SDn^2))-0.5*sum(((G-y)/mP.SDn).^2);
+                    lY = -(N/2)*log(2*pi)-(N/2)*log((mP.SDn^2))-0.5*sum(((G(nonNanIdx)-y(nonNanIdx))/mP.SDn).^2);
             end
             
             %Compute pi(Y) by adding the log-prior to lY

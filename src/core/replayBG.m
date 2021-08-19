@@ -12,7 +12,7 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   mg/dl), a column 'basal' that contains the basal insulin data (in
 %   U/min), a column 'bolus' that contains the bolus insulin data (in
 %   U/min), a column 'CHO' that contains the CHO intake data (in
-%   g/min). data MUST be sampled on a homogeneous time grid and MUST not 
+%   g/min). data MUST be sampled on a homogeneous time grid and MUST, except for the glucose column, not 
 %   contain Nan values. In case of scenario = 'multi-meal' data MUST also 
 %   contain a column of strings 'choLabel' that contains for each non-zero
 %   value of the 'CHO' column, a character that specifies the type of CHO

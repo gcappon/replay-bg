@@ -92,6 +92,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                     warning(['*** ETA greater than the maximum allowed ETA per MCMC run. Setting the number of MCMC iterations so that ETA is equal to the maximum allowed ETA. (Originally: ' num2str(mcmc.n) ', now: ' num2str(limitedN) ')']);
                 end
                 mcmc.n = limitedN;
+                ETA = timeForNmin*mcmc.n/mcmc.raftLewNmin;
                 runWithMaxETA = runWithMaxETA + 1;
             end
             

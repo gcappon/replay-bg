@@ -38,14 +38,13 @@ function [meal, mealDelayed] = mealSetup(data,model,modelParameters,environment)
 
 
             %Add delay of main meal absorption
-            mealDelay = round(mP.beta/model.TS);
+            mealDelay = round(modelParameters.beta/model.TS);
             mealDelayed = [zeros(mealDelay,1); meal];
             mealDelayed = mealDelayed(1:model.TIDSTEPS);
             
         case 'multi-meal'
             %Initialize the meal structure
             meal.breakfast = zeros(model.TIDSTEPS,1);
-            meal.breakfastO = zeros(model.TIDSTEPS,1);
             meal.lunch = zeros(model.TIDSTEPS,1);
             meal.dinner = zeros(model.TIDSTEPS,1);
             meal.snack = zeros(model.TIDSTEPS,1);
@@ -60,20 +59,30 @@ function [meal, mealDelayed] = mealSetup(data,model,modelParameters,environment)
             hIdx = find(data.choLabel == 'H');
             
             %Set the meal vectors
-            for i = bIdx
-                meal.breakfast((1+(i-1)*(model.YTS/model.TS)):(i*(model.YTS/model.TS))) = placeholder*data.CHO(bIdx)*1000/modelParameters.BW + meal.breakfast((1+(i-1)*(model.YTS/model.TS)):(i*(model.YTS/model.TS))); %mg/(kg*min)
+            for i = 1:length(bIdx)
+                meal.breakfast((1+(bIdx(i)-1)*(model.YTS/model.TS)):(bIdx(i)*(model.YTS/model.TS))) = ...
+                    placeholder*data.CHO(bIdx(i))*1000/modelParameters.BW + ...
+                    meal.breakfast((1+(bIdx(i)-1)*(model.YTS/model.TS)):(bIdx(i)*(model.YTS/model.TS))); %mg/(kg*min)
             end
-            for i = lIdx
-                meal.lunch((1+(i-1)*(model.YTS/model.TS)):(i*(model.YTS/model.TS))) = placeholder*data.CHO(lIdx)*1000/modelParameters.BW + meal.lunch((1+(i-1)*(model.YTS/model.TS)):(i*(model.YTS/model.TS))); %mg/(kg*min)
+            for i = 1:length(lIdx)
+                meal.lunch((1+(lIdx(i)-1)*(model.YTS/model.TS)):(lIdx(i)*(model.YTS/model.TS))) = ...
+                    placeholder*data.CHO(lIdx(i))*1000/modelParameters.BW + ...
+                    meal.lunch((1+(lIdx(i)-1)*(model.YTS/model.TS)):(lIdx(i)*(model.YTS/model.TS))); %mg/(kg*min)
             end
-            for i = dIdx
-                meal.dinner((1+(i-1)*(model.YTS/model.TS)):(i*(model.YTS/model.TS))) = placeholder*data.CHO(dIdx)*1000/modelParameters.BW + meal.dinner((1+(i-1)*(model.YTS/model.TS)):(i*(model.YTS/model.TS))); %mg/(kg*min)
+            for i = 1:length(dIdx)
+                meal.dinner((1+(dIdx(i)-1)*(model.YTS/model.TS)):(dIdx(i)*(model.YTS/model.TS))) = ...
+                    placeholder*data.CHO(dIdx(i))*1000/modelParameters.BW + ...
+                    meal.dinner((1+(dIdx(i)-1)*(model.YTS/model.TS)):(dIdx(i)*(model.YTS/model.TS))); %mg/(kg*min)
             end
-            for i = sIdx
-                meal.snack((1+(i-1)*(model.YTS/model.TS)):(i*(model.YTS/model.TS))) = placeholder*data.CHO(sIdx)*1000/modelParameters.BW + meal.snack((1+(i-1)*(model.YTS/model.TS)):(i*(model.YTS/model.TS))); %mg/(kg*min)
+            for i = 1:length(sIdx)
+                meal.snack((1+(sIdx(i)-1)*(model.YTS/model.TS)):(sIdx(i)*(model.YTS/model.TS))) = ...
+                    placeholder*data.CHO(sIdx(i))*1000/modelParameters.BW + ...
+                    meal.snack((1+(sIdx(i)-1)*(model.YTS/model.TS)):(sIdx(i)*(model.YTS/model.TS))); %mg/(kg*min)
             end
-            for i = hIdx
-                meal.hypotreatment((1+(i-1)*(model.YTS/model.TS)):(i*(model.YTS/model.TS))) = placeholder*data.CHO(hIdx)*1000/modelParameters.BW + meal.hypotreatment((1+(i-1)*(model.YTS/model.TS)):(i*(model.YTS/model.TS))); %mg/(kg*min)
+            for i = 1:length(hIdx)
+                meal.hypotreatment((1+(hIdx(i)-1)*(model.YTS/model.TS)):(hIdx(i)*(model.YTS/model.TS))) = ...
+                    placeholder*data.CHO(hIdx(i))*1000/modelParameters.BW + ...
+                    meal.hypotreatment((1+(hIdx(i)-1)*(model.YTS/model.TS)):(hIdx(i)*(model.YTS/model.TS))); %mg/(kg*min)
             end
             
             %Add delay of main meal absorption

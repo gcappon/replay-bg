@@ -1,4 +1,4 @@
-function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy, bayesianEstimator,preFilterData, saveChains, adaptiveSCMH,environment,model)
+function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy, bayesianEstimator,preFilterData, saveChains, adaptiveSCMH,data,environment,model)
 % function  initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy)
 % Initializes the 'mcmc' core variable. 
 %
@@ -23,6 +23,7 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
 %   - adaptiveSCMH: a numerical flag that specifies whether to make the 
 %   Single Components Metropolis Hastings algorithm adaptive or 
 %   non-adaptive;
+%   - data: timetable which contains the data to be used by the tool;
 %   - environment: a structure that contains general parameters to be used
 %   by ReplayBG;
 %   - model: a structure that contains general parameters of the
@@ -86,34 +87,114 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                     betaD0 = 15;
                     betaS0 = 15;
                     betaH0 = 0;
-
-                    %MCMC vectors assignment
+                    
+                    %Set "always identifiable" parameters
                     mcmc.thetaNames = {'SG','SIB','SIL','SID','Gb','p2',...
-                        'kempt','kabsB','kabsL','kabsD','kabsS','kabsH',...
-                        'kd','ka2',...
-                        'betaB','betaL','betaD','betaS'}; %names of the parameters to identify
+                        'kempt',...
+                        'kd','ka2'}; %names of the parameters to identify
+                    
                     mcmc.std = [5e-4, 1e-6, 1e-6, 1e-6, 1, 1e-3,...
-                        5e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3,...
-                        1e-3, 1e-3,...
-                        0.5, 0.5, 0.5, 0.5]; %initial guess for the SD of each parameter
+                        5e-3, ...
+                        1e-3, 1e-3]; %initial guess for the SD of each parameter
                     mcmc.theta0 = [SG0, SIB0, SIL0, SID0, Gb0, p20,...
-                        kempt0, kabsB0, kabsL0, kabsD0, kabsS0, kabsH0,...
-                        kd0, ka20,...
-                        betaB0,betaL0,betaD0,betaS0]; %initial guess for the parameter values...
+                        kempt0,...
+                        kd0, ka20]; %initial guess for the parameter values...
                     mcmc.stdMax = [1e-3, 1e-5, 1e-5, 1e-5, 2, 2e-3,...
-                        1e-2, 5e-3, 5e-3, 5e-3, 5e-3, 5e-3,...
-                        5e-3, 5e-3,...
-                        1, 1, 1, 1]*inf; %initial guess for the SD of each parameter
+                        1e-2,...
+                        5e-3, 5e-3]*inf; %initial guess for the SD of each parameter
                     mcmc.stdMin = [0, 0, 0, 0, 0, 0,...
-                        0, 0, 0, 0, 0, 0,...
-                        0, 0,...
-                        0.25, 0.25, 0.25, 0.25]; %minimum allowed SD of each parameter
+                        0,...
+                        0, 0]; %minimum allowed SD of each parameter
                     
                     %Assign the block of each parameter (for Single-Component M-H)
                     mcmc.parBlock = [1, 1, 1, 1, 1, 2,...
-                        2, 2, 2, 2, 2, 2,...
-                        3, 3,...
-                        4, 4, 4, 4]; 
+                        2,...
+                        3, 3]; 
+                    
+                    %Attach parameters related to breakfast if available 
+                    if(any(strcmp(data.choLabel,'B')))
+                        mcmc.thetaNames{end+1} = 'kabsB';
+                        mcmc.thetaNames{end+1} = 'betaB';
+                        mcmc.std(end+1) = 1e-3;
+                        mcmc.std(end+1) = 0.5;
+                        mcmc.theta0(end+1) = kabsB0; 
+                        mcmc.theta0(end+1) = betaB0;
+                        mcmc.stdMax(end+1) = 5e-3*inf;
+                        mcmc.stdMax(end+1) = 1*inf;
+                        mcmc.stdMin(end+1) = 0;
+                        mcmc.stdMin(end+1) = 0.25;
+                        mcmc.parBlock(end+1) = 2;
+                        mcmc.parBlock(end+1) = 4;
+                    else
+                        warning("No breakfast CHO intake are present for the specified data. Breakfast absorption parameters will be set to the average between lunch and dinner (if present). Intake delay will be set to poulation value.");
+                    end
+                    
+                    %Attach parameters related to lunch if available 
+                    if(any(strcmp(data.choLabel,'L')))
+                        mcmc.thetaNames{end+1} = 'kabsL';
+                        mcmc.thetaNames{end+1} = 'betaL';
+                        mcmc.std(end+1) = 1e-3;
+                        mcmc.std(end+1) = 0.5;
+                        mcmc.theta0(end+1) = kabsL0; 
+                        mcmc.theta0(end+1) = betaL0;
+                        mcmc.stdMax(end+1) = 5e-3*inf;
+                        mcmc.stdMax(end+1) = 1*inf;
+                        mcmc.stdMin(end+1) = 0;
+                        mcmc.stdMin(end+1) = 0.25;
+                        mcmc.parBlock(end+1) = 2;
+                        mcmc.parBlock(end+1) = 4;
+                    else
+                        warning("No lunch CHO intake are present for the specified data. Lunch absorption parameters will be set to the average between breakfast and dinner (if present). Intake delay will be set to poulation value.");
+                    end
+                    
+                    %Attach parameters related to dinner if available 
+                    if(any(strcmp(data.choLabel,'D')))
+                        mcmc.thetaNames{end+1} = 'kabsD';
+                        mcmc.thetaNames{end+1} = 'betaD';
+                        mcmc.std(end+1) = 1e-3;
+                        mcmc.std(end+1) = 0.5;
+                        mcmc.theta0(end+1) = kabsD0; 
+                        mcmc.theta0(end+1) = betaD0;
+                        mcmc.stdMax(end+1) = 5e-3*inf;
+                        mcmc.stdMax(end+1) = 1*inf;
+                        mcmc.stdMin(end+1) = 0;
+                        mcmc.stdMin(end+1) = 0.25;
+                        mcmc.parBlock(end+1) = 2;
+                        mcmc.parBlock(end+1) = 4;
+                    else
+                        warning("No dinner CHO intake are present for the specified data. Dinner absorption parameters will be set to the average between breakfast and lunch (if present). Intake delay will be set to poulation value.");
+                    end
+                    
+                    %Attach parameters related to snacks if available 
+                    if(any(strcmp(data.choLabel,'S')))
+                        mcmc.thetaNames{end+1} = 'kabsS';
+                        mcmc.thetaNames{end+1} = 'betaS';
+                        mcmc.std(end+1) = 1e-3;
+                        mcmc.std(end+1) = 0.5;
+                        mcmc.theta0(end+1) = kabsS0; 
+                        mcmc.theta0(end+1) = betaS0;
+                        mcmc.stdMax(end+1) = 5e-3*inf;
+                        mcmc.stdMax(end+1) = 1*inf;
+                        mcmc.stdMin(end+1) = 0;
+                        mcmc.stdMin(end+1) = 0.25;
+                        mcmc.parBlock(end+1) = 2;
+                        mcmc.parBlock(end+1) = 4;
+                    else
+                        warning("No snack CHO intake are present for the specified data. Snack absorption parameters will be set to the average between breakfast, lunch and dinner (if present). Intake delay will be set to poulation value.");
+                    end
+                    
+                    %Attach parameters related to hypotreatment if available 
+                    if(any(strcmp(data.choLabel,'H')))
+                        mcmc.thetaNames{end+1} = 'kabsH';
+                        mcmc.std(end+1) = 1e-3;
+                        mcmc.theta0(end+1) = kabsH0; 
+                        mcmc.stdMax(end+1) = 5e-3*inf;
+                        mcmc.stdMin(end+1) = 0;
+                        mcmc.parBlock(end+1) = 2;
+                    else
+                        warning("No hypotreatment CHO intake are present for the specified data. Hypotreatment absorption parameters will be sampled from the [95th-100th] percentile of the 'fastest' absorption between breakfast, lunch, dinner, and snack (if present).");
+                    end
+                    
             end
             
         case 't2d'
