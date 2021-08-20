@@ -63,11 +63,11 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
         modelParameters.kgri = modelParameters.kempt;
         
         %...check model parameter physiological plausibility...
-        check = checkIdentifiedParameters(modelParameters);
-        physioCheck(r) = all(struct2array(check));
+        %check = checkIdentifiedParameters(modelParameters);
+        %physioCheck(r) = all(struct2array(check));
         
         %...and simulate the scenario using the given data
-        [G, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,dss);
+        [G, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,dss,environment);
         glucose.realizations(:,r) = G(1:model.YTS:end);
         insulinBolus.realizations(:,r) = iB;
         correctionBolus.realizations(:,r) = cB;

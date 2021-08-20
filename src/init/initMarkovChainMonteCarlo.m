@@ -88,29 +88,68 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                     betaS0 = 15;
                     betaH0 = 0;
                     
+                    
                     %Set "always identifiable" parameters
-                    mcmc.thetaNames = {'SG','SIB','SIL','SID','Gb','p2',...
+                    mcmc.thetaNames = {'SG','Gb','p2',...
                         'kempt',...
                         'kd','ka2'}; %names of the parameters to identify
                     
-                    mcmc.std = [5e-4, 1e-6, 1e-6, 1e-6, 1, 1e-3,...
+                    mcmc.std = [5e-4, 1, 1e-3,...
                         5e-3, ...
                         1e-3, 1e-3]; %initial guess for the SD of each parameter
-                    mcmc.theta0 = [SG0, SIB0, SIL0, SID0, Gb0, p20,...
+                    mcmc.theta0 = [SG0, Gb0, p20,...
                         kempt0,...
                         kd0, ka20]; %initial guess for the parameter values...
-                    mcmc.stdMax = [1e-3, 1e-5, 1e-5, 1e-5, 2, 2e-3,...
+                    mcmc.stdMax = [1e-3, 2, 2e-3,...
                         1e-2,...
                         5e-3, 5e-3]*inf; %initial guess for the SD of each parameter
-                    mcmc.stdMin = [0, 0, 0, 0, 0, 0,...
+                    mcmc.stdMin = [0, 0, 0,...
                         0,...
                         0, 0]; %minimum allowed SD of each parameter
                     
                     %Assign the block of each parameter (for Single-Component M-H)
-                    mcmc.parBlock = [1, 1, 1, 1, 1, 2,...
+                    mcmc.parBlock = [1, 1, 2,...
                         2,...
                         3, 3]; 
                     
+                    %Attach breakfast SI if data between 4:00 - 11:00 are available
+                    if(any(hour(data.Time) >= 4 & hour(data.Time) < 11))
+                        mcmc.thetaNames{end+1} = 'SIB';
+                        mcmc.std(end+1) = 1e-6;
+                        mcmc.theta0(end+1) = SIB0; 
+                        mcmc.stdMax(end+1) = 1e-5*inf;
+                        mcmc.stdMin(end+1) = 0;
+                        mcmc.parBlock(end+1) = 1;
+                    else
+                        warning("No data are available between 4:00 - 11:00. SI during that time window will be set to population value (7.14e-4 mL/(uU*min)).");
+                    end
+                    
+                    %Attach lunch SI if data between 11:00 - 17:00 are available
+                    if(any(hour(data.Time) >= 11 & hour(data.Time) < 17))
+                        mcmc.thetaNames{end+1} = 'SIL';
+                        mcmc.std(end+1) = 1e-6;
+                        mcmc.theta0(end+1) = SIL0; 
+                        mcmc.stdMax(end+1) = 1e-5*inf;
+                        mcmc.stdMin(end+1) = 0;
+                        mcmc.parBlock(end+1) = 1;
+                    else
+                        warning("No data are available between 11:00 - 17:00. SI during that time window will be set to population value (7.14e-4 mL/(uU*min)).");
+                    end
+                    
+                    %Attach dinner SI if data between 0:00 - 4:00 or 17:00 - 24:00 are available
+                    if(any(hour(data.Time) < 4 | hour(data.Time) > 17))
+                        mcmc.thetaNames{end+1} = 'SID';
+                        mcmc.std(end+1) = 1e-6;
+                        mcmc.theta0(end+1) = SID0; 
+                        mcmc.stdMax(end+1) = 1e-5*inf;
+                        mcmc.stdMin(end+1) = 0;
+                        mcmc.parBlock(end+1) = 1;
+                    else
+                        warning("No data are available between 0:00 - 4:00 or 17:00 - 24:00. SI during that time window will be set to population value (7.14e-4 mL/(uU*min)).");
+                    end
+                    
+   
+    
                     %Attach parameters related to breakfast if available 
                     if(any(strcmp(data.choLabel,'B')))
                         mcmc.thetaNames{end+1} = 'kabsB';
@@ -126,7 +165,7 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                         mcmc.parBlock(end+1) = 2;
                         mcmc.parBlock(end+1) = 4;
                     else
-                        warning("No breakfast CHO intake are present for the specified data. Breakfast absorption parameters will be set to the average between lunch and dinner (if present). Intake delay will be set to poulation value.");
+                        warning("No breakfast CHO intake are present for the specified data. Breakfast absorption parameters will be set to population value (0.012 min^-1). Intake delay will be set to 0 min.");
                     end
                     
                     %Attach parameters related to lunch if available 
@@ -144,7 +183,7 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                         mcmc.parBlock(end+1) = 2;
                         mcmc.parBlock(end+1) = 4;
                     else
-                        warning("No lunch CHO intake are present for the specified data. Lunch absorption parameters will be set to the average between breakfast and dinner (if present). Intake delay will be set to poulation value.");
+                        warning("No lunch CHO intake are present for the specified data. Lunch absorption parameters will be set to population value (0.012 min^-1). Intake delay will be set to 0 min.");
                     end
                     
                     %Attach parameters related to dinner if available 
@@ -162,7 +201,7 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                         mcmc.parBlock(end+1) = 2;
                         mcmc.parBlock(end+1) = 4;
                     else
-                        warning("No dinner CHO intake are present for the specified data. Dinner absorption parameters will be set to the average between breakfast and lunch (if present). Intake delay will be set to poulation value.");
+                        warning("No dinner CHO intake are present for the specified data. Dinner absorption parameters will be set to population value (0.012 min^-1). Intake delay will be set to 0 min.");
                     end
                     
                     %Attach parameters related to snacks if available 
@@ -180,7 +219,7 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                         mcmc.parBlock(end+1) = 2;
                         mcmc.parBlock(end+1) = 4;
                     else
-                        warning("No snack CHO intake are present for the specified data. Snack absorption parameters will be set to the average between breakfast, lunch and dinner (if present). Intake delay will be set to poulation value.");
+                        warning("No snack CHO intake are present for the specified data. Snack absorption parameters will be set to population value (0.012 min^-1). Intake delay will be set to 0 min.");
                     end
                     
                     %Attach parameters related to hypotreatment if available 
@@ -192,7 +231,7 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                         mcmc.stdMin(end+1) = 0;
                         mcmc.parBlock(end+1) = 2;
                     else
-                        warning("No hypotreatment CHO intake are present for the specified data. Hypotreatment absorption parameters will be sampled from the [95th-100th] percentile of the 'fastest' absorption between breakfast, lunch, dinner, and snack (if present).");
+                        warning("No hypotreatment CHO intake are present for the specified data. Hypotreatment absorption parameters will be set to the 'fastest' absorption between breakfast, lunch, dinner, and snack (if present).");
                     end
                     
             end

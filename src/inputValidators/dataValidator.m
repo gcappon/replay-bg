@@ -62,7 +62,19 @@ function valid = dataValidator(data)
     if(~valid)
         error("'CHO' column must not contain NaN values.");
     end
-
+    
+    valid = valid && (sum(data.CHO) > 0);
+    
+    if(~valid)
+        error("'CHO' column must not contain only 0 values.");
+    end
+    
+    valid = valid && (sum(data.bolus) > 0);
+    
+    if(~valid)
+        error("'bolus' column must not contain only 0 values.");
+    end
+    
     %Generate a warning if nan values are present in the glucose column
     if(any(isnan(data.glucose)))
         warning("'glucose' column contains nan values.");

@@ -219,6 +219,13 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                 %Remeber to set kgri = kempt (known from the literature)
                 modelParameters = enforceConstraints(modelParameters,model,environment);
                 
+                %Set kabs of hypotreatment to the fastest kabs between
+                %breakfast, lunch, dinner, and snack, if no hypotreatment 
+                %are present within data.
+                if(~any(strcmp(data.choLabel,'H')) && strcmp(environment.scenario,'multi-meal'))
+                    modelParameters.kabsH = max([modelParameters.kabsB, modelParameters.kabsL, modelParameters.kabsD, modelParameters.kabsS]);
+                end
+                
         end
         
         %Sample 1000 model parameter samples using a copula
@@ -231,6 +238,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         for p = 1:length(mcmc.thetaNames)       
             draws.(mcmc.thetaNames{p}).samples = ksdensity(draws.(mcmc.thetaNames{p}).chain,r(:,p),'function','icdf');
         end
+        
         
         %Save distributions here 
         save(fullfile(environment.replayBGPath,'results','distributions',['distributions_' environment.saveName]),'mcmc','distributions','draws');
