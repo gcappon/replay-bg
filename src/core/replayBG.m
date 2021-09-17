@@ -186,8 +186,10 @@ function replayBG(modality, data, BW, saveName, varargin)
     
     addParameter(ip,'enableHypoTreatments',0, @(x) enableHypoTreatmentsValidator(x,modality)); % default = 0
     addParameter(ip,'hypoTreatmentsHandler','adaHypoTreatmentsHandler', @(x) hypoTreatmentsHandlerValidator(x,modality)); % default = 'adaHypoTreatmentsHandler'
+    addParameter(ip,'hypoTreatmentsHandlerParams',[], @(x) hypoTreatmentsHandlerParamsValidator(x,modality)); % default = 'correctsAbove250Handler'
     addParameter(ip,'enableCorrectionBoluses',0, @(x) enableCorrectionBolusesValidator(x,modality)); % default = 0
     addParameter(ip,'correctionBolusesHandler','correctsAbove250Handler', @(x) correctionBolusesHandlerValidator(x,modality)); % default = 'correctsAbove250Handler'
+    addParameter(ip,'correctionBolusesHandlerParams',[], @(x) correctionBolusesHandlerParamsValidator(x,modality)); % default = 'correctsAbove250Handler'
     
     addParameter(ip,'saveSuffix','',@(x) saveSuffixValidator(x)); % default = ''
     addParameter(ip,'plotMode',1,@(x) plotModeValidator(x)); % default = 1

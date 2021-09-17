@@ -86,7 +86,7 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
         
         %Add hypotreatments if needed
         if(dss.enableHypoTreatments)
-            HT = feval(dss.hypoTreatmentsHandler,G,CHO,hypotreatments,insulinBolus,insulinBasal,time,k-1,dss);
+            [HT, dss] = feval(dss.hypoTreatmentsHandler,G,CHO,hypotreatments,insulinBolus,insulinBasal,time,k-1,dss);
             
             switch(environment.scenario)
                 case 'single-meal'

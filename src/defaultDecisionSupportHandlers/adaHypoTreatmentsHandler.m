@@ -1,4 +1,4 @@
-function HT = adaHypoTreatmentsHandler(G,CHO,hypotreatments,bolus,basal,time,timeIndex,dss)
+function [HT, dss] = adaHypoTreatmentsHandler(G,CHO,hypotreatments,bolus,basal,time,timeIndex,dss)
 % function  adaHypoTreatmentsHandler(G,CHO,bolus,basal,time,timeIndex)
 % Implements the default hypotreatment strategy: "take an hypotreatment of 
 % 10 g every 15 minutes while in hypoglycemia".
@@ -37,6 +37,6 @@ function HT = adaHypoTreatmentsHandler(G,CHO,hypotreatments,bolus,basal,time,tim
         end
         
     end
-    
+        
 end
         
