@@ -66,7 +66,7 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
     correctionBolusInsulinNumber = zeros(length(insulinBolus.realizations),1);
     hypotreatmentNumber = zeros(length(insulinBolus.realizations),1);
     
-    for r = 1:length(insulinBolus.realizations)
+    for r = 1:size(insulinBolus.realizations,2)
         
         %Compute insulin amounts for each realization
         totalInsulin(r) = sum(insulinBolus.realizations(:,r)) + sum(insulinBasal.realizations(:,r));
