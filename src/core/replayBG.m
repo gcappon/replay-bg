@@ -23,6 +23,8 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   output file and result;
 %   - glucoseModel: (optional, default: 'IG') a vector of characters
 %   that specifies the glucose model to use. Can be 'IG' or 'BG';
+%   - cgmModel: (optional, default: 'IG') a vector of characters
+%   that specifies the glucose model to use as cgm measurement. Can be 'CGM', 'IG' or 'BG';
 %   - pathology: (optional, default: 't1d') a vector of characters that
 %   specifies the patient pathology. Can be 't1d', 't2d', 'pbh', 'healthy'.
 %   - scenario: (optional, default: 'single-meal') a vector of characters
@@ -163,6 +165,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     addRequired(ip,'BW',@(x) BWValidator(x));
     
     addRequired(ip,'saveName',@(x) saveNameValidator(x));
+    addParameter(ip,'cgmModel','IG',@(x) cgmModelValidator(x)); %default = 'IG'
     addParameter(ip,'glucoseModel','IG',@(x) glucoseModelValidator(x)); %default = 'IG'
     addParameter(ip,'sampleTime',5,@(x) sampleTimeValidator(x)); % default = 5
     addParameter(ip,'seed',randi([1 1048576]),@(x) seedValidator(x)); % default = randi([1 1048576])
@@ -213,7 +216,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     %% ====================================================================
     
     %% ================ Replay of the scenario ============================
-    [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,physioCheck] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss);
+    [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,physioCheck] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss);
     %% ====================================================================
     
     %% ================ Analyzing results =================================
@@ -224,10 +227,10 @@ function replayBG(modality, data, BW, saveName, varargin)
     if(environment.plotMode)
         
         %Replay overview
-        plotReplayBGResults(glucose,data,environment);
+        plotReplayBGResults(cgm,data,environment);
         
         %Convert the profile to a timetable to comply with AGATA
-        dataHat = glucoseVectorToTimetable(glucose.median,minutes(data.Time(2)-data.Time(1)),data.Time(1));
+        dataHat = glucoseVectorToTimetable(cgm.median,minutes(data.Time(2)-data.Time(1)),data.Time(1));
         
         %Clarke's Error Grid
         plotClarkeErrorGrid(data,dataHat,0);
@@ -244,12 +247,12 @@ function replayBG(modality, data, BW, saveName, varargin)
     if(strcmp(environment.modality,'identification'))
         save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','mcmc','model','dss',...
-            'glucose','insulinBolus', 'insulinBasal', 'CHO',...
+            'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO',...
             'analysis','physioCheck');
     else
         save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','model','dss',...
-            'glucose','insulinBolus', 'insulinBasal', 'CHO',...
+            'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO',...
             'correctionBolus', 'hypotreatments',...
             'analysis','physioCheck');
     end

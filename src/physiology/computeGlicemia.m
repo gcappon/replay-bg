@@ -1,4 +1,4 @@
-function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x] = computeGlicemia(mP,data,model,dss,environment)
+function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x] = computeGlicemia(mP,data,model,dss,environment)
 % function  computeGlicemia(mP,data,model)
 % Compute the glycemic profile obtained with the ReplayBG physiological
 % model using the given inputs and model parameters.
@@ -14,6 +14,7 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
 %   by ReplayBG.
 % Outputs:
 %   - G: is a vector containing the simulated glucose trace [mg/dl]; 
+%   - CGM: is a vector containing the simulated cgm trace [mg/dl]; 
 %   - insulinBolus: is a vector containing the input bolus insulin used to
 %   obtain G (U/min);
 %   - correctionBolus: a vector containing the correction bolus insulin used to
@@ -39,6 +40,7 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
     
     %Initialize the glucose vector
     G = nan(model.TIDSTEPS,1);
+    CGM = nan(model.TIDYSTEPS,1);
     
     %Set the initial glucose value
     switch(model.glucoseModel)
@@ -46,6 +48,16 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
             G(1) = x(model.nx,1); %y(k) = IG(k)
         case 'BG'
             G(1) = x(1,1); %y(k) = BG(k)
+    end
+    
+    %Set the initial cgm value
+    switch(model.cgmModel)
+        case 'IG' 
+            CGM(1) = x(model.nx,1); %y(k) = IG(k)
+        case 'BG'
+            CGM(1) = x(1,1); %y(k) = BG(k)
+        case 'CGM'
+            %TODO
     end
     
     %initialize inputs (basal, bolus, meal) with the initial condition (meal
@@ -132,6 +144,19 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
             case 'healthy'
                 %TODO: implement healthy model
         end     
+        
+        %Get the cgm
+        if(mod(k-1,model.YTS) == 0)
+            switch(model.cgmModel)
+                case 'IG' 
+                    CGM(((k-1)/model.YTS) + 1) = x(model.nx,k); %y(k) = IG(k)
+                case 'BG'
+                    CGM(((k-1)/model.YTS) + 1) = x(1,k); %y(k) = IG(k)
+                case 'CGM'
+                    %TODO
+            end
+        end
+        
         %Get the glucose
         switch(model.glucoseModel)
             case 'IG' 
@@ -139,6 +164,7 @@ function [G, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x
             case 'BG'
                 G(k) = x(1,k); %y(k) = BG(k)
         end   
+        
         
     end
     

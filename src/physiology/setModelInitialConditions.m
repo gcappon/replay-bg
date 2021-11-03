@@ -33,7 +33,7 @@ function x = setModelInitialConditions(data,modelParameters,model,environment)
                 switch(environment.scenario)
                     case 'single-meal'
                         
-                        x(1:model.nx,1) = [data.glucose(1);...                                                                            %G(0)
+                        x(1:model.nx,1) = [data.glucose(find(~isnan(data.glucose),1,'first')); ...                                 %G(0)
                               mP.Xpb; ...                                                                                          %X(0)
                               mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
                               (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
@@ -41,11 +41,11 @@ function x = setModelInitialConditions(data,modelParameters,model,environment)
                               0; ...                                                                                               %Qsto1(0)
                               0; ...                                                                                               %Qsto2(0)
                               mP.Qgutb; ...                                                                                        %Qgut(0)
-                              data.glucose(1)];                                                                                    %IG(0)  
+                              data.glucose(find(~isnan(data.glucose),1,'first'))];                                                 %IG(0)  
 
                     case 'multi-meal'
                         
-                        x(1:model.nx,1) = [data.glucose(1);...                                                                     %G(0)
+                        x(1:model.nx,1) = [data.glucose(find(~isnan(data.glucose),1,'first')); ...                                 %G(0)
                               mP.Xpb; ...                                                                                          %X(0)
                               mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
                               (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
@@ -65,7 +65,7 @@ function x = setModelInitialConditions(data,modelParameters,model,environment)
                               0; ...                                                                                               %Qsto1H(0)
                               0; ...                                                                                               %Qsto2H(0)
                               mP.QgutbH; ...                                                                                        %QgutH(0)
-                              data.glucose(1)];                                                                                    %IG(0)
+                              data.glucose(find(~isnan(data.glucose),1,'first'))];                                                 %IG(0) 
                           
                 end
             

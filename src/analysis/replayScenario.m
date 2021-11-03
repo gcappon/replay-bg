@@ -1,4 +1,4 @@
-function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, physioCheck] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
+function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, physioCheck] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
 % function  replayScenario(data,modelParameters,draws,environment,model,mcmc)
 % Replays the given scenario defined by the given data.
 %
@@ -16,6 +16,8 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
 %   - dss: a structure that contains the hyperparameters of the integrated
 %   decision support system.
 % Outputs:
+%   - cgm: a structure which contains the obtained cgm traces 
+%   simulated via ReplayBG
 %   - glucose: a structure which contains the obtained glucose traces 
 %   simulated via ReplayBG
 %   - insulinBolus: a structure containing the input bolus insulin used to
@@ -45,7 +47,8 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
     %Obtain the glicemic realizations using the copula-generated parameter samples
     
     %Initialize the structures
-    glucose.realizations = zeros(height(data),length(draws.(mcmc.thetaNames{1}).samples));
+    cgm.realizations = zeros(height(data),length(draws.(mcmc.thetaNames{1}).samples));
+    glucose.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     insulinBolus.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     correctionBolus.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     insulinBasal.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
@@ -67,13 +70,31 @@ function [glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatme
         %physioCheck(r) = all(struct2array(check));
         
         %...and simulate the scenario using the given data
-        [G, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,dss,environment);
-        glucose.realizations(:,r) = G(1:model.YTS:end);
+        [G, CGM, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,dss,environment);
+        cgm.realizations(:,r) = CGM;
+        glucose.realizations(:,r) = G;
         insulinBolus.realizations(:,r) = iB;
         correctionBolus.realizations(:,r) = cB;
         insulinBasal.realizations(:,r) = ib;
         CHO.realizations(:,r) = C;
         hypotreatments.realizations(:,r) = ht;
+        
+    end
+    
+    %Obtain the median glucose trace and confidence intervals
+    cgm.median = zeros(height(data),1);
+    cgm.ci25th = zeros(height(data),1);
+    cgm.ci75th = zeros(height(data),1);
+    cgm.ci5th = zeros(height(data),1);
+    cgm.ci95th = zeros(height(data),1);
+    
+    for g = 1:length(cgm.median)
+        
+        cgm.median(g) = prctile(cgm.realizations(g,:),50);
+        cgm.ci25th(g) = prctile(cgm.realizations(g,:),25);
+        cgm.ci75th(g) = prctile(cgm.realizations(g,:),75);
+        cgm.ci5th(g) = prctile(cgm.realizations(g,:),5);
+        cgm.ci95th(g) = prctile(cgm.realizations(g,:),95);
         
     end
     

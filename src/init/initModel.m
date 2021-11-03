@@ -1,10 +1,11 @@
-function model = initModel(data,sampleTime,glucoseModel, pathology, seed, environment)
-% function  initModel(data,sampleTime,glucoseModel,seed)
+function model = initModel(data,sampleTime,cgmModel,glucoseModel, pathology, seed, environment)
+% function  initModel(data,sampleTime,cgmModel,glucoseModel,seed)
 % Initializes the 'model' core variable.
 %
 % Inputs:
 %   - data: timetable which contains the data to be used by the tool;
 %   - sampleTime: an integer that specifies the data sample time;
+%   - cgmModel: a vector of characters that specifies the glucose 
 %   - glucoseModel: a vector of characters that specifies the glucose 
 %   model to use;
 %   - pathology: a vector of characters that specifies the pathology 
@@ -32,6 +33,7 @@ function model = initModel(data,sampleTime,glucoseModel, pathology, seed, enviro
     model.TIDYSTEPS = model.TID/model.YTS; %total identification simulation time [sample steps]
     
     %Data hyperparameters
+    model.cgmModel = cgmModel; %glucose selection {'CGM','BG','IG'}
     model.glucoseModel = glucoseModel; %glucose selection {'BG','IG'}
     model.pathology = pathology; %model selection {'t1d','t2d','pbh'}
     
