@@ -1,12 +1,12 @@
 function prior = definePriorPDF(model, environment)
-% function  definePriorPDF()
+% function  definePriorPDF(model, environment)
 % Defines the a priori probability density functions of model parameters.
 %
 % Input:
-%   - environment: a structure that contains general parameters to be used
-%   by ReplayBG;
 %   - model: a structure that contains general parameters of the
-%   physiological model.
+%   physiological model;
+%   - environment: a structure that contains general parameters to be used
+%   by ReplayBG.
 % Output:
 %   - prior: a structure containing the anonymous functions defining the
 %   a priori probability density functions of model parameters.

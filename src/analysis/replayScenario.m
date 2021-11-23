@@ -1,5 +1,5 @@
-function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, physioCheck] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
-% function  replayScenario(data,modelParameters,draws,environment,model,mcmc)
+function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
+% function  replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
 % Replays the given scenario defined by the given data.
 %
 % Inputs:
@@ -47,15 +47,16 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
     %Obtain the glicemic realizations using the copula-generated parameter samples
     
     %Initialize the structures
-    cgm.realizations = zeros(height(data),length(draws.(mcmc.thetaNames{1}).samples));
-    glucose.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
-    insulinBolus.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
-    correctionBolus.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
-    insulinBasal.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
-    CHO.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
-    hypotreatments.realizations = zeros(model.TIDSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    cgm.realizations = zeros(model.TYSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    glucose.realizations = zeros(model.TSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    insulinBolus.realizations = zeros(model.TSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    correctionBolus.realizations = zeros(model.TSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    insulinBasal.realizations = zeros(model.TSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    CHO.realizations = zeros(model.TSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    hypotreatments.realizations = zeros(model.TSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     
-    physioCheck = zeros(length(draws.(mcmc.thetaNames{1}).samples),1);
+    %physioCheck = zeros(length(draws.(mcmc.thetaNames{1}).samples),1);
+    
     %For each parameter set...
     for r = 1:length(draws.(mcmc.thetaNames{1}).samples)
         
@@ -81,7 +82,7 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
         
     end
     
-    %Obtain the median glucose trace and confidence intervals
+    %Obtain the median cgm trace and confidence intervals
     cgm.median = zeros(height(data),1);
     cgm.ci25th = zeros(height(data),1);
     cgm.ci75th = zeros(height(data),1);

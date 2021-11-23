@@ -1,5 +1,5 @@
 function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy, bayesianEstimator,preFilterData, saveChains, adaptiveSCMH,data,environment,model)
-% function  initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy)
+% function  initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,maxMCMCRuns, maxMCMCRunsWithMaxETA, MCMCTheta0Policy, bayesianEstimator,preFilterData, saveChains, adaptiveSCMH,data,environment,model)
 % Initializes the 'mcmc' core variable. 
 %
 % Inputs:
@@ -40,7 +40,12 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
 %
 % ---------------------------------------------------------------------
     
-    %Type 1 diabetes initial conditions
+    if(environment.verbose)
+        fprintf('Setting up the MCMC hyperparameters...');
+        tic;
+    end
+        
+    %Type 1 diabetes initial model parameters guess
     
     switch(model.pathology)
         case 't1d'
@@ -89,7 +94,7 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                     betaH0 = 0;
                     
                     
-                    %Set "always identifiable" parameters
+                    %Set the parameters that always need to be identified
                     mcmc.thetaNames = {'SG','Gb','p2',...
                         'kempt',...
                         'kd','ka2'}; %names of the parameters to identify
@@ -148,8 +153,6 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                         warning("No data are available between 0:00 - 4:00 or 17:00 - 24:00. SI during that time window will be set to population value (7.14e-4 mL/(uU*min)).");
                     end
                     
-   
-    
                     %Attach parameters related to breakfast if available 
                     if(any(strcmp(data.choLabel,'B')))
                         mcmc.thetaNames{end+1} = 'kabsB';
@@ -286,6 +289,11 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
             mcmc.adaptationFrequency = 1000;
         case 'multi-meal'
             mcmc.adaptationFrequency = 2000;
+    end
+    
+    if(environment.verbose)
+    	time = toc;
+    	fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
     end
     
 end

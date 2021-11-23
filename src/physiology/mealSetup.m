@@ -1,5 +1,5 @@
 function [meal, mealDelayed] = mealSetup(data,model,modelParameters,environment)
-% function  mealSetup(data,model,modelParameters)
+% function  mealSetup(data,model,modelParameters,environment)
 % Generates the vector containing the CHO intake events to be used to
 % simulate the physiological model.
 %
@@ -28,27 +28,28 @@ function [meal, mealDelayed] = mealSetup(data,model,modelParameters,environment)
         case 'single-meal'
             
             %Initialize the meal vector
-            meal = zeros(model.TIDSTEPS,1);
+            meal = zeros(model.TSTEPS,1);
 
-
+            %Find the meals
+            mIdx = find(data.CHO);
+            
             %Set the meal vector
-            for time = 1:length(0:model.YTS:(model.TID-1))
-                meal((1+(time-1)*(model.YTS/model.TS)):(time*(model.YTS/model.TS))) = data.CHO(time)*1000/modelParameters.BW; %mg/(kg*min)
+            for i = 1:length(mIdx)
+                meal((1+(mIdx(i)-1)*(model.YTS/model.TS)):(mIdx(i)*(model.YTS/model.TS))) = data.CHO(mIdx(i))*1000/modelParameters.BW; %mg/(kg*min)
             end
-
 
             %Add delay of main meal absorption
             mealDelay = round(modelParameters.beta/model.TS);
             mealDelayed = [zeros(mealDelay,1); meal];
-            mealDelayed = mealDelayed(1:model.TIDSTEPS);
+            mealDelayed = mealDelayed(1:model.TSTEPS);
             
         case 'multi-meal'
             %Initialize the meal structure
-            meal.breakfast = zeros(model.TIDSTEPS,1);
-            meal.lunch = zeros(model.TIDSTEPS,1);
-            meal.dinner = zeros(model.TIDSTEPS,1);
-            meal.snack = zeros(model.TIDSTEPS,1);
-            meal.hypotreatment = zeros(model.TIDSTEPS,1);
+            meal.breakfast = zeros(model.TSTEPS,1);
+            meal.lunch = zeros(model.TSTEPS,1);
+            meal.dinner = zeros(model.TSTEPS,1);
+            meal.snack = zeros(model.TSTEPS,1);
+            meal.hypotreatment = zeros(model.TSTEPS,1);
             
             placeholder = ones(length(1:(model.YTS/model.TS)),1);
             
@@ -93,15 +94,15 @@ function [meal, mealDelayed] = mealSetup(data,model,modelParameters,environment)
             mealDelayH = round(modelParameters.betaH/model.TS);
             
             mealDelayed.breakfast = [zeros(mealDelayB,1); meal.breakfast];
-            mealDelayed.breakfast = mealDelayed.breakfast(1:model.TIDSTEPS);
+            mealDelayed.breakfast = mealDelayed.breakfast(1:model.TSTEPS);
             mealDelayed.lunch = [zeros(mealDelayL,1); meal.lunch];
-            mealDelayed.lunch = mealDelayed.lunch(1:model.TIDSTEPS);
+            mealDelayed.lunch = mealDelayed.lunch(1:model.TSTEPS);
             mealDelayed.dinner = [zeros(mealDelayD,1); meal.dinner];
-            mealDelayed.dinner = mealDelayed.dinner(1:model.TIDSTEPS);
+            mealDelayed.dinner = mealDelayed.dinner(1:model.TSTEPS);
             mealDelayed.snack = [zeros(mealDelayS,1); meal.snack];
-            mealDelayed.snack = mealDelayed.snack(1:model.TIDSTEPS);
+            mealDelayed.snack = mealDelayed.snack(1:model.TSTEPS);
             mealDelayed.hypotreatment = [zeros(mealDelayH,1); meal.hypotreatment];
-            mealDelayed.hypotreatment = mealDelayed.hypotreatment(1:model.TIDSTEPS);
+            mealDelayed.hypotreatment = mealDelayed.hypotreatment(1:model.TSTEPS);
             
     end
     

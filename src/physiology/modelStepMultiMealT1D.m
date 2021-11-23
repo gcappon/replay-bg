@@ -1,10 +1,10 @@
-function xk = modelStepMultiMealT1D(xkm1,B,CHOB,CHOL,CHOD,CHOS,CHOH,hourOfTheDay,mP,xk,model)
-% function  modelStepMultiMealT1D(xkm1,B,CHO,mP,xk,model)
+function xk = modelStepMultiMealT1D(xkm1,I,CHOB,CHOL,CHOD,CHOS,CHOH,hourOfTheDay,mP,xk,model)
+% function  modelStepMultiMealT1D(xkm1,I,CHOB,CHOL,CHOD,CHOS,CHOH,hourOfTheDay,mP,xk,model)
 % Simulates a step of the multi-meal t1d physiological model.
 %
 % Inputs:
 %   - xkm1: is a vector containing the model state at time k-1;
-%   - B: is the insulin at time k;
+%   - I: is the insulin at time k;
 %   - CHOB: is the CHO breakfast at time k;
 %   - CHOL: is the CHO lunch at time k;
 %   - CHOD: is the CHO dinner at time k;
@@ -21,55 +21,56 @@ function xk = modelStepMultiMealT1D(xkm1,B,CHOB,CHOL,CHOD,CHOS,CHOH,hourOfTheDay
 %
 % ---------------------------------------------------------------------
 %
-% Copyright (C) 2020 Giacomo Cappon
+% Copyright (C) 2021 Giacomo Cappon
 %
 % This file is part of ReplayBG.
 %
 % ---------------------------------------------------------------------
     
-    G = xkm1(1); %mg/dL
+    G = xkm1(1); %Plasma glucose concentration (mg/dL)
     %Gss = Gb (assuming Xss = 0 and Rass = 0)
-    X = xkm1(2); %1/min
-    %Xss = 0 (over-basal insulin action)
-    Isc1 = xkm1(3); %mU/kg
+    X = xkm1(2); %(Over-basal) insulin action (1/min)
+    %Xss = 0 (over-basal --> 0)
+    Isc1 = xkm1(3); %Subcutaneous insulin concentration in a non-monomeric state (mU/kg)
     %Isc1ss = u2ss / ( ka1 + kd )
-    Isc2 = xkm1(4); %mU/kg
+    Isc2 = xkm1(4); %Subcutaneous insulin concentration in a monomeric state (mU/kg)
     %Isc2ss = kd / ka2 * u2ss / ( ka1 + kd )
-    Ip = xkm1(5); %mU/kg
+    Ip = xkm1(5); %Plasma insulin concentration (mU/kg)
     %Ipss = ka1 / ke * u2ss / ( ka1 + kd ) + ka2 / ke * kd / ka2 * u2ss / ( ka1 + kd ) 
-    Qsto1B = xkm1(6); %mg/kg
+    Qsto1B = xkm1(6); %Breakfast-related glucose concentration in the stomach in a solid state (mg/kg)
     %Qsto1ss = 0
-    Qsto2B = xkm1(7); %mg/kg
+    Qsto2B = xkm1(7); %Breakfast-related glucose concentration in the stomach in a liquid state (mg/kg)
     %Qsto2ss = 0
-    QgutB = xkm1(8); %mg/kg
+    QgutB = xkm1(8); %Breakfast-related glucose concentration in the intestin (mg/kg)
     %Qgutss = 0
-    Qsto1L = xkm1(9); %mg/kg
+    Qsto1L = xkm1(9); %Lunch-related glucose concentration in the stomach in a solid state (mg/kg)
     %Qsto1ss = 0
-    Qsto2L = xkm1(10); %mg/kg
+    Qsto2L = xkm1(10); %Lunch-related glucose concentration in the stomach in a liquid state (mg/kg)
     %Qsto2ss = 0
-    QgutL = xkm1(11); %mg/kg
+    QgutL = xkm1(11); %Lunch-related glucose concentration in the intestin (mg/kg)
     %Qgutss = 0
-    Qsto1D = xkm1(12); %mg/kg
+    Qsto1D = xkm1(12); %Dinner-related glucose concentration in the stomach in a solid state (mg/kg)
     %Qsto1ss = 0
-    Qsto2D = xkm1(13); %mg/kg
+    Qsto2D = xkm1(13); %Dinner-related glucose concentration in the stomach in a liquid state (mg/kg)
     %Qsto2ss = 0
-    QgutD = xkm1(14); %mg/kg
+    QgutD = xkm1(14); %Dinner-related glucose concentration in the intestin (mg/kg)
     %Qgutss = 0
-    Qsto1S = xkm1(15); %mg/kg
+    Qsto1S = xkm1(15); %Snack-related glucose concentration in the stomach in a solid state (mg/kg)
     %Qsto1ss = 0
-    Qsto2S = xkm1(16); %mg/kg
+    Qsto2S = xkm1(16); %Snack-related glucose concentration in the stomach in a liquid state (mg/kg)
     %Qsto2ss = 0
-    QgutS = xkm1(17); %mg/kg
+    QgutS = xkm1(17); %Snack-related glucose concentration in the intestin (mg/kg)
     %Qgutss = 0
-    Qsto1H = xkm1(18); %mg/kg
+    Qsto1H = xkm1(18); %Hypotreatment-related glucose concentration in the stomach in a solid state (mg/kg)
     %Qsto1ss = 0
-    Qsto2H = xkm1(19); %mg/kg
+    Qsto2H = xkm1(19); %Hypotreatment-related glucose concentration in the stomach in a liquid state (mg/kg)
     %Qsto2ss = 0
-    QgutH = xkm1(20); %mg/kg
+    QgutH = xkm1(20); %Hypotreatment-related glucose concentration in the intestin (mg/kg)
     %Qgutss = 0
-    IG = xkm1(21); %mg/dL  
+    IG = xkm1(21); %Interstitial glucose concentration (mg/dL) 
     %IGss = Gb
     
+    %Set the inisulin sensitivity based on the time of the day
     if(hourOfTheDay<4 || hourOfTheDay >= 17)
         SI = mP.SID;
     else
@@ -113,7 +114,7 @@ function xk = modelStepMultiMealT1D(xkm1,B,CHOB,CHOL,CHOD,CHOS,CHOH,hourOfTheDay
     RaS = mP.f*mP.kabsS*xk(17);
     RaH = mP.f*mP.kabsH*xk(20);
     
-    xk(3) = (Isc1 + model.TS*B)/(1+model.TS*(mP.ka1+mP.kd));
+    xk(3) = (Isc1 + model.TS*I)/(1+model.TS*(mP.ka1+mP.kd));
     xk(4) = (Isc2 + model.TS*mP.kd*xk(3))/(1+model.TS*mP.ka2);
     xk(5) = (Ip + model.TS*(mP.ka1*xk(3)+mP.ka2*xk(4)))/(1+model.TS*mP.ke);
     

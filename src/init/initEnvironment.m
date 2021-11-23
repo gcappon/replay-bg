@@ -1,5 +1,5 @@
 function environment = initEnvironment(modality,saveName,saveSuffix,scenario, plotMode,enableLog,verbose)
-% function  initEnvironment(modality,saveName,saveSuffix,plotMode,verbose)
+% function  initEnvironment(modality,saveName,saveSuffix,scenario, plotMode,enableLog,verbose)
 % Initializes the 'environment' core variable.
 %
 % Inputs:
@@ -28,7 +28,12 @@ function environment = initEnvironment(modality,saveName,saveSuffix,scenario, pl
 % This file is part of ReplayBG.
 %
 % ---------------------------------------------------------------------
-
+    
+    if(verbose)
+        fprintf('Setting up the environment...');
+        tic;
+    end 
+    
     %Set the absolute path of the ReplayBG tool
     p = fileparts(which('replayBG'));
     p = regexp(p,filesep,'split');
@@ -39,22 +44,22 @@ function environment = initEnvironment(modality,saveName,saveSuffix,scenario, pl
     end
     
     %Create the results subfolders if they do not exist
-    if(~(exist(fullfile(environment.replayBGPath,'results')) == 7))
+    if(~exist(fullfile(environment.replayBGPath,'results'),'dir'))
         mkdir(fullfile(environment.replayBGPath,'results'));
     end
-    if(~(exist(fullfile(environment.replayBGPath,'results','distributions')) == 7))
+    if(~exist(fullfile(environment.replayBGPath,'results','distributions'),'dir'))
         mkdir(fullfile(environment.replayBGPath,'results','distributions'));
     end
-    if(~(exist(fullfile(environment.replayBGPath,'results','logs')) == 7))
+    if(~exist(fullfile(environment.replayBGPath,'results','logs'),'dir'))
         mkdir(fullfile(environment.replayBGPath,'results','logs'));
     end
-    if(~(exist(fullfile(environment.replayBGPath,'results','mcmcChains')) == 7))
+    if(~exist(fullfile(environment.replayBGPath,'results','mcmcChains'),'dir'))
         mkdir(fullfile(environment.replayBGPath,'results','mcmcChains'));
     end
-    if(~(exist(fullfile(environment.replayBGPath,'results','modelParameters')) == 7))
+    if(~exist(fullfile(environment.replayBGPath,'results','modelParameters'),'dir'))
         mkdir(fullfile(environment.replayBGPath,'results','modelParameters'));
     end
-    if(~(exist(fullfile(environment.replayBGPath,'results','workspaces')) == 7))
+    if(~exist(fullfile(environment.replayBGPath,'results','workspaces'),'dir'))
         mkdir(fullfile(environment.replayBGPath,'results','workspaces'));
     end
     
@@ -72,17 +77,26 @@ function environment = initEnvironment(modality,saveName,saveSuffix,scenario, pl
     end
     
     %Create the log file associated to the simulation.
-    environment.logFile = fullfile(environment.replayBGPath,'results','logs',[datestr(datetime('now'),'yyyy-mm-dd_hh:MM') '_' environment.modality '_' environment.saveName environment.saveSuffix '.txt']);
-    if(exist(environment.logFile,'file'))
-        delete(environment.logFile);
-    end % if log
+    environment.enableLog = enableLog; % if 0 do not log 
+    
+    if(environment.enableLog)
+        environment.logFile = fullfile(environment.replayBGPath,'results','logs',[datestr(datetime('now'),'yyyy-mm-dd_hh:MM') '_' environment.modality '_' environment.saveName environment.saveSuffix '.txt']);
+        if(exist(environment.logFile,'file'))
+            delete(environment.logFile);
+        end % if log
+        environment.logFile = [];
+    end
     
     %Single-meal or multi-meal scenario?
     environment.scenario = scenario;
     
     %Set the verbosity
     environment.plotMode = plotMode; % if 0 do not plot 
-    environment.enableLog = enableLog; % if 0 do not log 
     environment.verbose = verbose; % if 0 do not display stuff
+    
+    if(environment.verbose)
+        time = toc;
+        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
+    end
     
 end

@@ -1,5 +1,5 @@
 function modelParameters = enforceConstraints(modelParameters, model, environment)
-% function  enforceConstraints(modelParameters)
+% function  enforceConstraints(modelParameters, model, environment)
 % Function that enforces the model paramenter values contraints.
 %
 % Inputs:

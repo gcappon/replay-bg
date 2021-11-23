@@ -1,5 +1,5 @@
 function valid = adaptiveSCMHValidator(adaptiveSCMH, modality)
-% function  adaptiveSCMHValidator(adaptiveSCMH)
+% function  adaptiveSCMHValidator(adaptiveSCMH,modality)
 % Validates the input parameter 'adaptiveSCMH'.
 %
 % Inputs:

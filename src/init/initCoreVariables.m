@@ -32,24 +32,8 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
         diary(environment.logFile);
     end
     
-    if(environment.verbose)
-        fprintf('Setting up the model hyperparameters...');
-        tic;
-    end
-    
     %Initialize the model hyperparameters
     model = initModel(data,ip.Results.sampleTime, ip.Results.cgmModel, ip.Results.glucoseModel,ip.Results.pathology, ip.Results.seed, environment);
-    
-    if(environment.verbose)
-        time = toc;
-        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
-    end
-    
-    
-    if(environment.verbose && strcmp(environment.modality,'replay'))
-        fprintf('Setting up the Decision Support System hyperparameters...');
-        tic;
-    end
     
     %Initialize the decision support system hyperparameters
     dss = initDecisionSupportSystem(ip.Results.CR, ip.Results.CF,...
@@ -58,28 +42,13 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
         ip.Results.hypoTreatmentsHandlerParams,...
         ip.Results.correctionBolusesHandlerParams);
     
-    if(environment.verbose && strcmp(environment.modality,'replay'))
-        time = toc;
-        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
-    end
-    
     %Initialize the mcmc hyperparameters (if modality: 'identification')
     if(strcmp(environment.modality,'identification'))
         
-        if(environment.verbose)
-            fprintf('Setting up the MCMC hyperparameters...');
-            tic;
-        end
-
         mcmc = initMarkovChainMonteCarlo(ip.Results.maxETAPerMCMCRun,ip.Results.maxMCMCIterations,ip.Results.maxMCMCRuns,ip.Results.maxMCMCRunsWithMaxETA,...
             ip.Results.MCMCTheta0Policy, ip.Results.bayesianEstimator, ip.Results.preFilterData, ip.Results.saveChains, ip.Results.adaptiveSCMH,...
             data,environment, model);
 
-        if(environment.verbose)
-            time = toc;
-            fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
-        end
-        
     else
         
         mcmc = [];

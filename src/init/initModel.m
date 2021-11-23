@@ -1,5 +1,5 @@
 function model = initModel(data,sampleTime,cgmModel,glucoseModel, pathology, seed, environment)
-% function  initModel(data,sampleTime,cgmModel,glucoseModel,seed)
+% function  initModel(data,sampleTime,cgmModel,glucoseModel, pathology, seed, environment)
 % Initializes the 'model' core variable.
 %
 % Inputs:
@@ -25,12 +25,17 @@ function model = initModel(data,sampleTime,cgmModel,glucoseModel, pathology, see
 %
 % ---------------------------------------------------------------------
     
+    if(environment.verbose)
+            fprintf('Setting up the model hyperparameters...');
+            tic;
+    end
+    
     %Time constants within the simulation
     model.TS = 1; %integration time
     model.YTS = sampleTime; %sample time
-    model.TID = minutes(data.Time(end)-data.Time(1))+sampleTime; %from 1 to TID identify the model parameters. [min]
-    model.TIDSTEPS = model.TID/model.TS; %from 1 to TID identify the model parameters. [integration steps]
-    model.TIDYSTEPS = model.TID/model.YTS; %total identification simulation time [sample steps]
+    model.T = minutes(data.Time(end)-data.Time(1))+sampleTime; %simulation timespan [min]
+    model.TSTEPS = model.T/model.TS; %total simulation length [integration steps]
+    model.TYSTEPS = model.T/model.YTS; %total simulation length [sample steps]
     
     %Data hyperparameters
     model.cgmModel = cgmModel; %glucose selection {'CGM','BG','IG'}
@@ -61,5 +66,10 @@ function model = initModel(data,sampleTime,cgmModel,glucoseModel, pathology, see
     
     %Set the rng seed
     rng(seed,'twister')
+    
+    if(environment.verbose)
+        time = toc;
+        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
+    end
     
 end

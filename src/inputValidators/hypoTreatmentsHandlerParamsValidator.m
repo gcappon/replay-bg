@@ -10,7 +10,7 @@ function valid = hypoTreatmentsHandlerParamsValidator(hypoTreatmentsHandlerParam
 %
 % ---------------------------------------------------------------------
 %
-% Copyright (C) 2020 Giacomo Cappon
+% Copyright (C) 2021 Giacomo Cappon
 %
 % This file is part of ReplayBG.
 %
@@ -18,7 +18,7 @@ function valid = hypoTreatmentsHandlerParamsValidator(hypoTreatmentsHandlerParam
 
     valid = strcmp(modality,'replay');
     if(~valid)
-        error("Cannot set hypotreatments handler parameters while identifying model parameters.");
+        error("Cannot set hypotreatment handler parameters while identifying model parameters.");
     end
     
 end

@@ -1,5 +1,5 @@
 function modelParameters = setDefaultModelParameters(data,BW,model,environment)
-% function  modelParameters(model, environment)
+% function setDefaultModelParameters(data,BW,model,environment)
 % Function that sets the default model parameter values.
 %
 % Input:

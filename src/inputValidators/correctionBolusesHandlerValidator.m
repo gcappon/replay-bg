@@ -26,9 +26,9 @@ function valid = correctionBolusesHandlerValidator(correctionBolusesHandler,moda
         error("Handler does not exist or it is not a function.");
     end
     
-    valid = valid && nargout(correctionBolusesHandler) == 1;
+    valid = valid && nargout(correctionBolusesHandler) == 2;
     if(~valid)
-        error("Handler does not have the proper number of inputs (must be 1).");
+        error("Handler does not have the proper number of inputs (must be 2).");
     end
     
     valid = valid && nargin(correctionBolusesHandler) == 7;

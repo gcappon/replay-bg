@@ -1,5 +1,5 @@
 function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x] = computeGlicemia(mP,data,model,dss,environment)
-% function  computeGlicemia(mP,data,model)
+% function  computeGlicemia(mP,data,model,dss,environment)
 % Compute the glycemic profile obtained with the ReplayBG physiological
 % model using the given inputs and model parameters.
 %
@@ -38,9 +38,9 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
     %Initial model conditions
     x = setModelInitialConditions(data,mP,model,environment);
     
-    %Initialize the glucose vector
-    G = nan(model.TIDSTEPS,1);
-    CGM = nan(model.TIDYSTEPS,1);
+    %Initialize the glucose and cgm vectors
+    G = nan(model.TSTEPS,1);
+    CGM = nan(model.TYSTEPS,1);
     
     %Set the initial glucose value
     switch(model.glucoseModel)
@@ -73,7 +73,6 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
             time = data.Time(1):minutes(1):(data.Time(1) + minutes(length(meal.breakfast) - 1));
     end
     
-    
     %Hour of the day vector for multi-meal simulations
     hourOfTheDay = hour(time);
     
@@ -85,21 +84,23 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
     switch(environment.scenario)
         case 'single-meal'
             CHO = meal/1000*mP.BW;
-            hypotreatments = CHO*0;
+            hypotreatments = CHO*0; %Hypotreatments definition is not present in single-meal --> set to 0
         case 'multi-meal'
             CHO = (meal.breakfast + meal.lunch + meal.dinner + meal.snack) /1000*mP.BW;
             hypotreatments = meal.hypotreatment/1000*mP.BW;
     end
-
-    %glucose = CHO*nan;
     
     %Simulate the physiological model
-    for k = 2:model.TIDSTEPS
+    for k = 2:model.TSTEPS
         
-        %Add hypotreatments if needed
+        %Use the hypotreatments module if it is enabled
         if(dss.enableHypoTreatments)
+            
+            %Call the hypotreatment function handler
             [HT, dss] = feval(dss.hypoTreatmentsHandler,G,CHO,hypotreatments,insulinBolus,insulinBasal,time,k-1,dss);
             
+            %Add the hypotreatments to meal model input if needed (remember
+            %to add meal absorption delay)
             switch(environment.scenario)
                 case 'single-meal'
                     mealDelayed(k) = mealDelayed(k) + HT*1000/mP.BW;                    
@@ -108,16 +109,19 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
             end
             
             %Update the CHO event vectors
-            
             hypotreatments(k) = hypotreatments(k) + HT;
             
         end
         
-        %Add correction boluses if needed (remember to add insulin
-        %absorption delay to the boluses)
+        %Use the correction bolus delivery module if it is enabled
         if(dss.enableCorrectionBoluses)
-            CB = feval(dss.correctionBolusesHandler,G,CHO,insulinBolus,insulinBasal,time,k-1,dss);
-            if(k+mP.tau <= model.TIDSTEPS)
+            
+            %Call the hypotreatment function handler
+            [CB, dss] = feval(dss.correctionBolusesHandler,G,CHO,insulinBolus,insulinBasal,time,k-1,dss);
+            
+            %Add correction boluses to insulin bolus input if needed (remember to add insulin
+            %absorption delay)
+            if(k+mP.tau <= model.TSTEPS)
                 bolusDelayed(k+mP.tau) = bolusDelayed(k+mP.tau) + CB*1000/mP.BW;
             end
             
@@ -129,7 +133,7 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
         %Integration step
         switch(model.pathology)
             case 't1d'
-            
+
                 switch(environment.scenario)
                     case 'single-meal'
                         x(:,k) = modelStepSingleMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm

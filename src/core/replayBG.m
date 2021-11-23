@@ -21,27 +21,31 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   - BW: (required) the patient body weight (kg);
 %   - saveName: (required) a vector of characters used to label, thus identify, each 
 %   output file and result;
+%
 %   - glucoseModel: (optional, default: 'IG') a vector of characters
 %   that specifies the glucose model to use. Can be 'IG' or 'BG';
 %   - cgmModel: (optional, default: 'IG') a vector of characters
 %   that specifies the glucose model to use as cgm measurement. Can be 'CGM', 'IG' or 'BG';
+%
 %   - pathology: (optional, default: 't1d') a vector of characters that
 %   specifies the patient pathology. Can be 't1d', 't2d', 'pbh', 'healthy'.
 %   - scenario: (optional, default: 'single-meal') a vector of characters
 %   that specifies whether the given scenario refers to a single-meal
 %   scenario or a multi-meal scenario. Can be 'single-meal' or
 %   'multi-meal';
+%
 %   - sampleTime: (optional, default: 5 (min)) an integer that specifies
 %   the data sample time;
 %   - seed: (optional, default: randi([1 1048576])) an integer that
 %   specifies the random seed. For reproducibility. NOT SUPPORTED YET;
+%
 %   - maxETAPerMCMCRun: (optional, default: inf) a number that specifies
 %   the maximum time in hours allowed for each MCMC run; 
 %   - maxMCMCIterations: (optional, default: inf) an integer that specifies
 %   the maximum number of iterations for each MCMC run; 
 %   - maxMCMCRuns: (optional, default: inf) an integer that specifies
 %   the maximum number of MCMC runs; 
-%   - maxMCMCRunsWithMaxETA: (optional, default: 2) an integer that 
+%   - maxMCMCRunsWithMaxETA: (optional, default: inf) an integer that 
 %   specifies the maximum number of MCMC runs having maximum ETA; 
 %   - adaptiveSCMH: (optional, default: 1) a numerical flag that specifies 
 %   whether to make the Single Components Metropolis Hastings algorithm 
@@ -68,13 +72,14 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   - saveChains: (optional, default: 1) a numerical flag that specifies
 %   whether to save the resulting mcmc chains in dedicated files (one for 
 %   each MCMC run) for future analysis or not. Can be 0 or 1;
-%   - enableHypoTreatments: (optional, default: 0) a numerical flag that
-%   specifies whether to enable hypotreatments during the replay of a given
-%   scenario. Can be 0 or 1. Can be set only when modality is 'replay';
+%
 %   - CR: (optional, default: nan) the carbohydrate-to-insulin ratio of the
 %   patient in g/U to be used by the integrated decision support system;
 %   - CF: (optional, default: nan) the correction factor of the
 %   patient in mg/dl/U to be used by the integrated decision support system;
+%   - enableHypoTreatments: (optional, default: 0) a numerical flag that
+%   specifies whether to enable hypotreatments during the replay of a given
+%   scenario. Can be 0 or 1. Can be set only when modality is 'replay';
 %   - hypoTreatmentsHandler: (optional, default:
 %   'adaHypoTreatmentsHandler') a vector of characters that specifies the
 %   name of the function handler that implements an hypotreatment strategy
@@ -110,6 +115,12 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   a number that defines the current time istant in the replay simulation.
 %   Vectors contain one value for each integration step. The default policy
 %   is "take a corrective bolus of 1 U every 1 hour while above 250 mg/dl";
+%   - hypoTreatmentsHandlerParams: (optional, default: []) a structure that contains the parameters
+%   to pass to the hypoTreatmentsHandler function. It also serves as memory
+%   area for the hypoTreatmentsHandler function;
+%   - correctionBolusesHandlerParams: (optional, default: []) a structure that contains the parameters
+%   to pass to the correctionBolusesHandler function. It also serves as memory
+%   area for the correctionBolusesHandler function;
 %   - saveSuffix: (optional, default: '') a vector of char to be attached
 %   as suffix to the resulting output files' name;
 %   - plotMode: (optional, default: 1) a numerical flag that specifies
@@ -176,7 +187,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     addParameter(ip,'maxETAPerMCMCRun',inf,@(x) maxETAPerMCMCRunValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCIterations',inf,@(x) maxMCMCIterationsValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCRuns',inf,@(x) maxMCMCRunsValidator(x, modality)); % default = inf
-    addParameter(ip,'maxMCMCRunsWithMaxETA',2, @(x) maxMCMCRunsWithMaxETAValidator(x,modality)); % default = 2
+    addParameter(ip,'maxMCMCRunsWithMaxETA',inf, @(x) maxMCMCRunsWithMaxETAValidator(x,modality)); % default = inf
     addParameter(ip,'adaptiveSCMH',1, @(x) adaptiveSCMHValidator(x,modality)); % default = 1
     
     addParameter(ip,'MCMCTheta0Policy','mean', @(x) MCMCTheta0PolicyValidator(x,modality)); % default = 'mean'
@@ -216,7 +227,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     %% ====================================================================
     
     %% ================ Replay of the scenario ============================
-    [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,physioCheck] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss);
+    [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss);
     %% ====================================================================
     
     %% ================ Analyzing results =================================
@@ -248,13 +259,13 @@ function replayBG(modality, data, BW, saveName, varargin)
         save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','mcmc','model','dss',...
             'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO',...
-            'analysis','physioCheck');
+            'analysis');
     else
         save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','model','dss',...
             'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO',...
             'correctionBolus', 'hypotreatments',...
-            'analysis','physioCheck');
+            'analysis');
     end
     
     if(environment.verbose)
@@ -264,7 +275,6 @@ function replayBG(modality, data, BW, saveName, varargin)
     
     if(environment.enableLog)
         diary off;
-        
     end
     %% ====================================================================
     

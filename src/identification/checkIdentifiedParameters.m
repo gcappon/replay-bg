@@ -1,5 +1,5 @@
 function check = checkIdentifiedParameters(mP)
-% function  checkIdentifiedParameters()
+% function  checkIdentifiedParameters(mP)
 % Checks the identified parameters physiological plausibility.
 % 
 % Input:

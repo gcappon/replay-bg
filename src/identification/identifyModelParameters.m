@@ -160,7 +160,16 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         
         %Initialize the output structure
         draws = struct();
+        
+        flagChainHealthy = true;
+        
         paramsForCopula = zeros(length(pHat.(mcmc.thetaNames{1})(max(conv.M_burn):max(conv.k_thin):end)),mcmc.nPar);
+        
+        if(isempty(paramsForCopula))
+            flagChainHealthy = false;
+            paramsForCopula = zeros(length(pHat.(mcmc.thetaNames{1})),mcmc.nPar);
+            warning('Initial (burn-in) samples  of the MCMC chains cannot be removed becuase the number of iterations was too low. Identification can be innacurate. To solve this issue try to increase the limit on the maximum ETA.');
+        end
         
         %Obtain a point estimate of model parameters using the specified
         %bayesian esitmator
@@ -173,7 +182,11 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                     
                     %...get the chain realization, minimum, and maximum
                     %value...
-                    draws.(mcmc.thetaNames{p}).chain = pHat.(mcmc.thetaNames{p})(max(conv.M_burn):max(conv.k_thin):end);
+                    if(flagChainHealthy)
+                        draws.(mcmc.thetaNames{p}).chain = pHat.(mcmc.thetaNames{p})(max(conv.M_burn):max(conv.k_thin):end);
+                    else
+                        draws.(mcmc.thetaNames{p}).chain = pHat.(mcmc.thetaNames{p});
+                    end
                     draws.(mcmc.thetaNames{p}).min = min(draws.(mcmc.thetaNames{p}).chain);
                     draws.(mcmc.thetaNames{p}).max = max(draws.(mcmc.thetaNames{p}).chain);
                     
@@ -182,7 +195,11 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                     
                     %...and obtain a point-estimate of model parameters as
                     %the mean value of the chain.
-                    distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p})(conv.M_burn(p):conv.k_thin(p):end);
+                    if(flagChainHealthy)
+                        distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p})(conv.M_burn(p):conv.k_thin(p):end);
+                    else
+                        distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p});
+                    end
                     modelParameters.(mcmc.thetaNames{p}) = mean(distributions.(mcmc.thetaNames{p}));
                     
                 end
@@ -197,7 +214,11 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                     
                     %...get the chain realization, minimum, and maximum
                     %value...
-                    draws.(mcmc.thetaNames{p}).chain = pHat.(mcmc.thetaNames{p})(max(conv.M_burn):max(conv.k_thin):end);
+                    if(flagChainHealthy)
+                        draws.(mcmc.thetaNames{p}).chain = pHat.(mcmc.thetaNames{p})(max(conv.M_burn):max(conv.k_thin):end);
+                    else
+                        draws.(mcmc.thetaNames{p}).chain = pHat.(mcmc.thetaNames{p});
+                    end
                     draws.(mcmc.thetaNames{p}).min = min(draws.(mcmc.thetaNames{p}).chain);
                     draws.(mcmc.thetaNames{p}).max = max(draws.(mcmc.thetaNames{p}).chain);
                     
@@ -206,7 +227,11 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                     
                     %...and obtain a point-estimate of model parameters as
                     %the value of the chain having maxiimum probabilty.
-                    distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p})(conv.M_burn(p):conv.k_thin(p):end);
+                    if(flagChainHealthy)
+                        distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p})(conv.M_burn(p):conv.k_thin(p):end);
+                    else
+                        distributions.(mcmc.thetaNames{p}) = pHat.(mcmc.thetaNames{p});
+                    end
                     kernel = histfit(distributions.(mcmc.thetaNames{p}),round(length(distributions.(mcmc.thetaNames{p}))/3),'kernel');
                     maxs = find(kernel(2).YData == max(kernel(2).YData));
                     if(length(maxs) > 1)
@@ -231,14 +256,17 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         %Sample 1000 model parameter samples using a copula
         
         %Fit the copula
-        [Rho,nu] = copulafit('t',paramsForCopula,'Method','ApproximateML');
-        %Generate the samples
-        r = copularnd('t',Rho,nu,1000);
-        %Scale the samples back to the original scale of the data
-        for p = 1:length(mcmc.thetaNames)       
-            draws.(mcmc.thetaNames{p}).samples = ksdensity(draws.(mcmc.thetaNames{p}).chain,r(:,p),'function','icdf');
+        try
+            [Rho,nu] = copulafit('t',paramsForCopula,'Method','ApproximateML');
+            %Generate the samples
+            r = copularnd('t',Rho,nu,1000);
+            %Scale the samples back to the original scale of the data
+            for p = 1:length(mcmc.thetaNames)       
+                draws.(mcmc.thetaNames{p}).samples = ksdensity(draws.(mcmc.thetaNames{p}).chain,r(:,p),'function','icdf');
+            end
+        catch exception
+            error('The estimate of parameters made by copula has become rank-deficient. You may have too few data, or strong dependencies among variables. To solve this issue try to increase the limit on the maximum ETA.');
         end
-        
         
         %Save distributions here 
         save(fullfile(environment.replayBGPath,'results','distributions',['distributions_' environment.saveName]),'mcmc','distributions','draws');

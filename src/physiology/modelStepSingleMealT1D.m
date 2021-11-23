@@ -1,10 +1,10 @@
-function xk = modelStepSingleMealT1D(xkm1,B,CHO,mP,xk,model)
-% function  modelStepSingleMealT1D(xkm1,B,CHO,mP,xk,model)
+function xk = modelStepSingleMealT1D(xkm1,I,CHO,mP,xk,model)
+% function  modelStepSingleMealT1D(xkm1,I,CHO,mP,xk,model)
 % Simulates a step of the single-meal t1d physiological model.
 %
 % Inputs:
 %   - xkm1: is a vector containing the model state at time k-1;
-%   - B: is the insulin at time k;
+%   - I: is the insulin at time k;
 %   - CHO: is the CHO at time k;
 %   - mP: is a struct containing the model parameters;
 %   - xk: is the preallocated vector that will contain the model state at 
@@ -22,23 +22,23 @@ function xk = modelStepSingleMealT1D(xkm1,B,CHO,mP,xk,model)
 %
 % ---------------------------------------------------------------------
     
-    G = xkm1(1); %mg/dL
+    G = xkm1(1); %Plasma glucose concentration (mg/dL)
     %Gss = Gb (assuming Xss = 0 and Rass = 0)
-    X = xkm1(2); %1/min
-    %Xss = 0 (over-basal insulin action)
-    Isc1 = xkm1(3); %mU/kg
+    X = xkm1(2); %(Over-basal) insulin action (1/min)
+    %Xss = 0 (over-basal --> 0)
+    Isc1 = xkm1(3); %Subcutaneous insulin concentration in a non-monomeric state (mU/kg)
     %Isc1ss = u2ss / ( ka1 + kd )
-    Isc2 = xkm1(4); %mU/kg
+    Isc2 = xkm1(4); %Subcutaneous insulin concentration in a monomeric state (mU/kg)
     %Isc2ss = kd / ka2 * u2ss / ( ka1 + kd )
-    Ip = xkm1(5); %mU/kg
+    Ip = xkm1(5); %Plasma insulin concentration (mU/kg)
     %Ipss = ka1 / ke * u2ss / ( ka1 + kd ) + ka2 / ke * kd / ka2 * u2ss / ( ka1 + kd ) 
-    Qsto1 = xkm1(6); %mg/kg
+    Qsto1 = xkm1(6); %Glucose concentration in the stomach in a solid state (mg/kg)
     %Qsto1ss = 0
-    Qsto2 = xkm1(7); %mg/kg
+    Qsto2 = xkm1(7); %Glucose concentration in the stomach in a liquid state (mg/kg)
     %Qsto2ss = 0
-    Qgut = xkm1(8); %mg/kg
+    Qgut = xkm1(8); %Glucose concentration in the intestin (mg/kg)
     %Qgutss = 0
-    IG = xkm1(9); %mg/dL  
+    IG = xkm1(9); %Interstitial glucose concentration (mg/dL)  
     %IGss = Gb
     
     %Compute the basal plasmatic insulin
@@ -54,7 +54,7 @@ function xk = modelStepSingleMealT1D(xkm1,B,CHO,mP,xk,model)
     
     Ra = mP.f*mP.kabs*xk(8);
     
-    xk(3) = (Isc1 + model.TS*B)/(1+model.TS*(mP.ka1+mP.kd));
+    xk(3) = (Isc1 + model.TS*I)/(1+model.TS*(mP.ka1+mP.kd));
     xk(4) = (Isc2 + model.TS*mP.kd*xk(3))/(1+model.TS*mP.ka2);
     xk(5) = (Ip + model.TS*(mP.ka1*xk(3)+mP.ka2*xk(4)))/(1+model.TS*mP.ke);
     

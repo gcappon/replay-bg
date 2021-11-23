@@ -68,6 +68,9 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
     %Identify the non-nan values
     nonNanIdx = find(~isnan(y));
     
+    %Get the number of samples
+    N = model.TYSTEPS;
+    
     %Run MCMC
     for run = 1:mcmc.n
 
@@ -89,7 +92,6 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             G = G(1:(model.YTS/model.TS):end);
             
             %Compute the log-likelihood lX
-            N = model.TID/model.YTS;
             switch(mP.typeN)
                 case 'CV'
                     lX = -(N/2)*log(2*pi)-(N/2)*log(((y(nonNanIdx).*mP.CVn)^2))-0.5*sum(((G(nonNanIdx)-y(nonNanIdx))/(y(nonNanIdx).*mP.CVn)).^2);

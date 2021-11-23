@@ -1,5 +1,5 @@
 function dss = initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams)
-% function  initDecisionSupportSystem(enableHypoTreatments)
+% function  initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams)
 % Initializes the 'dss' core variable.
 %
 % Inputs:
@@ -17,17 +17,28 @@ function dss = initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmen
 %   - correctionBolusesHandler: a vector of characters that specifies the
 %   name of the function handler that implements a corrective bolusing strategy
 %   during the replay of a given scenario.
+%   - hypoTreatmentsHandlerParams: (optional, default: []) a structure that contains the parameters
+%   to pass to the hypoTreatmentsHandler function. It also serves as memory
+%   area for the hypoTreatmentsHandler function;
+%   - correctionBolusesHandlerParams: (optional, default: []) a structure that contains the parameters
+%   to pass to the correctionBolusesHandler function. It also serves as memory
+%   area for the correctionBolusesHandler function.
 % Outputs:
 %   - dss: a structure that contains the hyperparameters of the integrated
 %   decision support system.
 %
 % ---------------------------------------------------------------------
 %
-% Copyright (C) 2020 Giacomo Cappon
+% Copyright (C) 2021 Giacomo Cappon
 %
 % This file is part of ReplayBG.
 %
 % ---------------------------------------------------------------------
+    
+    if(environment.verbose && strcmp(environment.modality,'replay'))
+    	fprintf('Setting up the Decision Support System hyperparameters...');
+    	tic;
+    end
     
     %Patient therapy parameters
     dss.CR = CR;
@@ -44,5 +55,10 @@ function dss = initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmen
     %Handlers optional parameters
     dss.hypoTreatmentsHandlerParams = hypoTreatmentsHandlerParams;
     dss.correctionBolusesHandlerParams = correctionBolusesHandlerParams;
+    
+    if(environment.verbose && strcmp(environment.modality,'replay'))
+        time = toc;
+        fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
+    end
     
 end
