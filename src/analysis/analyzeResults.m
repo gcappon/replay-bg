@@ -1,8 +1,10 @@
-function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment)
+function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment)
 % function  analyzeResults(glucose,data,environment)
 % Analyses the simulated glucose traces obtained using ReplayBG.
 %
 % Inputs:
+%   - cgm: a structure which contains the obtained cgm traces 
+%   simulated via ReplayBG;
 %   - glucose: a structure which contains the obtained glucose traces 
 %   simulated via ReplayBG; 
 %   - insulinBolus: a structure containing the input bolus insulin used to
@@ -48,7 +50,13 @@ function analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insul
         glucoseProfile = glucoseVectorToTimetable(glucose.(field{:}),minutes(data.Time(2)-data.Time(1)));
         
         %Analyze the glucose profile
-        analysis.(field{:}) = analyzeGlucoseProfile(glucoseProfile);
+        analysis.(field{:}).glucose = analyzeGlucoseProfile(glucoseProfile);
+        
+        %Transform the cgm profile under examination into a timetable
+        cgmProfile = glucoseVectorToTimetable(cgm.(field{:}),minutes(data.Time(2)-data.Time(1)));
+        
+        %Analyze the glucose profile
+        analysis.(field{:}).cgm = analyzeGlucoseProfile(cgmProfile);
         
     end
     

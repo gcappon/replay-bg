@@ -17,9 +17,9 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
 %   decision support system.
 % Outputs:
 %   - cgm: a structure which contains the obtained cgm traces 
-%   simulated via ReplayBG
+%   simulated via ReplayBG;
 %   - glucose: a structure which contains the obtained glucose traces 
-%   simulated via ReplayBG
+%   simulated via ReplayBG;
 %   - insulinBolus: a structure containing the input bolus insulin used to
 %   obtain glucose (U/min);
 %   - correctionBolus: a structure containing the correction bolus insulin used to
@@ -64,7 +64,9 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
         for p = 1:length(mcmc.thetaNames)
             modelParameters.(mcmc.thetaNames{p}) = draws.(mcmc.thetaNames{p}).samples(r);
         end
-        modelParameters.kgri = modelParameters.kempt;
+        
+        %Enforce model constraints
+        modelParameters = enforceConstraints(modelParameters, model, environment);
         
         %...check model parameter physiological plausibility...
         %check = checkIdentifiedParameters(modelParameters);
@@ -83,11 +85,11 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
     end
     
     %Obtain the median cgm trace and confidence intervals
-    cgm.median = zeros(height(data),1);
-    cgm.ci25th = zeros(height(data),1);
-    cgm.ci75th = zeros(height(data),1);
-    cgm.ci5th = zeros(height(data),1);
-    cgm.ci95th = zeros(height(data),1);
+    cgm.median = zeros(model.TYSTEPS,1);
+    cgm.ci25th = zeros(model.TYSTEPS,1);
+    cgm.ci75th = zeros(model.TYSTEPS,1);
+    cgm.ci5th = zeros(model.TYSTEPS,1);
+    cgm.ci95th = zeros(model.TYSTEPS,1);
     
     for g = 1:length(cgm.median)
         
@@ -100,11 +102,11 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
     end
     
     %Obtain the median glucose trace and confidence intervals
-    glucose.median = zeros(height(data),1);
-    glucose.ci25th = zeros(height(data),1);
-    glucose.ci75th = zeros(height(data),1);
-    glucose.ci5th = zeros(height(data),1);
-    glucose.ci95th = zeros(height(data),1);
+    glucose.median = zeros(model.TSTEPS,1);
+    glucose.ci25th = zeros(model.TSTEPS,1);
+    glucose.ci75th = zeros(model.TSTEPS,1);
+    glucose.ci5th = zeros(model.TSTEPS,1);
+    glucose.ci95th = zeros(model.TSTEPS,1);
     
     for g = 1:length(glucose.median)
         
