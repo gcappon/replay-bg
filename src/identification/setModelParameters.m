@@ -1,5 +1,5 @@
-function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment,mcmc,model,dss)
-% function  setModelParameters(data,BW,environment,mcmc,model,dss)
+function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment,mcmc,model,sensors, dss)
+% function  setModelParameters(data,BW,environment,mcmc,model,sensors,dss)
 % Sets the parameters of the physiological model.
 %
 % Inputs:
@@ -11,6 +11,8 @@ function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment
 %   identification procedure;
 %   - model: a structure that contains general parameters of the
 %   physiological model;
+%   - sensors: a structure that contains general parameters of the
+%   sensors models;
 %   - dss: a structure that contains the hyperparameters of the integrated
 %   decision support system.
 % Outputs:
@@ -39,7 +41,7 @@ function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment
         end
 
         %Identify model parameters (if modality: 'identification')
-        [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, model, dss, environment);
+        [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, model, sensors, dss, environment);
         
     else
         

@@ -1,5 +1,5 @@
-function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, model, dss, environment) 
-% function  identifyModelParameters(data, BW, mcmc, model, dss, environment) 
+function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, model, sensors, dss, environment) 
+% function  identifyModelParameters(data, BW, mcmc, model, sensors, dss, environment) 
 % Identifies the physiological model parameters using the MCMC.
 %
 % Inputs:
@@ -9,6 +9,8 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
 %   identification procedure;
 %   - model: a structure that contains general parameters of the
 %   physiological model;
+%   - sensors: a structure that contains general parameters of the
+%   sensors models;
 %   - dss: a structure that contains the hyperparameters of the integrated
 %   decision support system;
 %   - environment: a structure that contains general parameters to be used
@@ -38,7 +40,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
             disp(['*** Simulating first explorative MCMC run for ' num2str(mcmc.n) ' iterations...']);
         end
         tic;
-        [pHat, accept, ll] = runMCMC(data,mcmc,modelParameters,model,dss,environment); %Run MCMC
+        [pHat, accept, ll] = runMCMC(data,mcmc,modelParameters,model,sensors,dss,environment); %Run MCMC
         timeFirstRun = toc;
         if(environment.verbose)
             disp(['*** MCMC Finished! , Time: ' num2str(timeFirstRun/60) ' min.']);
@@ -52,7 +54,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
             disp(['*** Simulating second explorative MCMC run for ' num2str(mcmc.n) ' iterations...']);
         end
         tic;
-        [pHat, accept, ll] = runMCMC(data,mcmc,modelParameters,model,dss,environment); %Run MCMC
+        [pHat, accept, ll] = runMCMC(data,mcmc,modelParameters,model,sensors,dss,environment); %Run MCMC
         timeSecondRun = toc;
         if(environment.verbose)
             disp(['*** MCMC Finished! , Time: ' num2str(timeSecondRun/60) ' min.']);
@@ -111,7 +113,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                 tic;
                 disp(['*** Simulating MCMC run number ' num2str(nIterations) ' for ' num2str(mcmc.n) ' iterations (ETA ~ ' num2str(ETA) ' min)...']);
             end
-            [pHat, accept, ll] = runMCMC(data,mcmc,modelParameters,model,dss,environment);
+            [pHat, accept, ll] = runMCMC(data,mcmc,modelParameters,model,sensors,dss,environment);
             if(environment.verbose)
                 timeRun = toc;
                 disp(['*** MCMC Finished! , Time: ' num2str(timeRun/60) ' min.']);

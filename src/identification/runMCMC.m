@@ -1,5 +1,5 @@
-function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
-% function  runMCMC(data,mcmc,mP,model,environment)
+function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,sensors,dss,environment)
+% function  runMCMC(data,mcmc,mP,model,sensors,environment)
 % Performs a run of the MCMC identification procedure.
 %
 % Inputs:
@@ -9,6 +9,8 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
 %   - mP: a struct containing the model parameters;
 %   - model: a structure that contains general parameters of the
 %   physiological model;
+%   - sensors: a structure that contains general parameters of the
+%   sensors models;
 %   - dss: a structure that contains the hyperparameters of the integrated
 %   decision support system;
 %   - environment: a structure that contains general parameters to be used
@@ -88,7 +90,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             mP = enforceConstraints(mP,model,environment);
             
             %Compute glicemia given the data and model parameters
-            G = computeGlicemia(mP,data,model,dss,environment);
+            G = computeGlicemia(mP,data,model,sensors,dss,environment);
             G = G(1:(model.YTS/model.TS):end);
             
             %Compute the log-likelihood lX
@@ -129,7 +131,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             mP = enforceConstraints(mP,model,environment);
             
             %Compute glicemia given the data and model parameters
-            G = computeGlicemia(mP,data,model,dss,environment);
+            G = computeGlicemia(mP,data,model,sensors,dss,environment);
             G = G(1:(model.YTS/model.TS):end);
             
             %Compute the log-likelihood lY
@@ -179,7 +181,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,dss,environment)
             
             if(mod(run,100)==0 || run == mcmc.n)
                 
-                [G, ~, ~, ~, ~, ~, ~, x] = computeGlicemia(mP,data,model,dss,environment);
+                [G, ~, ~, ~, ~, ~, ~, x] = computeGlicemia(mP,data,model,sensors,dss,environment);
                 G = G(1:(model.YTS/model.TS):end);
 
                 subplot(5,1,1:3)

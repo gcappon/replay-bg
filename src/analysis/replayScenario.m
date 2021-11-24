@@ -1,5 +1,5 @@
-function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
-% function  replayScenario(data,modelParameters,draws,environment,model,mcmc,dss)
+function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,sensors,mcmc,dss)
+% function  replayScenario(data,modelParameters,draws,environment,model,sensors,mcmc,dss)
 % Replays the given scenario defined by the given data.
 %
 % Inputs:
@@ -11,6 +11,8 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
 %   by ReplayBG;
 %   - model: a structure that contains general parameters of the
 %   physiological model;
+%   - sensors: a structure that contains general parameters of the
+%   sensors models;
 %   - mcmc: a structure that contains the hyperparameters of the MCMC
 %   identification procedure;
 %   - dss: a structure that contains the hyperparameters of the integrated
@@ -73,7 +75,7 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
         %physioCheck(r) = all(struct2array(check));
         
         %...and simulate the scenario using the given data
-        [G, CGM, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,dss,environment);
+        [G, CGM, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,sensors,dss,environment);
         cgm.realizations(:,r) = CGM;
         glucose.realizations(:,r) = G;
         insulinBolus.realizations(:,r) = iB;

@@ -84,6 +84,7 @@ function environment = initEnvironment(modality,saveName,saveSuffix,scenario, pl
         if(exist(environment.logFile,'file'))
             delete(environment.logFile);
         end % if log
+    else
         environment.logFile = [];
     end
     

@@ -1,5 +1,5 @@
 function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment)
-% function  analyzeResults(glucose,data,environment)
+% function  analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment)
 % Analyses the simulated glucose traces obtained using ReplayBG.
 %
 % Inputs:

@@ -37,7 +37,7 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   - sampleTime: (optional, default: 5 (min)) an integer that specifies
 %   the data sample time;
 %   - seed: (optional, default: randi([1 1048576])) an integer that
-%   specifies the random seed. For reproducibility. NOT SUPPORTED YET;
+%   specifies the random seed. For reproducibility;
 %
 %   - maxETAPerMCMCRun: (optional, default: inf) a number that specifies
 %   the maximum time in hours allowed for each MCMC run; 
@@ -176,7 +176,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     addRequired(ip,'BW',@(x) BWValidator(x));
     
     addRequired(ip,'saveName',@(x) saveNameValidator(x));
-    addParameter(ip,'cgmModel','IG',@(x) cgmModelValidator(x)); %default = 'IG'
+    addParameter(ip,'cgmModel','CGM',@(x) cgmModelValidator(x)); %default = 'CGM'
     addParameter(ip,'glucoseModel','IG',@(x) glucoseModelValidator(x)); %default = 'IG'
     addParameter(ip,'sampleTime',5,@(x) sampleTimeValidator(x)); % default = 5
     addParameter(ip,'seed',randi([1 1048576]),@(x) seedValidator(x)); % default = randi([1 1048576])
@@ -219,26 +219,26 @@ function replayBG(modality, data, BW, saveName, varargin)
     %% ====================================================================
     
     %% ================ Initialize core variables =========================
-    [environment, model, mcmc, dss] = initCoreVariables(data,ip);
+    [environment, model, sensors, mcmc, dss] = initCoreVariables(data,ip);
     %% ====================================================================
     
     %% ================ Set model parameters ==============================
-    [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment,mcmc,model,dss);
+    [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment,mcmc,model,sensors,dss);
     %% ====================================================================
     
     %% ================ Replay of the scenario ============================
-    [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,mcmc,dss);
+    [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,sensors,mcmc,dss);
     %% ====================================================================
     
     %% ================ Analyzing results =================================
-    analysis = analyzeResults(glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment);
+    analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment);
     %% ====================================================================
     
     %% ================ Plotting results ==================================
     if(environment.plotMode)
         
         %Replay overview
-        plotReplayBGResults(cgm,data,environment);
+        plotReplayBGResults(cgm,glucose,data,environment);
         
         %Convert the profile to a timetable to comply with AGATA
         dataHat = glucoseVectorToTimetable(cgm.median,minutes(data.Time(2)-data.Time(1)),data.Time(1));
@@ -257,12 +257,12 @@ function replayBG(modality, data, BW, saveName, varargin)
     
     if(strcmp(environment.modality,'identification'))
         save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName environment.saveSuffix]),...
-            'data','BW','environment','mcmc','model','dss',...
+            'data','BW','environment','mcmc','model','sensors','dss',...
             'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO',...
             'analysis');
     else
         save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName environment.saveSuffix]),...
-            'data','BW','environment','model','dss',...
+            'data','BW','environment','model','sensors','dss',...
             'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO',...
             'correctionBolus', 'hypotreatments',...
             'analysis');

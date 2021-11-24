@@ -1,4 +1,4 @@
-function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x] = computeGlicemia(mP,data,model,dss,environment)
+function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x] = computeGlicemia(mP,data,model,sensors,dss,environment)
 % function  computeGlicemia(mP,data,model,dss,environment)
 % Compute the glycemic profile obtained with the ReplayBG physiological
 % model using the given inputs and model parameters.
@@ -8,6 +8,8 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
 %   - data: a timetable which contains the data to be used by the tool;
 %   - model: a structure that contains general parameters of the
 %   physiological model;
+%   - sensors: a structure that contains general parameters of the
+%   sensors models;
 %   - dss: a structure that contains the hyperparameters of the integrated
 %   decision support system;
 %   - environment: a structure that contains general parameters to be used
@@ -51,18 +53,18 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
     end
     
     %Set the initial cgm value
-    switch(model.cgmModel)
+    switch(sensors.cgm.model)
         case 'IG' 
             CGM(1) = x(model.nx,1); %y(k) = IG(k)
         case 'BG'
             CGM(1) = x(1,1); %y(k) = BG(k)
         case 'CGM'
-            %TODO
+            CGM(1) = cgmMeasure(x(model.nx,1),0,sensors);
     end
     
     %initialize inputs (basal, bolus, meal) with the initial condition (meal
     %intake + its bolus)
-    [bolus, basal, bolusDelayed, basalDelayed] = insulinSetup(data,model,mP,environment);
+    [bolus, basal, bolusDelayed, basalDelayed] = insulinSetup(data,model,mP);
     [meal,mealDelayed] = mealSetup(data,model,mP,environment);
     
     %Time vector for DSS
@@ -150,14 +152,14 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
         end     
         
         %Get the cgm
-        if(mod(k-1,model.YTS) == 0)
-            switch(model.cgmModel)
+        if(mod(k-1,sensors.cgm.TS) == 0)
+            switch(sensors.cgm.model)
                 case 'IG' 
-                    CGM(((k-1)/model.YTS) + 1) = x(model.nx,k); %y(k) = IG(k)
+                    CGM(((k-1)/sensors.cgm.TS) + 1) = x(model.nx,k); %y(k) = IG(k)
                 case 'BG'
-                    CGM(((k-1)/model.YTS) + 1) = x(1,k); %y(k) = IG(k)
+                    CGM(((k-1)/sensors.cgm.TS) + 1) = x(1,k); %y(k) = IG(k)
                 case 'CGM'
-                    %TODO
+                    CGM(((k-1)/sensors.cgm.TS) + 1) = cgmMeasure(x(model.nx,k),(k-1)/(24*60),sensors);
             end
         end
         

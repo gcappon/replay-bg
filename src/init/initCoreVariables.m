@@ -1,4 +1,4 @@
-function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
+function [environment, model, sensors, mcmc, dss] = initCoreVariables(data,ip)
 % function  initCoreVariables(data,ip)
 % Initializes the core variables (i.e., environment, model, mcmc, and dss) of
 % ReplayBG.
@@ -11,6 +11,8 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
 %   by ReplayBG;
 %   - model: a structure that contains general parameters of the
 %   physiological model;
+%   - sensors: a structure that contains general parameters of the
+%   sensors models;
 %   - mcmc: a structure that contains the hyperparameters of the MCMC
 %   identification procedure;
 %   - dss: a structure that contains the hyperparameters of the integrated
@@ -33,14 +35,18 @@ function [environment, model, mcmc, dss] = initCoreVariables(data,ip)
     end
     
     %Initialize the model hyperparameters
-    model = initModel(data,ip.Results.sampleTime, ip.Results.cgmModel, ip.Results.glucoseModel,ip.Results.pathology, ip.Results.seed, environment);
+    model = initModel(data,ip.Results.sampleTime, ip.Results.glucoseModel,ip.Results.pathology, ip.Results.seed, environment);
+    
+    %Initialize sensors hyperparameters 
+    sensors = initSensors(ip.Results.cgmModel, model, environment);
     
     %Initialize the decision support system hyperparameters
     dss = initDecisionSupportSystem(ip.Results.CR, ip.Results.CF,...
         ip.Results.enableHypoTreatments,ip.Results.hypoTreatmentsHandler,...
         ip.Results.enableCorrectionBoluses,ip.Results.correctionBolusesHandler,...
         ip.Results.hypoTreatmentsHandlerParams,...
-        ip.Results.correctionBolusesHandlerParams);
+        ip.Results.correctionBolusesHandlerParams,...
+        environment);
     
     %Initialize the mcmc hyperparameters (if modality: 'identification')
     if(strcmp(environment.modality,'identification'))

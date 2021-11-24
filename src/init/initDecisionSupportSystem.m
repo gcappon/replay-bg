@@ -1,4 +1,4 @@
-function dss = initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams)
+function dss = initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams,environment)
 % function  initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams)
 % Initializes the 'dss' core variable.
 %
@@ -22,7 +22,9 @@ function dss = initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmen
 %   area for the hypoTreatmentsHandler function;
 %   - correctionBolusesHandlerParams: (optional, default: []) a structure that contains the parameters
 %   to pass to the correctionBolusesHandler function. It also serves as memory
-%   area for the correctionBolusesHandler function.
+%   area for the correctionBolusesHandler function;
+%   - environment: a structure that contains general parameters to be used
+%   by ReplayBG.
 % Outputs:
 %   - dss: a structure that contains the hyperparameters of the integrated
 %   decision support system.
