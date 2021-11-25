@@ -67,6 +67,15 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
             modelParameters.(mcmc.thetaNames{p}) = draws.(mcmc.thetaNames{p}).samples(r);
         end
         
+        
+        %If the CGM model is selected...
+        if(strcmp(sensors.cgm.model,'CGM'))
+            
+            %..connect a new CGM sensor
+            [sensors.cgm.errorParameters, sensors.cgm.outputNoiseSD] = connectNewCGM(sensors);
+        
+        end
+        
         %Enforce model constraints
         modelParameters = enforceConstraints(modelParameters, model, environment);
         

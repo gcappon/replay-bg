@@ -1,33 +1,15 @@
-function CGM = cgmMeasure(IG, t, sensors )
-% function  computeGlicemia(mP,data,model,dss,environment)
-% Compute the glycemic profile obtained with the ReplayBG physiological
-% model using the given inputs and model parameters.
+function CGM = cgmMeasure(IG, t, sensors)
+% function  cgmMeasure(IG, t, sensors)
+% Function that provide a CGM measure using the model of Vettoretti et al.,
+% Sensors, 2019.
 %
 % Inputs:
 %   - IG: interstitial glucose concentration at current time (mg/dl);
-%   - t: current time. Minutes from the start of CGM sensor;
-%   - model: a structure that contains general parameters of the
-%   physiological model;
+%   - t: current time in days from the start of CGM sensor;
 %   - sensors: a structure that contains general parameters of the
-%   sensors models;
-%   - dss: a structure that contains the hyperparameters of the integrated
-%   decision support system;
-%   - environment: a structure that contains general parameters to be used
-%   by ReplayBG.
+%   sensors models.
 % Outputs:
-%   - G: is a vector containing the simulated glucose trace [mg/dl]; 
-%   - CGM: is a vector containing the simulated cgm trace [mg/dl]; 
-%   - insulinBolus: is a vector containing the input bolus insulin used to
-%   obtain G (U/min);
-%   - correctionBolus: a vector containing the correction bolus insulin used to
-%   obtain G (U/min);
-%   - insulinBasal: a vector containing the input basal insulin used to
-%   obtain G (U/min);
-%   - CHO: a vector containing the input CHO used to obtain glucose
-%   (g/min);
-%   - hypotreatments: a vector containing the input hypotreatments used 
-%   to obtain G (g/min);
-%   - x: is a matrix containing the simulated model states. 
+%   - CGM: the CGM measurement at current time (mg/dl).
 %
 % ---------------------------------------------------------------------
 %
