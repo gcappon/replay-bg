@@ -78,7 +78,6 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                     SIL0 = 10.35e-4/1.45;
                     SID0 = 10.35e-4/1.45;
                     Gb0 = 119.13;
-                    Gbdawn0 = 119.13;
                     p20 = 0.012;
                     kempt0 = 0.18;
                     kabsB0 = 0.012;
@@ -117,18 +116,6 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                     mcmc.parBlock = [1, 1, 2,...
                         2,...
                         3, 3]; 
-                    
-                    %Attach dawn Gb if data between 2:00 - 8:00 are available
-                    if(any(hour(data.Time) >= 2 & hour(data.Time) < 8))
-                        mcmc.thetaNames{end+1} = 'Gbdawn';
-                        mcmc.std(end+1) = 1;
-                        mcmc.theta0(end+1) = Gbdawn0; 
-                        mcmc.stdMax(end+1) = 2;
-                        mcmc.stdMin(end+1) = 0;
-                        mcmc.parBlock(end+1) = 4;
-                    else
-                        warning("No data are available between 2:00 - 8:00. Gb of dawn phenomenon during that time window will be set to day Gb.");
-                    end
                     
                     %Attach breakfast SI if data between 4:00 - 11:00 are available
                     if(any(hour(data.Time) >= 4 & hour(data.Time) < 11))
