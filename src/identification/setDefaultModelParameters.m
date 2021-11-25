@@ -80,6 +80,7 @@ function modelParameters = setDefaultModelParameters(data,BW,model,environment)
                         modelParameters.VG = 1.45; %dl/kg
                         modelParameters.SG = 2.5e-2; %1/min
                         modelParameters.Gb = 119.13; %mg/dL
+                        modelParameters.Gbdawn = 140; %mg/dL
                         modelParameters.r1 = 1.4407; %unitless
                         modelParameters.r2 = 0.8124; %unitless
                         modelParameters.alpha = 7; %1/min
