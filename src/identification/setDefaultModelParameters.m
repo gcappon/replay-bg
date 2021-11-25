@@ -28,8 +28,9 @@ function modelParameters = setDefaultModelParameters(data,BW,model,environment)
                     case 'single-meal'
                         
                         %Initial conditions
-                        modelParameters.Xpb = 0; %Insulin action initial condition
-                        modelParameters.Qgutb = 0; %Intestinal content initial condition
+                        modelParameters.X0 = 0; %Insulin action initial condition
+                        modelParameters.Qgut0 = 0; %Intestinal content initial condition
+                        modelParameters.Ip0 = 0; %Plasma insulin initial condition
 
                         %Glucose-insulin submodel parameters
                         modelParameters.VG = 1.45; %dl/kg

@@ -43,10 +43,16 @@ function prior = definePriorPDF(model, environment)
                         prior.ka2 = @(mP) lognpdf(mP.ka2,-4.2875,0.4274)*(mP.ka2<1);
                         prior.tau = @(mP) lognpdf(mP.tau,1.7869,1.1586)*(mP.tau <= 45);
 
-                        %Oral glucose absorption sumodel
+                        %Oral glucose absorption submodel
                         prior.kabs = @(mP) lognpdf(mP.kabs,-5.4591,1.4396)*(mP.kempt>=mP.kabs)*(mP.kabs<1);
                         prior.kempt = @(mP) lognpdf(mP.kempt,-1.9646,0.7069)*(mP.kempt>=mP.kabs)*(mP.kempt<1);
                         prior.beta = @(mP) 1*(mP.beta>=0 && mP.beta<=60);
+                        
+                        %Initial conditions
+                        prior.X0 = @(mP) 1*(mP.X0>=0);
+                        prior.Ip0 = @(mP) 1*(mP.Ip0>=0);
+                        prior.Qgut0 = @(mP) 1*(mP.Qgut0>=0);
+                        
                     case 'multi-meal'
                         %Glucose-insulin submodel parameters
                         prior.SIB = @(mP) gampdf(mP.SIB*mP.VG,3.3,5e-4)*((mP.SIB*mP.VG)<1e-2);
@@ -70,7 +76,7 @@ function prior = definePriorPDF(model, environment)
                         prior.ka2 = @(mP) lognpdf(mP.ka2,-4.2875,0.4274)*(mP.ka2<1);
                         prior.tau = @(mP) lognpdf(mP.tau,1.7869,1.1586)*(mP.tau <= 45);
 
-                        %Oral glucose absorption sumodel
+                        %Oral glucose absorption submodel
                         prior.kabsB = @(mP) lognpdf(mP.kabsB,-5.4591,1.4396)*(mP.kempt>=mP.kabsB)*(mP.kabsB<1);
                         prior.kabsL = @(mP) lognpdf(mP.kabsL,-5.4591,1.4396)*(mP.kempt>=mP.kabsL)*(mP.kabsL<1);
                         prior.kabsD = @(mP) lognpdf(mP.kabsD,-5.4591,1.4396)*(mP.kempt>=mP.kabsD)*(mP.kabsD<1);
@@ -82,6 +88,11 @@ function prior = definePriorPDF(model, environment)
                         prior.betaD = @(mP) 1*(mP.betaD>=0 && mP.betaD<=60);
                         prior.betaS = @(mP) 1*(mP.betaS>=0 && mP.betaS<=60);
                         prior.betaH = @(mP) 1*(mP.betaH>=0 && mP.betaH<=60);
+                        
+                        %Initial conditions
+                        prior.X0 = @(mP) 1*(mP.X0>=0);
+                        prior.Ip0 = @(mP) 1*(mP.Ip0>=0);
+                        prior.Qgut0 = @(mP) 1*(mP.Qgut0>=0);
 
                 end
             

@@ -93,6 +93,10 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                     betaS0 = 15;
                     betaH0 = 0;
                     
+                    Qgut0 = 0;
+                    X0 = 0;
+                    Ip0 = 0;
+                    
                     
                     %Set the parameters that always need to be identified
                     mcmc.thetaNames = {'SG','Gb','p2',...
@@ -116,6 +120,23 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                     mcmc.parBlock = [1, 1, 2,...
                         2,...
                         3, 3]; 
+                    
+                    
+                    %Attach initial conditions
+                    mcmc.thetaNames{end+1} = 'Qgut0';
+                    mcmc.std(end+1) = 10;
+                    mcmc.theta0(end+1) = Qgut0; 
+                    mcmc.stdMax(end+1) = 1e-5*inf;
+                    mcmc.stdMin(end+1) = 0;
+                    mcmc.parBlock(end+1) = 5;
+                    
+                    mcmc.thetaNames{end+1} = 'Ip0';
+                    mcmc.std(end+1) = 10;
+                    mcmc.theta0(end+1) = Ip0; 
+                    mcmc.stdMax(end+1) = 1e-5*inf;
+                    mcmc.stdMin(end+1) = 0;
+                    mcmc.parBlock(end+1) = 5;
+
                     
                     %Attach breakfast SI if data between 4:00 - 11:00 are available
                     if(any(hour(data.Time) >= 4 & hour(data.Time) < 11))
