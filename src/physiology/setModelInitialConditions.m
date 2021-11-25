@@ -40,13 +40,13 @@ function x0 = setModelInitialConditions(data,modelParameters,model,environment)
                         
                         %Set initial conditions 
                         x0(1:model.nx,1) = [data.glucose(idxFirstNonNan); ...                                 %G(0)
-                              mP.X0; ...                                                                                          %X(0)
+                              mP.Xpb; ...                                                                                          %X(0)
                               mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
                               (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
-                              (mP.ka1/mP.ke)*mP.u2ss/(mP.ka1+mP.kd) + (mP.ka2/mP.ke)*(mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd) + mP.Ip0; ...    %Ip(0) 
+                              (mP.ka1/mP.ke)*mP.u2ss/(mP.ka1+mP.kd) + (mP.ka2/mP.ke)*(mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...    %Ip(0) 
                               0; ...                                                                                               %Qsto1(0)
                               0; ...                                                                                               %Qsto2(0)
-                              mP.Qgut0; ...                                                                                        %Qgut(0)
+                              mP.Qgutb; ...                                                                                        %Qgut(0)
                               data.glucose(idxFirstNonNan)];                                                 %IG(0)  
 
                     case 'multi-meal'
@@ -58,7 +58,7 @@ function x0 = setModelInitialConditions(data,modelParameters,model,environment)
                         
                         %Set initial conditions
                         x0(1:model.nx,1) = [data.glucose(idxFirstNonNan); ...                                 %G(0)
-                              mP.Xpb; ...                                                                                          %X(0)
+                              mP.X0; ...                                                                                          %X(0)
                               mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
                               (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
                               (mP.ka1/mP.ke)*mP.u2ss/(mP.ka1+mP.kd) + (mP.ka2/mP.ke)*(mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...    %Ip(0) 
