@@ -39,7 +39,12 @@ function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment
             tic;
             fprintf(['Identifying ReplayBG model using MCMC on ' st '...\n']);
         end
-
+        
+        %Connect a CGM sensor if sensors.cgmModel is CGM
+        if(strcmp(sensors.cgm.model,'CGM'))
+            [sensors.cgm.errorParameters, sensors.cgm.outputNoiseSD] = connectNewCGM(sensors);
+        end
+        
         %Identify model parameters (if modality: 'identification')
         [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, model, sensors, dss, environment);
         

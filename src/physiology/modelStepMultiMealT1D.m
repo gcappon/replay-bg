@@ -70,7 +70,7 @@ function xk = modelStepMultiMealT1D(xkm1,I,CHOB,CHOL,CHOD,CHOS,CHOH,hourOfTheDay
     IG = xkm1(21); %Interstitial glucose concentration (mg/dL) 
     %IGss = Gb
     
-    %Set the inisulin sensitivity based on the time of the day
+    %Set the insulin sensitivity based on the time of the day
     if(hourOfTheDay<4 || hourOfTheDay >= 17)
         SI = mP.SID;
     else
@@ -79,6 +79,13 @@ function xk = modelStepMultiMealT1D(xkm1,I,CHOB,CHOL,CHOD,CHOS,CHOH,hourOfTheDay
         else
             SI = mP.SIL;
         end
+    end
+    
+    %Set the basal glucose based on the time of the day
+    if(hourOfTheDay>=2 && hourOfTheDay < 8)
+        Gb = mP.Gbdawn;
+    else
+        Gb = mP.Gb;
     end
     
     %Compute the basal plasmatic insulin
@@ -120,7 +127,7 @@ function xk = modelStepMultiMealT1D(xkm1,I,CHOB,CHOL,CHOD,CHOS,CHOH,hourOfTheDay
     
     xk(2) = (X + model.TS*mP.p2*(SI/mP.VI)*(xk(5)-Ipb))/(1+model.TS*mP.p2);
     
-    xk(1) = (G + model.TS*(mP.SG*mP.Gb+(RaB + RaL + RaD + RaS + RaH)/mP.VG))/(1+model.TS*(mP.SG + (1+mP.r1*risk)*xk(2)));
+    xk(1) = (G + model.TS*(mP.SG*Gb+(RaB + RaL + RaD + RaS + RaH)/mP.VG))/(1+model.TS*(mP.SG + (1+mP.r1*risk)*xk(2)));
     xk(21) = (IG + (model.TS/mP.alpha)*xk(1))/(1+model.TS/mP.alpha);
     
 end %function model

@@ -58,6 +58,7 @@ function prior = definePriorPDF(model, environment)
                         prior.SG = @(mP) lognpdf(mP.SG,-3.8,0.5)*(mP.SG<1);                        
                         prior.p2 = @(mP) normpdf(sqrt(mP.p2),0.11,0.004)*(mP.p2>0)*(mP.p2<1);
                         prior.Gb = @(mP) normpdf(mP.Gb,119.13,7.11)*(mP.Gb<=180)*(mP.Gb>=70);
+                        prior.Gbdawn = @(mP) normpdf(mP.Gbdawn,119.13,7.11)*(mP.Gbdawn<=250)*(mP.Gbdawn>=70)*(mP.Gbdawn >= mP.Gb);
                         prior.r1 = @(mP) (mP.r1>=0)*normpdf(mP.r1,1.4407,0.0562);
                         prior.r2 = @(mP) (mP.r2>=0)*normpdf(mP.r2,0.8124,0.0171);
                         prior.alpha = @(mP) 1*(mP.alpha>0);

@@ -121,6 +121,7 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   - correctionBolusesHandlerParams: (optional, default: []) a structure that contains the parameters
 %   to pass to the correctionBolusesHandler function. It also serves as memory
 %   area for the correctionBolusesHandler function;
+%
 %   - saveSuffix: (optional, default: '') a vector of char to be attached
 %   as suffix to the resulting output files' name;
 %   - plotMode: (optional, default: 1) a numerical flag that specifies
