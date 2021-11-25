@@ -58,7 +58,7 @@ function x0 = setModelInitialConditions(data,modelParameters,model,environment)
                         
                         %Set initial conditions
                         x0(1:model.nx,1) = [data.glucose(idxFirstNonNan); ...                                 %G(0)
-                              mP.X0; ...                                                                                          %X(0)
+                              mP.Xpb; ...                                                                                          %X(0)
                               mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
                               (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
                               (mP.ka1/mP.ke)*mP.u2ss/(mP.ka1+mP.kd) + (mP.ka2/mP.ke)*(mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...    %Ip(0) 
