@@ -122,17 +122,17 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                         2,...
                         3, 3]; 
                     
-                    %Attach Gbdawn if data between 2:00 - 8:00 are available
-                    if(any(hour(data.Time) >= 2 & hour(data.Time) < 8))
-                        mcmc.thetaNames{end+1} = 'Gbdawn';
-                        mcmc.std(end+1) = 1;
-                        mcmc.theta0(end+1) = Gbdawn0; 
-                        mcmc.stdMax(end+1) = 2;
-                        mcmc.stdMin(end+1) = 0;
-                        mcmc.parBlock(end+1) = 2;
-                    else
-                        warning("No data are available between 2:00 - 8:00. Gbdawn during that time window will be set to Gb.");
-                    end
+%                     %Attach Gbdawn if data between 2:00 - 8:00 are available
+%                     if(any(hour(data.Time) >= 2 & hour(data.Time) < 8))
+%                         mcmc.thetaNames{end+1} = 'Gbdawn';
+%                         mcmc.std(end+1) = 1;
+%                         mcmc.theta0(end+1) = Gbdawn0; 
+%                         mcmc.stdMax(end+1) = 2;
+%                         mcmc.stdMin(end+1) = 0;
+%                         mcmc.parBlock(end+1) = 2;
+%                     else
+%                         warning("No data are available between 2:00 - 8:00. Gbdawn during that time window will be set to Gb.");
+%                     end
                     
                     %Attach breakfast SI if data between 4:00 - 11:00 are available
                     if(any(hour(data.Time) >= 4 & hour(data.Time) < 11))
