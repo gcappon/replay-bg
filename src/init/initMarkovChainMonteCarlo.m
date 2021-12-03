@@ -146,18 +146,6 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                         warning("No data are available between 4:00 - 11:00. SI during that time window will be set to population value (7.14e-4 mL/(uU*min)).");
                     end
                     
-                    %Attach breakfast SI if data between 4:00 - 11:00 are available
-                    if(any(hour(data.Time) >= 4 & hour(data.Time) < 11))
-                        mcmc.thetaNames{end+1} = 'SIB';
-                        mcmc.std(end+1) = 1e-6;
-                        mcmc.theta0(end+1) = SIB0; 
-                        mcmc.stdMax(end+1) = 1e-5*inf;
-                        mcmc.stdMin(end+1) = 0;
-                        mcmc.parBlock(end+1) = 1;
-                    else
-                        warning("No data are available between 4:00 - 11:00. SI during that time window will be set to population value (7.14e-4 mL/(uU*min)).");
-                    end
-                    
                     %Attach lunch SI if data between 11:00 - 17:00 are available
                     if(any(hour(data.Time) >= 11 & hour(data.Time) < 17))
                         mcmc.thetaNames{end+1} = 'SIL';
