@@ -115,7 +115,7 @@ function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, 
         for field = fields
             
             %Transform the glucose profile under examination into a timetable
-            dataHat = glucoseVectorToTimetable(glucose.(field{:}),minutes(data.Time(2)-data.Time(1)),data.Time(1));
+            dataHat = glucoseVectorToTimetable(cgm.(field{:}),minutes(data.Time(2)-data.Time(1)),data.Time(1));
             
             analysis.(field{:}).identification.RMSE = rmse(data,dataHat); % [mg/dl]
             analysis.(field{:}).identification.MARD = mard(data,dataHat); 

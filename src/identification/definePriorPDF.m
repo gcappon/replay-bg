@@ -38,14 +38,14 @@ function prior = definePriorPDF(model, environment)
                         %Subcutaneous insulin absorption submodel
                         prior.VI = @(mP) lognpdf(mP.VI,-2.0568,0.1128);
                         prior.ke = @(mP) lognpdf(mP.ke,-2.0811,0.2977)*(mP.ke<1);
-                        prior.kd = @(mP) lognpdf(mP.kd,-3.5090,0.6187)*(mP.kd<1);
+                        prior.kd = @(mP) lognpdf(mP.kd,-3.5090,0.6187)*(mP.kd<1)*(mP.ka2 <= mP.kd);
                         prior.ka1 = @(mP) lognpdf(mP.ka1,-5.7775,0.6545)*(mP.ka1<1);
-                        prior.ka2 = @(mP) lognpdf(mP.ka2,-4.2875,0.4274)*(mP.ka2<1);
+                        prior.ka2 = @(mP) lognpdf(mP.ka2,-4.2875,0.4274)*(mP.ka2<1)*(mP.ka2 <= mP.kd);
                         prior.tau = @(mP) lognpdf(mP.tau,1.7869,1.1586)*(mP.tau <= 45);
 
                         %Oral glucose absorption submodel
                         prior.kabs = @(mP) lognpdf(mP.kabs,-5.4591,1.4396)*(mP.kempt>=mP.kabs)*(mP.kabs<1);
-                        prior.kempt = @(mP) lognpdf(mP.kempt,-1.9646,0.7069)*(mP.kempt>=mP.kabs)*(mP.kempt<1);
+                        prior.kempt = @(mP) lognpdf(mP.kempt,-1.9646,0.7069)*(mP.kempt<1);
                         prior.beta = @(mP) 1*(mP.beta>=0 && mP.beta<=60);
                         
                     case 'multi-meal'
@@ -67,9 +67,9 @@ function prior = definePriorPDF(model, environment)
                         %Subcutaneous insulin absorption submodel
                         prior.VI = @(mP) lognpdf(mP.VI,-2.0568,0.1128);
                         prior.ke = @(mP) lognpdf(mP.ke,-2.0811,0.2977)*(mP.ke<1);
-                        prior.kd = @(mP) lognpdf(mP.kd,-3.5090,0.6187)*(mP.kd<1);
+                        prior.kd = @(mP) lognpdf(mP.kd,-3.5090,0.6187)*(mP.kd<1)*(mP.ka2 <= mP.kd);
                         prior.ka1 = @(mP) lognpdf(mP.ka1,-5.7775,0.6545)*(mP.ka1<1);
-                        prior.ka2 = @(mP) lognpdf(mP.ka2,-4.2875,0.4274)*(mP.ka2<1);
+                        prior.ka2 = @(mP) lognpdf(mP.ka2,-4.2875,0.4274)*(mP.ka2<1)*(mP.ka2 <= mP.kd);
                         prior.tau = @(mP) lognpdf(mP.tau,1.7869,1.1586)*(mP.tau <= 45);
 
                         %Oral glucose absorption submodel

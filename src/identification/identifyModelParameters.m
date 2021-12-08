@@ -17,7 +17,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
 %   by ReplayBG.
 % Outputs:
 %   - modelParameters: is a struct containing all the identified model 
-%   parameters;
+%   parameters (point estimates);
 %   - draws: a structure that contains the modelParameter draws obtained
 %   with MCMC.
 %
@@ -255,17 +255,35 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                 
         end
         
-        %Sample 1000 model parameter samples using a copula
+        %Sample mcmc.tbe model parameter samples using a copula
         
         %Fit the copula
         try
             [Rho,nu] = copulafit('t',paramsForCopula,'Method','ApproximateML');
-            %Generate the samples
-            r = copularnd('t',Rho,nu,1000);
-            %Scale the samples back to the original scale of the data
-            for p = 1:length(mcmc.thetaNames)       
-                draws.(mcmc.thetaNames{p}).samples = ksdensity(draws.(mcmc.thetaNames{p}).chain,r(:,p),'function','icdf');
+           
+            %Init parameters that are not ok yet 
+            nyOK = mcmc.tbe;
+            parametersOK = false(mcmc.tbe,1);
+            
+            %Repeat while not all parameters are ok
+            while ~all(parametersOK)
+                
+                %Generate the samples
+                r = copularnd('t',Rho,nu,nyOK);
+                
+                %Scale the samples back to the original scale of the data
+                for p = 1:length(mcmc.thetaNames)       
+                    draws.(mcmc.thetaNames{p}).samples(~parametersOK) = ksdensity(draws.(mcmc.thetaNames{p}).chain,r(:,p),'function','icdf');
+                end
+                
+                %Check if the extracted parameters are ok and find who's
+                %not
+                parametersOK = checkCopulaExtractions(draws, mcmc, modelParameters, model, environment);
+                %Count who many are missing yet
+                nyOK = sum(~parametersOK);
+                
             end
+            
         catch exception
             error('The estimate of parameters made by copula has become rank-deficient. You may have too few data, or strong dependencies among variables. To solve this issue try to increase the limit on the maximum ETA.');
         end

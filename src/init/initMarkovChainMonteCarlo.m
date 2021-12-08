@@ -308,6 +308,9 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
             mcmc.adaptationFrequency = 2000;
     end
     
+    %Number of samples to be extracted via copula 
+    mcmc.tbe = 1000;
+    
     if(environment.verbose)
     	time = toc;
     	fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);

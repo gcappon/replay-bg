@@ -71,13 +71,9 @@ function modelParameters = enforceConstraints(modelParameters, model, environmen
                             modelParameters.ka2 = modelParameters.kd;
                         end
                         
-                        % kempt = kgri
+                        % kgri = kempt
                         modelParameters.kgri = modelParameters.kempt;
                         
-                        % Gb <= Gbdawn
-                        if(modelParameters.Gbdawn<modelParameters.Gb)
-                            modelParameters.Gbdawn = modelParameters.Gb;
-                        end
 
                 end
             
