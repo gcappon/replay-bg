@@ -69,7 +69,7 @@ ReplayBG accepts optional parameters that can be used to fit user's preferences.
 - `enableLog`: (optional, default: `1`) a numerical flag that specifies whether to log the output of ReplayBG not. Can be `0` or `1`;
 - `verbose`: (optional, default: `1`) a numerical flag that specifies the verbosity of ReplayBG. Can be `0` or `1`.
 
-### Suggested setting for step 1
+### Suggested settings for step 1
 
 Potentially, given the computational cost and the function of the parameter identification machinery (MCMC), this step can take forever. 
 
@@ -141,7 +141,7 @@ where:
 - `'replay'` specifies that the tool will be used to simulate the scenario specified by the given `data`;
 - `data` is a timetable which contains the data to be used by the tool. MUST contain a column `glucose` that contains the glucose measurements (in mg/dl), a column `basal` that contains the basal insulin data (in U/min), a column `bolus` that contains the bolus insulin data (in U/min), a column `CHO` that contains the CHO intake data (in g/min). `data` MUST be sampled on a homogeneous time grid and MUST, except for the `glucose` column, not contain Nan values. In case of `scenario = 'multi-meal'` `data` (see "Optional parameters" section below) MUST also contain a column of strings `choLabel` that contains for each non-zero value of the `CHO` column, a character that specifies the type of CHO intake (`'B'` for breakfast, `'L'` for lunch, `'D'` for dinner, `'S'` for snack, `'H'` for hypotreatment);
 - `BW` is the patient body weight (kg);
-- `saveName` is a vector of characters used to label, thus identify, each output file and result of ReaplyBG.
+- `saveName` is a vector of characters used to label, thus identify, each output file and result of ReaplyBG. **It MUST be the same used during step 1.**
 
 ### Optional parameters
 
@@ -155,9 +155,9 @@ ReplayBG accepts optional parameters that can be used to fit user's preferences.
 - `CR`: (optional, default: `nan`) the carbohydrate-to-insulin ratio of the patient in g/U to be used by the integrated decision support system;
 - `CF`: (optional, default: nan) the correction factor of the patient in mg/dl/U to be used by the integrated decision support system;
 - `enableHypoTreatments`: (optional, default: `0`) a numerical flag that specifies whether to enable hypotreatments during the replay of a given scenario. Can be `0` or `1`. Can be set only when ReplayBG is used in `'replay'` mode;
-- `hypoTreatmentsHandler`: (optional, default: `'adaHypoTreatmentsHandler'`) a vector of characters that specifies the name of the function handler that implements an hypotreatment strategy during the replay of a given scenario. The function must have 2 outputs, i.e., the hypotreatments carbohydrates intake (g/min) and the `dss` structure (see section "Use case 2: Test an hypotreatment strategy with ReplayBG" below). The function must have 8 inputs, i.e., `G` (mg/dl) a glucose vector as long the simulation length containing all the simulated glucose concentrations up to timeIndex. The other values are nan, `CHO` (g/min) a vector that contains the CHO intakes input for the whole replay simulation, `hypotreatments` (g/min) a vector that contains the hypotreatments intakes input for the whole replay simulation (will be also populated by ReplayBG during the simulation if one or more hypotreatment is given by the function itself), `bolus` (U/min) a vector that contains the bolus insulin input for the whole replay simulation, `basal` (U/min) a vector that contains the basal insulin input for the whole replay simulation, `time` (datetime) a vector that contains the time instants of current replay simulation, `timeIndex` is a number that defines the current time instant in the replay simulation and the `dss` structure. Vectors contain one value for each integration step. The default policy implemented by the `adaHypoTreatmentsHandler` function is "take an hypotreatment of 10 g every 15 minutes while in hypoglycemia";
+- `hypoTreatmentsHandler`: (optional, default: `'adaHypoTreatmentsHandler'`) a vector of characters that specifies the name of the function handler that implements an hypotreatment strategy during the replay of a given scenario. The function must have 2 outputs, i.e., the hypotreatments carbohydrates intake (g/min) and the `dss` structure (see section "Use case 2: Test an hypotreatment strategy with ReplayBG" below). The function must have 8 inputs, i.e., `G` (mg/dl) a glucose vector as long the simulation length containing all the simulated glucose concentrations up to timeIndex (the other values are nan), `CHO` (g/min) a vector that contains the CHO intakes input for the whole replay simulation, `hypotreatments` (g/min) a vector that contains the hypotreatments intakes input for the whole replay simulation (will be also populated by ReplayBG during the simulation if one or more hypotreatment is given by the function itself), `bolus` (U/min) a vector that contains the bolus insulin input for the whole replay simulation, `basal` (U/min) a vector that contains the basal insulin input for the whole replay simulation, `time` (datetime) a vector that contains the time instants of current replay simulation, `timeIndex` is a number that defines the current time instant in the replay simulation and the `dss` structure. Vectors contain one value for each integration step. The default policy implemented by the `adaHypoTreatmentsHandler` function is "take an hypotreatment of 10 g every 15 minutes while in hypoglycemia";
 - `enableCorrectionBoluses`: (optional, default: `0`) a numerical flag that specifies whether to enable correction boluses during the replay of a  given scenario. Can be `0` or `1`. Can be set only when ReplayBG is used in `'replay'` mode;
-- `correctionBolusesHandler`: (optional, default: `'correctsAbove250Handler'`) a vector of characters that specifies the name of the function handler that implements a corrective bolusing strategy during the replay of a given scenario. The function must have 2 output, i.e., the correction insulin bolus (U/min) and the `dss` structure (see section "Use case 3: Test a corrective bolusing strategy with ReplayBG" below). The function must have 7 inputs, i.e., `G` (mg/dl) a glucose vector as long the simulation length containing all the simulated glucose concentrations up to timeIndex. The other values are nan, `CHO' (g/min) a vector that contains the CHO intakes input for the whole replay simulation, `bolus` (U/min) a vector that contains the bolus insulin input for the whole replay simulation, `basal` (U/min) a vector that contains the basal insulin input for the whole replay simulation, `'time'` (datetime) a vector that contains the time instants of current replay simulation, `timeIndex` is a number that defines the current time instant in the replay simulation and the `dss` structure. Vectors contain one value for each integration step. The default policy implemented by the `correctsAbove250Handler` function is "take a corrective bolus of 1 U every 1 hour while above 250 mg/dl";
+- `correctionBolusesHandler`: (optional, default: `'correctsAbove250Handler'`) a vector of characters that specifies the name of the function handler that implements a corrective bolusing strategy during the replay of a given scenario. The function must have 2 output, i.e., the correction insulin bolus (U/min) and the `dss` structure (see section "Use case 3: Test a corrective bolusing strategy with ReplayBG" below). The function must have 7 inputs, i.e., `G` (mg/dl) a glucose vector as long the simulation length containing all the simulated glucose concentrations up to timeIndex (the other values are nan), `CHO' (g/min) a vector that contains the CHO intakes input for the whole replay simulation, `bolus` (U/min) a vector that contains the bolus insulin input for the whole replay simulation, `basal` (U/min) a vector that contains the basal insulin input for the whole replay simulation, `'time'` (datetime) a vector that contains the time instants of current replay simulation, `timeIndex` is a number that defines the current time instant in the replay simulation and the `dss` structure. Vectors contain one value for each integration step. The default policy implemented by the `correctsAbove250Handler` function is "take a corrective bolus of 1 U every 1 hour while above 250 mg/dl";
 - `hypoTreatmentsHandlerParams`: (optional, default: `[]`) a structure that contains the parameters to pass to the `hypoTreatmentsHandler` function (see section "Use case 2: Test an hypotreatment strategy with ReplayBG" below). It also serves as memory area for the `hypoTreatmentsHandler` function;
 - `correctionBolusesHandlerParams`: (optional, default: `[]`) a structure that contains the parameters to pass to the `correctionBolusesHandler` function (see section "Use case 3: Test a corrective bolusing strategy with ReplayBG" below). It also serves as memory area for the `correctionBolusesHandler` function;
 - `seed`: (optional, default: `randi([1 1048576])`) an integer that specifies the random seed. For reproducibility;
@@ -166,8 +166,154 @@ ReplayBG accepts optional parameters that can be used to fit user's preferences.
 - `enableLog`: (optional, default: `1`) a numerical flag that specifies whether to log the output of ReplayBG not. Can be `0` or `1`;
 - `verbose`: (optional, default: `1`) a numerical flag that specifies the verbosity of ReplayBG. Can be `0` or `1`.
 
-### Use case 1: Integrate your online decision support system in ReplayBG
+### Example of ReplayBG use for assessing your algorithm
 
+Potentially, given the computational cost and the function of the parameter identification machinery (MCMC), this step can take forever. 
+
+These are some suggested usage of ReaplyBG depending on your needs.
+
+Please remember that the rationale is to identify a dataset "once and for all" (that is the heavy part of ReplayBG) and then play with the simulations (see "Step 2: Use of ReplayBG for simulation"). 
+
+#### Use case 1: Test different inputs by simply modifying `data`
+
+The most simple use case of ReaplyBG consists of modifying the `data` timetable used during step 1 setting new insulin/meal inputs and replaying the scenario. For example if you want to simulate "what would have happened if I had doubled the CHO intake?":
+
+```MATLAB
+%Here, I suppose that data is the timetable used during identification
+data.CHO = data.CHO*2;
+replayBG( ...
+  'replay', data, BW, saveName, ...
+  'plotMode',1, ...
+  'verbose',1, ...
+  'seed', 1
+);
+```
+
+The same rationale can be applied to the insulin bolus/basal input. 
+
+Note that if you want to add a meal and `scenario` is `multi-meal` you also have to set the corresponding `choLabel`, e.g.:
+```MATLAB
+%Here, I suppose that data is the timetable used during identification
+data.CHO(12) = 5; %Here I am adding a snack of 5 g/min at 12*`sampleTime` minutes after the starting of the simulation.
+data.choLabel(12) = 'S';
+replayBG( ...
+  'replay', data, BW, saveName, ...
+  'plotMode',1, ...
+  'verbose',1, ...
+  'seed', 1
+);
+```
+#### Use case 2: Test an hypotreatment strategy with ReplayBG
+
+Let's say that you want to test an algorithm that advice to take an hypotreatment according to some strategy to avoid hypoglycemia. 
+
+You have to follow two steps: 
+1. First define a function that implements your strategy, namely the "handler". This function, as stated above, must have 2 outputs, i.e., the hypotreatments carbohydrates intake (g/min) and the `dss` structure. The function must have 8 inputs, i.e., `G` (mg/dl) a glucose vector as long the simulation length containing all the simulated glucose concentrations up to timeIndex (the other values are nan), `CHO` (g/min) a vector that contains the CHO intakes input for the whole replay simulation, `hypotreatments` (g/min) a vector that contains the hypotreatments intakes input for the whole replay simulation (will be also populated by ReplayBG during the simulation if one or more hypotreatment is given by the function itself), `bolus` (U/min) a vector that contains the bolus insulin input for the whole replay simulation, `basal` (U/min) a vector that contains the basal insulin input for the whole replay simulation, `time` (datetime) a vector that contains the time instants of current replay simulation, `timeIndex` is a number that defines the current time instant in the replay simulation and the `dss` structure. For example, here's the default handler implemented in ReplayBG that provides the user with an example to start playing with:
+
+```MATLAB
+function [HT, dss] = adaHypoTreatmentsHandler(G,CHO,hypotreatments,bolus,basal,time,timeIndex,dss)
+% function  adaHypoTreatmentsHandler(G,CHO,hypotreatments,bolus,basal,time,timeIndex,dss)
+% Implements the default hypotreatment strategy: "take an hypotreatment of 
+% 10 g every 15 minutes while in hypoglycemia".
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
+
+    HT = 0;
+    
+    %If glucose is lower than 70...
+    if(G(timeIndex) < 70)
+        
+        %...and if there are no CHO intakes in the last 15 minutes, then take an HT
+        if(timeIndex > 15 && ~any(hypotreatments((timeIndex - 15):timeIndex)))
+            HT = 15; % g/min
+        end
+        
+    end
+        
+end
+```
+
+2. Call ReplayBG by enabling the hypotreatments "module" and by providing the name of the handler just created: 
+
+```MATLAB
+%Here, I suppose that data is the timetable used during identification
+replayBG( ...
+  'replay', data, BW, saveName, ...
+  'enableHypoTreatments', 1, ...
+  'hypoTreatmentsHandler', 'adaHypoTreatmentsHandler', ...
+  'plotMode',1, ...
+  'verbose',1, ...
+  'seed', 1
+);
+```
+
+Three notes: 
+
+- The handler function will be called for each integration time step (each "simulated" minute). This will slow down ReplayBG.
+- If `scenario` is `'single meal'`, the `hypotreatments` input will contain only the hypotreatments generated by this function during the simulation. If `scenario` is `'multi-meal'`, the `hypotreatments` input will ALSO contain the hypotreatments already present in the given data that labeled as such.
+- `CHO` does not contain hypotreatments.
+- `dss` is a structure that serves as memory area and contains decsion support related parameter passed to ReplayBG when you call the `replayBG` function (i.e., the parameter `CR`, `CF`, `hypoTreatmentsHandlerParams`, and `correctionBolusesHandlerParams`. As such you can use it to provide to your handler the parameter you need. Also, keep in mind that, serving as a memory area, it is possible to store values inside `dss` and `hypoTreatmentsHandlerParams` and they will be available in the next call of the function (this is useful if you need to compute things like the insulin-on-board, or "when is the last time I gave an hypotreatment?").
+
+#### Use case 3: Test a corrective bolusing strategy with ReplayBG
+
+Let's say that you want to test an algorithm that advice to take a corrective insulin bolus according to some strategy to avoid hyperglycemia. 
+
+You have to follow two steps: 
+1. First define a function that implements your strategy, namely the "handler". This function, as stated above, must have 2 outputs, i.e., the hypotreatments carbohydrates intake (g/min) and the `dss` structure. The function must have 7 inputs, i.e., `G` (mg/dl) a glucose vector as long the simulation length containing all the simulated glucose concentrations up to timeIndex (the other values are nan), `CHO` (g/min) a vector that contains the CHO intakes input for the whole replay simulation, `bolus` (U/min) a vector that contains the bolus insulin input for the whole replay simulation, `basal` (U/min) a vector that contains the basal insulin input for the whole replay simulation, `time` (datetime) a vector that contains the time instants of current replay simulation, `timeIndex` is a number that defines the current time instant in the replay simulation and the `dss` structure. For example, here's the default handler implemented in ReplayBG that provides the user with an example to start playing with:
+
+```MATLAB
+function [CB, dss] = correctsAbove250Handler(G,CHO,bolus,basal,time,timeIndex,dss)
+% function  correctsAbove250Handler(G,CHO,bolus,basal,time,timeIndex,dss)
+% Implements the default correction bolus strategy: "take a correction
+% bolus of 1 U every 1 hour while above 250 mg/dl".
+%
+% ---------------------------------------------------------------------
+%
+% Copyright (C) 2020 Giacomo Cappon
+%
+% This file is part of ReplayBG.
+%
+% ---------------------------------------------------------------------
+
+    CB = 0;
+    
+    %If glucose is greater than 250...
+    if(G(timeIndex) > 250)
+        
+        %...and if there are no boluses in the last 1 hour, then take a CB
+        if(timeIndex > 60 && ~any(bolus((timeIndex - 60):timeIndex)))
+            CB = 1; % U/min
+        end
+        
+    end
+    
+end
+```
+
+2. Call ReplayBG by enabling the correction insulin "module" and by providing the name of the handler just created: 
+
+```MATLAB
+%Here, I suppose that data is the timetable used during identification
+replayBG( ...
+  'replay', data, BW, saveName, ...
+  'enableCorrectionBoluses', 1, ...
+  'correctionBolusesHandler', 'correctsAbove250Handler', ...
+  'plotMode',1, ...
+  'verbose',1, ...
+  'seed', 1
+);
+```
+
+Three notes: 
+
+- The handler function will be called for each integration time step (each "simulated" minute). This will slow down ReplayBG.
+- `dss` is a structure that serves as memory area and contains decsion support related parameter passed to ReplayBG when you call the `replayBG` function (i.e., the parameter `CR`, `CF`, `hypoTreatmentsHandlerParams`, and `correctionBolusesHandlerParams`. As such you can use it to provide to your handler the parameter you need. Also, keep in mind that, serving as a memory area, it is possible to store values inside `dss` and `correctionBolusesHandlerParams` and they will be available in the next call of the function (this is useful if you need to compute things like the insulin-on-board, or "when is the last time I gave a correction bolus?").
 
 ## Results
 
@@ -181,4 +327,4 @@ Results are saved in the `results/` folder of the replay-bg folder, specifically
 # Notes
 
 - Only the 'single-meal' mode has been extensively validated and evaluated in the referred paper. The 'multi-meal' model is working correctly but it is currently under development. 
-- The code is continuosly evolving and if you want to support its development please feel free to contact me.
+- The code is continuosly evolving and if you want to support its development please feel free to contact me at giacomo.cappon@unipd.it.
