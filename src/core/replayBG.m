@@ -158,7 +158,7 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   - Plot is not currently showing insulin and carbohydrate intake
 %   generated during the simulation via the dss, only input data. This is
 %   because we have multiple simulations, so events can occur at different
-%   time with different amounts (see  
+%   time with different amounts (see issue #17).
 %
 % ---------------------------------------------------------------------
 % REFERENCES:
