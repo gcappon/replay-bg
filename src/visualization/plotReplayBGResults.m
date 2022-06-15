@@ -44,8 +44,8 @@ function plotReplayBGResults(cgm,glucose,data,environment)
     a(2).FaceColor = [0 0 1];
     a(2).FaceAlpha = 0.2;
     hp1(5) = a(2);
-    plot([data.Time(1) data.Time(end)],[70 70],'m--','linewidth',2);
-    plot([data.Time(1) data.Time(end)],[180 180],'m--','linewidth',2);
+    plot([data.Time(1) data.Time(end)],[70 70],'k--','linewidth',2);
+    plot([data.Time(1) data.Time(end)],[180 180],'k--','linewidth',2);
     grid on
     ylabel('Glucose [mg/dl]','FontWeight','bold','FontSize',18);
     legend(hp1,'Glucose (data)','Replay CGM (Median)','Replay Glucose (Median)', 'Replay CGM (CI 5-95th)', 'Replay Glucose (CI 5-95th)');

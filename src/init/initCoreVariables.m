@@ -1,6 +1,6 @@
 function [environment, model, sensors, mcmc, dss] = initCoreVariables(data,ip)
 % function  initCoreVariables(data,ip)
-% Initializes the core variables (i.e., environment, model, mcmc, and dss) of
+% Initializes the core variables (i.e., environment, model, sensors, mcmc, and dss) of
 % ReplayBG.
 %
 % Inputs:

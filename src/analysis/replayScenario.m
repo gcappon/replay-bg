@@ -43,7 +43,7 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
 
     if(environment.verbose)
         tic;
-        fprintf(['Replaying scenario...']);
+        fprintf('Replaying scenario...');
     end
 
     %Obtain the glicemic realizations using the copula-generated parameter samples

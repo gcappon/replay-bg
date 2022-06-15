@@ -1,5 +1,5 @@
 function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x] = computeGlicemia(mP,data,model,sensors,dss,environment)
-% function  computeGlicemia(mP,data,model,dss,environment)
+% function  computeGlicemia(mP,data,model,sensors,dss,environment)
 % Compute the glycemic profile obtained with the ReplayBG physiological
 % model using the given inputs and model parameters.
 %

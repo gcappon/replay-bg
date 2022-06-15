@@ -1,5 +1,5 @@
 function sensors = initSensors(cgmModel, model, environment)
-% function  initSensors(cgmModel,glucoseModel, pathology, seed, environment)
+% function  initSensors(cgmModel, model, environment)
 % Initializes the 'sensors' core variable.
 %
 % Inputs:

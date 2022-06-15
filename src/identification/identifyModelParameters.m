@@ -261,7 +261,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         try
             [Rho,nu] = copulafit('t',paramsForCopula,'Method','ApproximateML');
            
-            %Init parameters that are not ok yet 
+            %Init parameters that are not yet ok (nyOK) 
             nyOK = mcmc.tbe;
             parametersOK = false(mcmc.tbe,1);
             

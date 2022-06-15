@@ -1,6 +1,6 @@
 function modelParameters = enforceConstraints(modelParameters, model, environment)
 % function  enforceConstraints(modelParameters, model, environment)
-% Function that enforces the model paramenter values contraints.
+% Function that enforces the model parameter values constraints.
 %
 % Inputs:
 %   - modelParameters: a struct containing the model parameters;

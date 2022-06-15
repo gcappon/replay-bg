@@ -28,7 +28,7 @@ function valid = hypoTreatmentsHandlerValidator(hypoTreatmentsHandler,modality)
     
     valid = valid && nargout(hypoTreatmentsHandler) == 2;
     if(~valid)
-        error("Handler does not have the proper number of inputs (must be 2).");
+        error("Handler does not have the proper number of outputs (must be 2).");
     end
     
     valid = valid && nargin(hypoTreatmentsHandler) == 8;

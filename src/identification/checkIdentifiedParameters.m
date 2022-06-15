@@ -5,7 +5,7 @@ function check = checkIdentifiedParameters(mP)
 % Input:
 %   - mP: a struct containing the model parameters;
 % Output:
-%   - prior: a structure containing the check flags for the given model 
+%   - check: a structure containing the check flags for the given model 
 %   parameters.
 %
 % ---------------------------------------------------------------------

@@ -155,9 +155,17 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   * results/workspaces/: contains the core ReplayBG variables and data used in a
 %   specific ReplayBG call.
 %
+%   - Plot is not currently showing insulin and carbohydrate intake
+%   generated during the simulation via the dss, only input data. This is
+%   because we have multiple simulations, so events can occur at different
+%   time with different amounts (see  
+%
 % ---------------------------------------------------------------------
 % REFERENCES:
-% TBD...
+% 
+%   - Cappon et al., "ReplayBG: a methodology to identify a personalized
+%   model from type 1 diabetes data and simulate glucose concentrations to
+%   assess alternative therapies", IEEE TBME, 2022 (under revision).
 %
 % ---------------------------------------------------------------------
 %
