@@ -27,7 +27,9 @@ function [environment, model, sensors, mcmc, dss] = initCoreVariables(data,ip)
 % ---------------------------------------------------------------------
 
     %Initialize the environment parameters
-    environment = initEnvironment(ip.Results.modality,ip.Results.saveName,ip.Results.saveSuffix, ip.Results.scenario, ip.Results.plotMode,ip.Results.enableLog,ip.Results.verbose);
+    environment = initEnvironment(ip.Results.modality,ip.Results.saveName,ip.Results.saveSuffix,ip.Results.scenario,...
+        ip.Results.bolusSource, ip.Results.basalSource, ip.Results.choSource,...
+        ip.Results.plotMode,ip.Results.enableLog,ip.Results.verbose);
     
     %Start the log file
     if(environment.enableLog)

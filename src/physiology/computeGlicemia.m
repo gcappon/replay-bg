@@ -64,7 +64,7 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
     
     %initialize inputs (basal, bolus, meal) with the initial condition (meal
     %intake + its bolus)
-    [bolus, basal, bolusDelayed, basalDelayed] = insulinSetup(data,model,mP);
+    [bolus, basal, bolusDelayed, basalDelayed] = insulinSetup(data,model,mP,environment);
     [meal,mealDelayed] = mealSetup(data,model,mP,environment);
     
     %Time vector for DSS

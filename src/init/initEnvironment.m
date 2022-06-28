@@ -1,5 +1,5 @@
-function environment = initEnvironment(modality,saveName,saveSuffix,scenario, plotMode,enableLog,verbose)
-% function  initEnvironment(modality,saveName,saveSuffix,scenario, plotMode,enableLog,verbose)
+function environment = initEnvironment(modality,saveName,saveSuffix,scenario, bolusSource, basalSource, choSource, plotMode,enableLog,verbose)
+% function  initEnvironment(modality,saveName,saveSuffix,scenario, bolusSource, basalSource, choSource, plotMode,enableLog,verbose)
 % Initializes the 'environment' core variable.
 %
 % Inputs:
@@ -12,6 +12,9 @@ function environment = initEnvironment(modality,saveName,saveSuffix,scenario, pl
 %   resulting output files' name;
 %   - scenario: a vector of characters that specifies if the scenario is
 %   single-meal or multi-meal;
+%   - bolusSource:
+%   - basalSource: 
+%   - choSource:
 %   - plotMode: a numerical flag that specifies whether to show the plot 
 %   of the results or not;
 %   - enableLog: (optional, default: 1) a numerical flag that specifies
@@ -90,6 +93,11 @@ function environment = initEnvironment(modality,saveName,saveSuffix,scenario, pl
     
     %Single-meal or multi-meal scenario?
     environment.scenario = scenario;
+    
+    %Set data sources
+    environment.bolusSource = bolusSource;
+    environment.basalSource = basalSource;
+    environment.choSource = choSource;
     
     %Set the verbosity
     environment.plotMode = plotMode; % if 0 do not plot 

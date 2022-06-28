@@ -32,7 +32,11 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
     %% ============ Set default parameter values ==========================
     
         modelParameters = setDefaultModelParameters(data,BW,model,environment);
-    
+        
+        %Set model initial conditions (to start replay according to data)
+        idxFirstNonNan = find(~isnan(data.glucose),1,'first');
+        modelParameters.G0 = data.glucose(idxFirstNonNan);
+        
     %% ========== Run MCMC  ===============================================
         %1. Explorative run to roughly estimate std and initial values
         mcmc.n = mcmc.raftLewNmin; %number of iterations

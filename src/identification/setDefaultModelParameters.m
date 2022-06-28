@@ -64,7 +64,10 @@ function modelParameters = setDefaultModelParameters(data,BW,model,environment)
                         %Measurement noise specifics
                         modelParameters.typeN = 'SD';
                         modelParameters.SDn = 5;
-                       
+                        
+                        %Initial conditions
+                        modelParameters.G0 = modelParameters.Gb;
+                        
 
                     case 'multi-meal'
                         
@@ -120,6 +123,9 @@ function modelParameters = setDefaultModelParameters(data,BW,model,environment)
                         %Measurement noise specifics
                         modelParameters.typeN = 'SD';
                         modelParameters.SDn = 5;
+                        
+                        %Initial conditions
+                        modelParameters.G0 = modelParameters.Gb;
 
                 end
             

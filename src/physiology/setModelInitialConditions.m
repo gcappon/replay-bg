@@ -33,13 +33,8 @@ function x0 = setModelInitialConditions(data,modelParameters,model,environment)
                 switch(environment.scenario)
                     case 'single-meal'
                         
-                        %Find the first non-nan glucose value to be set as
-                        %initial condition for plansma and interstitial
-                        %glucose
-                        idxFirstNonNan = find(~isnan(data.glucose),1,'first');
-                        
                         %Set initial conditions 
-                        x0(1:model.nx,1) = [data.glucose(idxFirstNonNan); ...                                 %G(0)
+                        x0(1:model.nx,1) = [mP.G0; ...                                 %G(0)
                               mP.Xpb; ...                                                                                          %X(0)
                               mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
                               (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
@@ -47,17 +42,12 @@ function x0 = setModelInitialConditions(data,modelParameters,model,environment)
                               0; ...                                                                                               %Qsto1(0)
                               0; ...                                                                                               %Qsto2(0)
                               mP.Qgutb; ...                                                                                        %Qgut(0)
-                              data.glucose(idxFirstNonNan)];                                                 %IG(0)  
+                              mP.G0];                                                 %IG(0)  
 
                     case 'multi-meal'
                         
-                        %Find the first non-nan glucose value to be set as
-                        %initial condition for plansma and interstitial
-                        %glucose
-                        idxFirstNonNan = find(~isnan(data.glucose),1,'first');
-                        
                         %Set initial conditions
-                        x0(1:model.nx,1) = [data.glucose(idxFirstNonNan); ...                                 %G(0)
+                        x0(1:model.nx,1) = [mP.G0; ...                                 %G(0)
                               mP.Xpb; ...                                                                                          %X(0)
                               mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
                               (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
@@ -77,7 +67,7 @@ function x0 = setModelInitialConditions(data,modelParameters,model,environment)
                               0; ...                                                                                               %Qsto1H(0)
                               0; ...                                                                                               %Qsto2H(0)
                               mP.QgutbH; ...                                                                                        %QgutH(0)
-                              data.glucose(idxFirstNonNan)];                                                 %IG(0) 
+                              mP.G0];                                                 %IG(0) 
                           
                 end
             

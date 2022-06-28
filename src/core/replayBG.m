@@ -1,5 +1,5 @@
-function replayBG(modality, data, BW, saveName, varargin)
-% function  replayBG(modality, data, BW, saveName, varargin)
+function replayBG(modality, data, BW, scenario, saveName, varargin)
+% function  replayBG(modality, data, BW, scenario, saveName, varargin)
 % Core function of ReplayBG. Can be used to identify ReplayBG model on the
 % given data or to "replay" specific scenarios specified by the given data.
 %
@@ -19,6 +19,10 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   intake ('B' for breakfast, 'L' for lunch, 'D' for dinner, 'S' for
 %   snack, 'H' for hypotreatment);
 %   - BW: (required) the patient body weight (kg);
+%   - scenario: (required) a vector of characters
+%   that specifies whether the given scenario refers to a single-meal
+%   scenario or a multi-meal scenario. Can be 'single-meal' or
+%   'multi-meal';
 %   - saveName: (required) a vector of characters used to label, thus identify, each 
 %   output file and result;
 %
@@ -29,10 +33,6 @@ function replayBG(modality, data, BW, saveName, varargin)
 %
 %   - pathology: (optional, default: 't1d') a vector of characters that
 %   specifies the patient pathology. Can be 't1d', 't2d', 'pbh', 'healthy'.
-%   - scenario: (optional, default: 'single-meal') a vector of characters
-%   that specifies whether the given scenario refers to a single-meal
-%   scenario or a multi-meal scenario. Can be 'single-meal' or
-%   'multi-meal';
 %
 %   - sampleTime: (optional, default: 5 (min)) an integer that specifies
 %   the data sample time;
@@ -147,10 +147,7 @@ function replayBG(modality, data, BW, saveName, varargin)
 %   obtained in each MCMC run;
 %   * results/modelParameters/: contains the model parameters identified using
 %   MCMC. Known model parameters are fixed to population values obtained
-%   from the literature. Unknown model parameters are pointly estimated
-%   using MAP criterion without accounting for intra-parameter correlation.
-%   For this reason is better to obtain an estimate of the replayed glucose
-%   profile via Monte Carlo simulations using hte model parameters in
+%   from the literature. Unknown model parameters estimates are in 
 %   draws.<modelParameterName>.samples;
 %   * results/workspaces/: contains the core ReplayBG variables and data used in a
 %   specific ReplayBG call.
@@ -178,21 +175,25 @@ function replayBG(modality, data, BW, saveName, varargin)
     %% ================ Function input parsing ============================
     %Obtain the InputParser object
     ip = inputParser;
-        
+    basalSource = 'data';
     %Add the parameters to the InputParsers
     addRequired(ip,'modality',@(x) modalityValidator(x));
-    addRequired(ip,'data',@(x) dataValidator(x));
+    addRequired(ip,'data',@(x) dataValidator(x,modality));
     addRequired(ip,'BW',@(x) BWValidator(x));
-    
+    addRequired(ip,'scenario',@(x) scenarioValidator(x));
     addRequired(ip,'saveName',@(x) saveNameValidator(x));
+    
     addParameter(ip,'cgmModel','CGM',@(x) cgmModelValidator(x)); %default = 'CGM'
     addParameter(ip,'glucoseModel','IG',@(x) glucoseModelValidator(x)); %default = 'IG'
     addParameter(ip,'sampleTime',5,@(x) sampleTimeValidator(x)); % default = 5
     addParameter(ip,'seed',randi([1 1048576]),@(x) seedValidator(x)); % default = randi([1 1048576])
     
-    addParameter(ip,'scenario','single-meal',@(x) scenarioValidator(x,data)); %default = 'single-meal'
     addParameter(ip,'pathology','t1d',@(x) pathologyValidator(x)); %default = 't1d'
     
+    addParameter(ip,'bolusSource','data',@(x) bolusSourceValidator(x,data,modality));
+    addParameter(ip,'basalSource','data',@(x) basalSourceValidator(x,data,modality));
+    addParameter(ip,'choSource','data',@(x) choSourceValidator(x,data,modality,scenario));
+
     addParameter(ip,'maxETAPerMCMCRun',inf,@(x) maxETAPerMCMCRunValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCIterations',inf,@(x) maxMCMCIterationsValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCRuns',inf,@(x) maxMCMCRunsValidator(x, modality)); % default = inf
@@ -220,7 +221,7 @@ function replayBG(modality, data, BW, saveName, varargin)
     addParameter(ip,'verbose',1,@(x) verboseValidator(x)); % default = 1
     
     %Parse the input arguments
-    parse(ip,modality,data,BW,saveName,varargin{:});
+    parse(ip,modality,data,BW,scenario,saveName,varargin{:});
     
     %Isolate data and BW from the results
     data = ip.Results.data;
@@ -247,13 +248,15 @@ function replayBG(modality, data, BW, saveName, varargin)
     if(environment.plotMode)
         
         %Replay overview
-        plotReplayBGResults(cgm,glucose,data,environment);
+        plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotreatments, correctionBolus, data,environment);
         
         %Convert the profile to a timetable to comply with AGATA
         dataHat = glucoseVectorToTimetable(cgm.median,minutes(data.Time(2)-data.Time(1)),data.Time(1));
         
         %Clarke's Error Grid
-        plotClarkeErrorGrid(data,dataHat,0);
+        if(strcmp(environment.modality,'identification'))
+            plotClarkeErrorGrid(data,dataHat,0);
+        end
         
     end
     %% ====================================================================
