@@ -1,4 +1,4 @@
-function [meal, mealDelayed] = mealSetup(data,model,modelParameters,environment)
+function [meal, mealDelayed, mealAnnouncement] = mealSetup(data,model,modelParameters,environment)
 % function  mealSetup(data,model,modelParameters,environment)
 % Generates the vector containing the CHO intake events to be used to
 % simulate the physiological model.
@@ -30,6 +30,9 @@ function [meal, mealDelayed] = mealSetup(data,model,modelParameters,environment)
             %Initialize the meal vector
             meal = zeros(model.TSTEPS,1);
             
+            %Initialize the mealAnnouncements vector
+            mealAnnouncement = zeros(model.TSTEPS,1);
+            
             if(strcmp(environment.choSource,'data'))
                 
                 %Find the meals
@@ -38,6 +41,8 @@ function [meal, mealDelayed] = mealSetup(data,model,modelParameters,environment)
                 %Set the meal vector
                 for i = 1:length(mIdx)
                     meal((1+(mIdx(i)-1)*(model.YTS/model.TS)):(mIdx(i)*(model.YTS/model.TS))) = data.CHO(mIdx(i))*1000/modelParameters.BW; %mg/(kg*min)
+                    mealAnnouncement((1+(mIdx(i)-1)*(model.YTS/model.TS))) = data.CHO(mIdx(i))*(model.YTS/model.TS); %mg/(kg*min)
+                    
                 end
                 
             end
@@ -55,6 +60,9 @@ function [meal, mealDelayed] = mealSetup(data,model,modelParameters,environment)
             meal.snack = zeros(model.TSTEPS,1);
             meal.hypotreatment = zeros(model.TSTEPS,1);
             
+            %Inizialize the mealAnnouncement vector
+            mealAnnouncement = zeros(model.TSTEPS,1);
+            
             if(strcmp(environment.choSource,'data'))
                 
                 placeholder = ones(length(1:(model.YTS/model.TS)),1);
@@ -70,21 +78,25 @@ function [meal, mealDelayed] = mealSetup(data,model,modelParameters,environment)
                     meal.breakfast((1+(bIdx(i)-1)*(model.YTS/model.TS)):(bIdx(i)*(model.YTS/model.TS))) = ...
                         placeholder*data.CHO(bIdx(i))*1000/modelParameters.BW + ...
                         meal.breakfast((1+(bIdx(i)-1)*(model.YTS/model.TS)):(bIdx(i)*(model.YTS/model.TS))); %mg/(kg*min)
+                    mealAnnouncement((1+(bIdx(i)-1)*(model.YTS/model.TS))) = data.CHO(bIdx(i))*(model.YTS/model.TS); %g
                 end
                 for i = 1:length(lIdx)
                     meal.lunch((1+(lIdx(i)-1)*(model.YTS/model.TS)):(lIdx(i)*(model.YTS/model.TS))) = ...
                         placeholder*data.CHO(lIdx(i))*1000/modelParameters.BW + ...
                         meal.lunch((1+(lIdx(i)-1)*(model.YTS/model.TS)):(lIdx(i)*(model.YTS/model.TS))); %mg/(kg*min)
+                    mealAnnouncement((1+(lIdx(i)-1)*(model.YTS/model.TS))) = data.CHO(lIdx(i))*(model.YTS/model.TS); %g
                 end
                 for i = 1:length(dIdx)
                     meal.dinner((1+(dIdx(i)-1)*(model.YTS/model.TS)):(dIdx(i)*(model.YTS/model.TS))) = ...
                         placeholder*data.CHO(dIdx(i))*1000/modelParameters.BW + ...
                         meal.dinner((1+(dIdx(i)-1)*(model.YTS/model.TS)):(dIdx(i)*(model.YTS/model.TS))); %mg/(kg*min)
+                    mealAnnouncement((1+(dIdx(i)-1)*(model.YTS/model.TS))) = data.CHO(dIdx(i))*(model.YTS/model.TS); %g
                 end
                 for i = 1:length(sIdx)
                     meal.snack((1+(sIdx(i)-1)*(model.YTS/model.TS)):(sIdx(i)*(model.YTS/model.TS))) = ...
                         placeholder*data.CHO(sIdx(i))*1000/modelParameters.BW + ...
                         meal.snack((1+(sIdx(i)-1)*(model.YTS/model.TS)):(sIdx(i)*(model.YTS/model.TS))); %mg/(kg*min)
+                    mealAnnouncement((1+(sIdx(i)-1)*(model.YTS/model.TS))) = data.CHO(sIdx(i))*(model.YTS/model.TS); %g
                 end
                 for i = 1:length(hIdx)
                     meal.hypotreatment((1+(hIdx(i)-1)*(model.YTS/model.TS)):(hIdx(i)*(model.YTS/model.TS))) = ...

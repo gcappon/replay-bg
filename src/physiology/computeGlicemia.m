@@ -65,7 +65,7 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
     %initialize inputs (basal, bolus, meal) with the initial condition (meal
     %intake + its bolus)
     [bolus, basal, bolusDelayed, basalDelayed] = insulinSetup(data,model,mP,environment);
-    [meal,mealDelayed] = mealSetup(data,model,mP,environment);
+    [meal,mealDelayed, mealAnnouncements] = mealSetup(data,model,mP,environment);
     
     %Time vector for DSS
     switch(environment.scenario)
@@ -94,6 +94,21 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
     
     %Simulate the physiological model
     for k = 2:model.TSTEPS
+        
+        if(strcmp(environment.bolusSource,'dss'))
+        
+            %Call the bolus calculator function handler
+            [B, dss] = feval(dss.bolusCalculatorHandler, G, mealAnnouncements, insulinBolus,basal,time,k-1,dss);
+            
+            %Add insulin boluses to insulin bolus input if needed (remember to add insulin
+            %absorption delay)
+            if(k+mP.tau <= model.TSTEPS)
+                bolusDelayed(k+mP.tau) = bolusDelayed(k+mP.tau) + B*1000/mP.BW;
+            end
+            
+            %Update the insulin bolus event vectors
+            insulinBolus(k) = insulinBolus(k) + B;
+        end
         
         %Use the hypotreatments module if it is enabled
         if(dss.enableHypoTreatments)

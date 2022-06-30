@@ -1,4 +1,7 @@
-function dss = initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams,environment)
+function dss = initDecisionSupportSystem(CR,CF,GT,...
+    bolusCalculatorHandler, bolusCalculatorHandlerParams, ...
+    enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams, ...
+    environment)
 % function  initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams)
 % Initializes the 'dss' core variable.
 %
@@ -7,6 +10,9 @@ function dss = initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmen
 %   used by the integrated decision support system;
 %   - CF: the correction factor of the patient in mg/dl/U to be used by the 
 %   integrated decision support system;
+%   - GT;
+%   - bolusCalculatorHandler;
+%   - bolusCalculatorHandlerParams;
 %   - enableHypoTreatments: a numerical flag that specifies whether to 
 %   enable hypotreatments during the replay of a given scenario;
 %   - hypoTreatmentsHandler: a vector of characters that specifies the
@@ -43,8 +49,13 @@ function dss = initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmen
     end
     
     %Patient therapy parameters
+    dss.GT = GT;
     dss.CR = CR;
     dss.CF = CF;
+    
+    %Bolus Calculator module parameters
+    dss.bolusCalculatorHandler = bolusCalculatorHandler;
+    dss.bolusCalculatorHandlerParams = bolusCalculatorHandlerParams;
     
     %Hypotreatment module parameters
     dss.enableHypoTreatments = enableHypoTreatments;

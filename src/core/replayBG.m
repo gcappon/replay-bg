@@ -7,7 +7,8 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %   - modality: (required) 'identification' or 'replay', specifies if the
 %   function will be used to identify the ReplayBG model on the given data
 %   or to replay the scenario specified by the given data;
-%   - data: (required) timetable which contains the data to be used by the tool. MUST
+%   - data: (required) timetable which contains the data to be used by the tool.
+%   When `modality` is `identification` it MUST
 %   contain a column 'glucose' that contains the glucose measurements (in
 %   mg/dl), a column 'basal' that contains the basal insulin data (in
 %   U/min), a column 'bolus' that contains the bolus insulin data (in
@@ -17,7 +18,11 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %   contain a column of strings 'choLabel' that contains for each non-zero
 %   value of the 'CHO' column, a character that specifies the type of CHO
 %   intake ('B' for breakfast, 'L' for lunch, 'D' for dinner, 'S' for
-%   snack, 'H' for hypotreatment);
+%   snack, 'H' for hypotreatment).
+%   If `modality` is `replay` it can be an empty timetable with only the
+%   Time column. `bolus` column is required if `bolusSource` is `data`.
+%   `basal` column is required if `basalSource` is data. `CHO` and
+%   `choLabel` columns are required if `choSource` is `data`;
 %   - BW: (required) the patient body weight (kg);
 %   - scenario: (required) a vector of characters
 %   that specifies whether the given scenario refers to a single-meal
@@ -73,28 +78,81 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %   whether to save the resulting mcmc chains in dedicated files (one for 
 %   each MCMC run) for future analysis or not. Can be 0 or 1;
 %
-%   - CR: (optional, default: nan) the carbohydrate-to-insulin ratio of the
+%   - bolusSource: (optional, default: `data`) a vector of character
+%   defining whether to use, during replay, the insulin bolus data
+%   contained in the `data` timetable (if `data`), or the boluses generated
+%   by the bolus calculator implemented via the provided `bolusCalculatorHandler` 
+%   function. Can be `data` or `dss`. It cannot be set if `modality` is
+%   `identification`;
+%   - basalSource: (optional, default: `data`) a vector of character
+%   defining whether to use, during replay, the insulin basal data
+%   contained in the `data` timetable (if `data`), or the basal generated
+%   by the controller implemented via the provided `basalControllerHandler` 
+%   function. Can be `data` or `dss`. It cannot be set if `modality` is
+%   `identification`;
+%   - choSource: (optional, default: `data`) a vector of character
+%   defining whether to use, during replay, the CHO data
+%   contained in the `data` timetable (if `data`), or the CHO generated
+%   by the meal generator implemented via the provided `mealGeneratorHandler` 
+%   function. Can be `data` or `dss`. It cannot be set if `modality` is
+%   `identification`;
+%
+%   - CR: (optional, default: 10) the carbohydrate-to-insulin ratio of the
 %   patient in g/U to be used by the integrated decision support system;
-%   - CF: (optional, default: nan) the correction factor of the
+%   - CF: (optional, default: 40) the correction factor of the
 %   patient in mg/dl/U to be used by the integrated decision support system;
+%   - GT: (optional, default: 120) the target glucose value in mg/dl to be
+%   used by the decsion support system modules;
+%
+%   - bolusCalculatorHandler: (optional, default:
+%   `standardBolusCalculatorHandler`) a vector of characters that specifies the
+%   name of the function handler that implements a bolus calculator to be
+%   used during the replay of a given scenario when `bolusSource` is `dss`. The function must have 2 output,
+%   i.e., the computed insulin bolus (U/min) and a structure
+%   containing the dss hyperparameter. The function
+%   must have 7 inputs, i.e., `G` (mg/dl) a vector as long the 
+%   simulation length containing all the simulated glucose concentrations 
+%   up to `timeIndex` (the other values are nan), 'mealAnnouncements'
+%   (g/min) a vector that contains the announced meal CHO intakes inputs for the whole replay simulation,
+%   'bolus' (U/min) a vector that contains the bolus insulin input for the whole replay 
+%   simulation, 'basal' (U/min) a vector that contains the basal insulin 
+%   input for the whole replay simulation, 'time' (datetime) a vector that 
+%   contains the time istants of current replay simulation, 'timeIndex' is
+%   a number that defines the current time istant in the replay simulation,
+%   `dss` a structure containing the dss hyperparameters and the optionally
+%   provided `bolusCalculatorTreatmentsHandlerParams` (`dss` is also echoed in the
+%   output to enable memory-like features). Vectors contain one value for each integration step. 
+%   The default bolus calculator implemented by `standardBolusCalculatorHandler` is
+%   the standrd formula: B = CHO/CR + (GC-GT)/CF - IOB;
+%   - bolusCalculatorHandlerParams: (optional, default: []) a structure that contains the parameters
+%   to pass to the bolusCalculatorHandler function. It also serves as memory
+%   area for the bolusCalculatorHandler function;
+
 %   - enableHypoTreatments: (optional, default: 0) a numerical flag that
 %   specifies whether to enable hypotreatments during the replay of a given
 %   scenario. Can be 0 or 1. Can be set only when modality is 'replay';
 %   - hypoTreatmentsHandler: (optional, default:
 %   'adaHypoTreatmentsHandler') a vector of characters that specifies the
 %   name of the function handler that implements an hypotreatment strategy
-%   during the replay of a given scenario. The function must have 1 output,
-%   i.e., the hypotreatments carbohydrates intake (g/min). The function
-%   must have 6 inputs, i.e., 'G' (mg/dl) the glucose concentration at 
-%   time(timeIndex), 'CHO' (g/min) a vector that contains the CHO
-%   intakes input for the whole replay simulation, 'bolus' (U/min) a 
+%   during the replay of a given scenario. The function must have 2 output,
+%   i.e., the hypotreatments carbohydrates intake (g/min) and a structure
+%   containing the dss hyperparameter. The function
+%   must have 8 inputs, i.e., `G` (mg/dl) a vector as long the 
+%   simulation length containing all the simulated glucose concentrations 
+%   up to `timeIndex` (the other values are nan), 'CHO' (g/min) a vector that contains the CHO
+%   intakes input for the whole replay simulation, `hypotreatment` (g/min)
+%   a vector that contains the hypotreatments intakes input for the whole 
+%   replay simulation (g/min); 'bolus' (U/min) a 
 %   vector that contains the bolus insulin input for the whole replay 
 %   simulation, 'basal' (U/min) a vector that contains the basal insulin 
 %   input for the whole replay simulation, 'time' (datetime) a vector that 
 %   contains the time istants of current replay simulation, 'timeIndex' is
-%   a number that defines the current time istant in the replay simulation.
+%   a number that defines the current time istant in the replay simulation,
+%   `dss` a structure containing the dss hyperparameters and the optionally
+%   provided `hypoTreatmentsHandlerParams` (`dss` is also echoed in the
+%   output to enable memory-like features).
 %   Vectors contain one value for each integration step. The default policy
-%   is "take an hypotreatment of 10 g every 15 minutes while in
+%   implemented by `adaHypoTreatmentsHandler` is "take an hypotreatment of 10 g every 15 minutes while in
 %   hypoglycemia";
 %   - enableCorrectionBoluses: (optional, default: 0) a numerical flag that
 %   specifies whether to enable correction boluses during the replay of a 
@@ -175,7 +233,7 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     %% ================ Function input parsing ============================
     %Obtain the InputParser object
     ip = inputParser;
-    basalSource = 'data';
+
     %Add the parameters to the InputParsers
     addRequired(ip,'modality',@(x) modalityValidator(x));
     addRequired(ip,'data',@(x) dataValidator(x,modality));
@@ -193,7 +251,12 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     addParameter(ip,'bolusSource','data',@(x) bolusSourceValidator(x,data,modality));
     addParameter(ip,'basalSource','data',@(x) basalSourceValidator(x,data,modality));
     addParameter(ip,'choSource','data',@(x) choSourceValidator(x,data,modality,scenario));
-
+    
+    addParameter(ip,'bolusCalculatorHandler','standardBolusCalculatorHandler',@(x) bolusCalculatorHandlerValidator(x,data,modality));
+    addParameter(ip,'bolusCalculatorHandlerParams',[], @(x) bolusCalculatorHandlerParamsValidator(x,modality));
+    %addParameter(ip,'basalSource','data',@(x) basalSourceValidator(x,data,modality));
+    %addParameter(ip,'choSource','data',@(x) choSourceValidator(x,data,modality,scenario));
+    
     addParameter(ip,'maxETAPerMCMCRun',inf,@(x) maxETAPerMCMCRunValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCIterations',inf,@(x) maxMCMCIterationsValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCRuns',inf,@(x) maxMCMCRunsValidator(x, modality)); % default = inf
@@ -205,8 +268,9 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     addParameter(ip,'preFilterData',0, @(x) preFilterDataValidator(x,modality)); % default = 0
     addParameter(ip,'saveChains',1, @(x) saveChainsValidator(x,modality)); % default = 1
     
-    addParameter(ip,'CR',nan, @(x) crValidator(x)); % default = nan
-    addParameter(ip,'CF',nan, @(x) cfValidator(x)); % default = nan
+    addParameter(ip,'CR',10, @(x) crValidator(x)); % default = 10
+    addParameter(ip,'CF',40, @(x) cfValidator(x)); % default = 40
+    addParameter(ip,'GT',120, @(x) gtValidator(x)); % default = 120
     
     addParameter(ip,'enableHypoTreatments',0, @(x) enableHypoTreatmentsValidator(x,modality)); % default = 0
     addParameter(ip,'hypoTreatmentsHandler','adaHypoTreatmentsHandler', @(x) hypoTreatmentsHandlerValidator(x,modality)); % default = 'adaHypoTreatmentsHandler'

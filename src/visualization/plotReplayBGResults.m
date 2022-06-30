@@ -102,7 +102,7 @@ function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotr
         hold off
         
         %Get events-time
-        eventTime = data.Time(1):minutes(1):data.Time(1)+(minutes(size(CHO.realizations,1)-1));
+        eventTime = data.Time(1):minutes(1):data.Time(1)+minutes(height(data)*5-1);
         
         %Plot CHO data
         ax(2) = subplot(514);
