@@ -127,7 +127,7 @@ function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotr
         hold on;
         hp3(2) = bar(eventTime, CBEvents,'FaceColor',[51,102,0]/255);
         hp3(3) = plot(eventTime, insulinBasal.realizations(:,1)*60,'-','linewidth',2,'color',[0,0,0]/255);
-        legend(hp3,'Bolus insulin (replay) [U/min]','Basal insulin (replay) [U/h]');
+        legend(hp3,'Bolus insulin (replay) [U/min]','Correction bolus insulin (replay) [U/min]','Basal insulin (replay) [U/h]');
         ylabel('Insulin (replay)','FontWeight','bold','FontSize',18);
         grid on
         hold off

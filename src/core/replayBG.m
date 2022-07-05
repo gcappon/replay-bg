@@ -88,8 +88,9 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %   defining whether to use, during replay, the insulin basal data
 %   contained in the `data` timetable (if `data`), or the basal generated
 %   by the controller implemented via the provided `basalControllerHandler` 
-%   function. Can be `data` or `dss`. It cannot be set if `modality` is
-%   `identification`;
+%   function (if `dss`), or fixed to the average basal rate used during 
+%   identification (if `u2ss`). Can be `data`, `u2ss`, or `dss`. It cannot 
+%   be set if `modality` is `identification`;
 %   - choSource: (optional, default: `data`) a vector of character
 %   defining whether to use, during replay, the CHO data
 %   contained in the `data` timetable (if `data`), or the CHO generated
@@ -120,14 +121,37 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %   contains the time istants of current replay simulation, 'timeIndex' is
 %   a number that defines the current time istant in the replay simulation,
 %   `dss` a structure containing the dss hyperparameters and the optionally
-%   provided `bolusCalculatorTreatmentsHandlerParams` (`dss` is also echoed in the
+%   provided `bolusCalculatorHandlerParams` (`dss` is also echoed in the
 %   output to enable memory-like features). Vectors contain one value for each integration step. 
 %   The default bolus calculator implemented by `standardBolusCalculatorHandler` is
 %   the standrd formula: B = CHO/CR + (GC-GT)/CF - IOB;
 %   - bolusCalculatorHandlerParams: (optional, default: []) a structure that contains the parameters
 %   to pass to the bolusCalculatorHandler function. It also serves as memory
 %   area for the bolusCalculatorHandler function;
-
+%   - basalHandler: (optional, default:
+%   `defaultBasalHandler`) a vector of characters that specifies the
+%   name of the function handler that implements a basal controller to be
+%   used during the replay of a given scenario when `basalSource` is `dss`. The function must have 2 output,
+%   i.e., the computed basal rate (U/min) and a structure
+%   containing the dss hyperparameter. The function
+%   must have 7 inputs, i.e., `G` (mg/dl) a vector as long the 
+%   simulation length containing all the simulated glucose concentrations 
+%   up to `timeIndex` (the other values are nan), 'mealAnnouncements'
+%   (g/min) a vector that contains the announced meal CHO intakes inputs for the whole replay simulation,
+%   'bolus' (U/min) a vector that contains the bolus insulin input for the whole replay 
+%   simulation, 'basal' (U/min) a vector that contains the basal insulin 
+%   input for the whole replay simulation, 'time' (datetime) a vector that 
+%   contains the time istants of current replay simulation, 'timeIndex' is
+%   a number that defines the current time istant in the replay simulation,
+%   `dss` a structure containing the dss hyperparameters and the optionally
+%   provided `basalHandlerParams` (`dss` is also echoed in the
+%   output to enable memory-like features). Vectors contain one value for each integration step. 
+%   The default basal controller implemented by `defaultBasalHandler` is:
+%   if G < 70, basal = 0, otherwise basal = basal(1). 
+%   - basalHandlerParams: (optional, default: []) a structure that contains the parameters
+%   to pass to the basalHandler function. It also serves as memory
+%   area for the basalHandler function;
+%
 %   - enableHypoTreatments: (optional, default: 0) a numerical flag that
 %   specifies whether to enable hypotreatments during the replay of a given
 %   scenario. Can be 0 or 1. Can be set only when modality is 'replay';
@@ -254,7 +278,8 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     
     addParameter(ip,'bolusCalculatorHandler','standardBolusCalculatorHandler',@(x) bolusCalculatorHandlerValidator(x,data,modality));
     addParameter(ip,'bolusCalculatorHandlerParams',[], @(x) bolusCalculatorHandlerParamsValidator(x,modality));
-    %addParameter(ip,'basalSource','data',@(x) basalSourceValidator(x,data,modality));
+    addParameter(ip,'basalHandler','defaultBasalHandler',@(x) basalHandlerValidator(x,data,modality));
+    addParameter(ip,'basalHandlerParams',[], @(x) basalHandlerParamsValidator(x,modality));
     
     addParameter(ip,'maxETAPerMCMCRun',inf,@(x) maxETAPerMCMCRunValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCIterations',inf,@(x) maxMCMCIterationsValidator(x,modality)); % default = inf
@@ -292,7 +317,7 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     %% ====================================================================
     
     %% ================ Initialize core variables =========================
-    [environment, model, sensors, mcmc, dss] = initCoreVariables(data,ip);
+    [environment, model, sensors, mcmc, dss] = initCoreVariables(data,BW,ip);
     %% ====================================================================
     
     %% ================ Set model parameters ==============================

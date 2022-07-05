@@ -17,11 +17,11 @@ function valid = basalSourceValidator(basalSource,data,modality)
 %
 % ---------------------------------------------------------------------
     
-    expectedBasalSource = {'data','dss'};
+    expectedBasalSource = {'data','u2ss','dss'};
 
     valid = any(validatestring(basalSource,expectedBasalSource));
     if(~valid)
-        error("'basalSource' must be 'data' or 'dss'.");
+        error("'basalSource' must be 'data', 'u2ss', or 'dss'.");
     end
     
     %Check that the user is not trying to set basalSource during

@@ -1,11 +1,13 @@
-function dss = initDecisionSupportSystem(CR,CF,GT,...
+function dss = initDecisionSupportSystem(BW,CR,CF,GT,...
     bolusCalculatorHandler, bolusCalculatorHandlerParams, ...
+    basalHandler, basalHandlerParams, ...
     enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams, ...
     environment)
 % function  initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams)
 % Initializes the 'dss' core variable.
 %
 % Inputs:
+%   - BW: the patient's body weight;
 %   - CR: the carbohydrate-to-insulin ratio of the patient in g/U to be 
 %   used by the integrated decision support system;
 %   - CF: the correction factor of the patient in mg/dl/U to be used by the 
@@ -18,6 +20,12 @@ function dss = initDecisionSupportSystem(CR,CF,GT,...
 %   - bolusCalculatorHandlerParams: a structure that contains the parameters
 %   to pass to the bolusCalculatorHandler function. It also serves as memory
 %   area for the bolusCalculatorHandler function;
+%   - basalHandler: a vector of characters that specifies the
+%   name of the function handler that implements a basal controller to be
+%   used during the replay of a given scenario;∂
+%   - basalHandlerParams: a structure that contains the parameters
+%   to pass to the basalHandler function. It also serves as memory
+%   area for the basalHandler function;
 %   - enableHypoTreatments: a numerical flag that specifies whether to 
 %   enable hypotreatments during the replay of a given scenario;
 %   - hypoTreatmentsHandler: a vector of characters that specifies the
@@ -53,6 +61,9 @@ function dss = initDecisionSupportSystem(CR,CF,GT,...
     	tic;
     end
     
+    %Patient's body weight
+    dss.BW = BW;
+    
     %Patient therapy parameters
     dss.GT = GT;
     dss.CR = CR;
@@ -61,6 +72,10 @@ function dss = initDecisionSupportSystem(CR,CF,GT,...
     %Bolus Calculator module parameters
     dss.bolusCalculatorHandler = bolusCalculatorHandler;
     dss.bolusCalculatorHandlerParams = bolusCalculatorHandlerParams;
+    
+    %Basal module parameters 
+    dss.basalHandler = basalHandler;
+    dss.basalHandlerParams = basalHandlerParams;
     
     %Hypotreatment module parameters
     dss.enableHypoTreatments = enableHypoTreatments;

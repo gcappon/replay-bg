@@ -1,10 +1,11 @@
-function [environment, model, sensors, mcmc, dss] = initCoreVariables(data,ip)
-% function  initCoreVariables(data,ip)
+function [environment, model, sensors, mcmc, dss] = initCoreVariables(data,BW,ip)
+% function  initCoreVariables(data,BW,ip)
 % Initializes the core variables (i.e., environment, model, sensors, mcmc, and dss) of
 % ReplayBG.
 %
 % Inputs:
 %   - data: timetable which contains the data to be used by the tool;
+%   - BW: the patient's body weight;
 %   - ip: the input parser;
 % Outputs:
 %   - environment: a structure that contains general parameters to be used
@@ -43,8 +44,9 @@ function [environment, model, sensors, mcmc, dss] = initCoreVariables(data,ip)
     sensors = initSensors(ip.Results.cgmModel, model, environment);
     
     %Initialize the decision support system hyperparameters
-    dss = initDecisionSupportSystem(ip.Results.CR, ip.Results.CF, ip.Results.GT, ...
+    dss = initDecisionSupportSystem(BW,ip.Results.CR, ip.Results.CF, ip.Results.GT, ...
         ip.Results.bolusCalculatorHandler, ip.Results.bolusCalculatorHandlerParams, ...
+        ip.Results.basalHandler, ip.Results.basalHandlerParams, ...
         ip.Results.enableHypoTreatments,ip.Results.hypoTreatmentsHandler,...
         ip.Results.enableCorrectionBoluses,ip.Results.correctionBolusesHandler,...
         ip.Results.hypoTreatmentsHandlerParams,...

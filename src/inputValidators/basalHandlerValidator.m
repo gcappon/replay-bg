@@ -1,9 +1,9 @@
-function valid = bolusCalculatorHandlerValidator(bolusCalculatorHandler,modality)
-% function  bolusCalculatorHandlerValidator(bolusCalculatorHandler,modality)
-% Validates the input parameter 'bolusCalculatorHandler'.
+function valid = basalHandlerValidator(basalHandler,modality)
+% function  basalHandlerValidator(basalHandler,modality)
+% Validates the input parameter 'basalHandler'.
 %
 % Inputs:
-%   - bolusCalculatorHandler;
+%   - basalHandler;
 %   - modality;
 % Outputs:
 %   - valid: a boolean defining if the input parameter is valid. 
@@ -18,20 +18,20 @@ function valid = bolusCalculatorHandlerValidator(bolusCalculatorHandler,modality
 
     valid = strcmp(modality,'replay');
     if(~valid)
-        error("Cannot set an bolus calculator handler while identifying model parameters.");
+        error("Cannot set a basal handler while identifying model parameters.");
     end
     
-    valid = valid && exist(bolusCalculatorHandler) == 2; %#ok<EXIST>
+    valid = valid && exist(basalHandler) == 2; %#ok<EXIST>
     if(~valid)
         error("Handler does not exist or it is not a function.");
     end
     
-    valid = valid && nargout(bolusCalculatorHandler) == 2;
+    valid = valid && nargout(basalHandler) == 2;
     if(~valid)
         error("Handler does not have the proper number of outputs (must be 2).");
     end
     
-    valid = valid && nargin(bolusCalculatorHandler) == 7;
+    valid = valid && nargin(basalHandler) == 7;
     if(~valid)
         error("Handler does not have the proper number of outputs (must be 7).");
     end

@@ -52,7 +52,13 @@ function [bolus, basal, bolusDelayed, basalDelayed] = insulinSetup(data,model,mo
         end
          
     end
+    
+    if(strcmp(environment.basalSource,'u2ss'))
         
+        basal(1:end) = modelParameters.u2ss;
+    
+    end
+    
     %Add delay in insulin absorption
     bolusDelay = floor(modelParameters.tau/model.TS); 
     
