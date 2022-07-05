@@ -104,20 +104,29 @@ function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotr
         %Get events-time
         eventTime = data.Time(1):minutes(1):data.Time(1)+minutes(height(data)*5-1);
         
+        CHOEvents = sum(CHO.realizations')/1000;
+        HTEvents = sum(hypotreatments.realizations')/1000;
+        
         %Plot CHO data
         ax(2) = subplot(514);
-        hp2(1) = stem(eventTime, CHO.realizations(:,1)+hypotreatments.realizations(:,1),'^','linewidth',2,'color',[70,130,180]/255);
+        hp2(1) = bar(eventTime, CHOEvents,'FaceColor',[70,130,180]/255);
         hold on
+        hp2(2) = bar(eventTime, HTEvents,'FaceColor',[0,204,204]/255);
         grid on
-        legend(hp2,'CHO (replay) [g/min]');
+        legend(hp2,'CHO (replay) [g/min]','HT (replay) [g/min]');
         ylabel('CHO (replay) [g/min]','FontWeight','bold','FontSize',18);
         hold off
 
         %Plot insulin data
+        
+        BEvents = sum(insulinBolus.realizations')/1000;
+        CBEvents = sum(correctionBolus.realizations')/1000;
+        
         ax(3) = subplot(515);
-        hp3(1) = stem(eventTime, insulinBolus.realizations(:,1),'^','linewidth',2,'color',[50,205,50]/255);
+        hp3(1) = bar(eventTime, BEvents,'FaceColor',[50,205,50]/255);
         hold on;
-        hp3(2) = plot(eventTime, insulinBasal.realizations(:,1)*60,'-','linewidth',2,'color',[0,0,0]/255);
+        hp3(2) = bar(eventTime, CBEvents,'FaceColor',[51,102,0]/255);
+        hp3(3) = plot(eventTime, insulinBasal.realizations(:,1)*60,'-','linewidth',2,'color',[0,0,0]/255);
         legend(hp3,'Bolus insulin (replay) [U/min]','Basal insulin (replay) [U/h]');
         ylabel('Insulin (replay)','FontWeight','bold','FontSize',18);
         grid on

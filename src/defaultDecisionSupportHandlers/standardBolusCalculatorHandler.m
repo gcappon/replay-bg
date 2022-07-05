@@ -7,7 +7,7 @@ function [B, dss] = standardBolusCalculatorHandler(G, mealAnnouncements,bolus,ba
 %   simulated glucose concentrations up to timeIndex. The other values are
 %   nan;
 %   - mealAnnouncements: is a vector that contains the meal announcements intakes input for the whole
-%   replay simulation (g/min);
+%   replay simulation (g);
 %   - bolus: is a vector that contains the bolus insulin input for the
 %   whole replay simulation (U/min);
 %   - basal: is a vector that contains the basal insulin input for the

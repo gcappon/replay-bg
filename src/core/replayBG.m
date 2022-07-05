@@ -255,7 +255,6 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     addParameter(ip,'bolusCalculatorHandler','standardBolusCalculatorHandler',@(x) bolusCalculatorHandlerValidator(x,data,modality));
     addParameter(ip,'bolusCalculatorHandlerParams',[], @(x) bolusCalculatorHandlerParamsValidator(x,modality));
     %addParameter(ip,'basalSource','data',@(x) basalSourceValidator(x,data,modality));
-    %addParameter(ip,'choSource','data',@(x) choSourceValidator(x,data,modality,scenario));
     
     addParameter(ip,'maxETAPerMCMCRun',inf,@(x) maxETAPerMCMCRunValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCIterations',inf,@(x) maxMCMCIterationsValidator(x,modality)); % default = inf

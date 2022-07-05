@@ -10,9 +10,14 @@ function dss = initDecisionSupportSystem(CR,CF,GT,...
 %   used by the integrated decision support system;
 %   - CF: the correction factor of the patient in mg/dl/U to be used by the 
 %   integrated decision support system;
-%   - GT;
-%   - bolusCalculatorHandler;
-%   - bolusCalculatorHandlerParams;
+%   - GT: the target glucose value in mg/dl to be used by the decsion
+%   support system modules;
+%   - bolusCalculatorHandler: a vector of characters that specifies the
+%   name of the function handler that implements a bolus calculator to be
+%   used during the replay of a given scenario;
+%   - bolusCalculatorHandlerParams: a structure that contains the parameters
+%   to pass to the bolusCalculatorHandler function. It also serves as memory
+%   area for the bolusCalculatorHandler function;
 %   - enableHypoTreatments: a numerical flag that specifies whether to 
 %   enable hypotreatments during the replay of a given scenario;
 %   - hypoTreatmentsHandler: a vector of characters that specifies the
@@ -22,11 +27,11 @@ function dss = initDecisionSupportSystem(CR,CF,GT,...
 %   enable correction boluses during the replay of a given scenario;
 %   - correctionBolusesHandler: a vector of characters that specifies the
 %   name of the function handler that implements a corrective bolusing strategy
-%   during the replay of a given scenario.
-%   - hypoTreatmentsHandlerParams: (optional, default: []) a structure that contains the parameters
+%   during the replay of a given scenario;
+%   - hypoTreatmentsHandlerParams: a structure that contains the parameters
 %   to pass to the hypoTreatmentsHandler function. It also serves as memory
 %   area for the hypoTreatmentsHandler function;
-%   - correctionBolusesHandlerParams: (optional, default: []) a structure that contains the parameters
+%   - correctionBolusesHandlerParams: a structure that contains the parameters
 %   to pass to the correctionBolusesHandler function. It also serves as memory
 %   area for the correctionBolusesHandler function;
 %   - environment: a structure that contains general parameters to be used

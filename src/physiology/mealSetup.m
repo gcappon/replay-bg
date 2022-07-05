@@ -14,7 +14,9 @@ function [meal, mealDelayed, mealAnnouncement] = mealSetup(data,model,modelParam
 %   - meal: is a vector containing the carbohydrate intake at each time
 %   step [mg/min*kg];
 %   - mealDelayed: is a vector containing the carbohydrate intake at each time
-%   step delayed by beta min [mg/min*kg].
+%   step delayed by beta min [mg/min*kg];
+%   - mealAnnouncements: is a vector containing the carbohydrate intake at each time
+%   step that the user announces to the bolus calculator [g].                
 %
 % ---------------------------------------------------------------------
 %
