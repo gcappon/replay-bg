@@ -95,7 +95,7 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %   defining whether to use, during replay, the CHO data
 %   contained in the `data` timetable (if `data`), or the CHO generated
 %   by the meal generator implemented via the provided `mealGeneratorHandler` 
-%   function. Can be `data` or `dss`. It cannot be set if `modality` is
+%   function. Can be `data` or `generated`. It cannot be set if `modality` is
 %   `identification`;
 %
 %   - CR: (optional, default: 10) the carbohydrate-to-insulin ratio of the
@@ -151,6 +151,33 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %   - basalHandlerParams: (optional, default: []) a structure that contains the parameters
 %   to pass to the basalHandler function. It also serves as memory
 %   area for the basalHandler function;
+%   - mealGeneratorHandler: (optional, default:
+%   `defaultMealGeneratorHandler`) a vector of characters that specifies the
+%   name of the function handler that implements a meal generator to be
+%   used during the replay of a given scenario when `choSource` is `generated`. The function must have 4 outputs,
+%   i.e., the generated meal (g/min) actually consumed by the virtual subject,
+%   the generated meal announcement (g/min) that is usually used to compute the 
+%   corresponding insulin bolus, the type of the meal (must be 'B','L','D', or 'S'), and a structure
+%   containing the dss hyperparameter. The function
+%   must have 8 inputs, i.e., `G` (mg/dl) a vector as long the 
+%   simulation length containing all the simulated glucose concentrations 
+%   up to `timeIndex` (the other values are nan), 'meal' (g/min) a vector
+%   that contains the meal CHO intakes inputs for the whole replay simulation,
+%   'mealAnnouncements' (g/min) a vector that contains the announced meal CHO 
+%   intakes inputs for the whole replay simulation, 'bolus' (U/min) a vector 
+%   that contains the bolus insulin input for the whole replay 
+%   simulation, 'basal' (U/min) a vector that contains the basal insulin 
+%   input for the whole replay simulation, 'time' (datetime) a vector that 
+%   contains the time istants of current replay simulation, 'timeIndex' is
+%   a number that defines the current time istant in the replay simulation,
+%   `dss` a structure containing the dss hyperparameters and the optionally
+%   provided `mealGeneratorHandlerParams` (`dss` is also echoed in the
+%   output to enable memory-like features). Vectors contain one value for each integration step. 
+%   The default meal generator implemented by `defaultMealGeneratorHandler` is:
+%   put a snack meal of 50g of CHO in the first instant and announce only 40g.
+%   - mealGeneratorHandlerParams: (optional, default: []) a structure that contains the parameters
+%   to pass to the mealGeneratorHandler function. It also serves as memory
+%   area for the mealGeneratorHandler function;
 %
 %   - enableHypoTreatments: (optional, default: 0) a numerical flag that
 %   specifies whether to enable hypotreatments during the replay of a given
@@ -234,11 +261,6 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %   * results/workspaces/: contains the core ReplayBG variables and data used in a
 %   specific ReplayBG call.
 %
-%   - Plot is not currently showing insulin and carbohydrate intake
-%   generated during the simulation via the dss, only input data. This is
-%   because we have multiple simulations, so events can occur at different
-%   time with different amounts (see issue #17).
-%
 % ---------------------------------------------------------------------
 % REFERENCES:
 % 
@@ -280,6 +302,8 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     addParameter(ip,'bolusCalculatorHandlerParams',[], @(x) bolusCalculatorHandlerParamsValidator(x,modality));
     addParameter(ip,'basalHandler','defaultBasalHandler',@(x) basalHandlerValidator(x,data,modality));
     addParameter(ip,'basalHandlerParams',[], @(x) basalHandlerParamsValidator(x,modality));
+    addParameter(ip,'mealGeneratorHandler','defaultMealGeneratorHandler',@(x) mealGeneratorHandlerValidator(x,data,modality));
+    addParameter(ip,'mealGeneratorHandlerParams',[],@(x) mealGeneratorHandlerParamsValidator(x,modality));
     
     addParameter(ip,'maxETAPerMCMCRun',inf,@(x) maxETAPerMCMCRunValidator(x,modality)); % default = inf
     addParameter(ip,'maxMCMCIterations',inf,@(x) maxMCMCIterationsValidator(x,modality)); % default = inf
@@ -325,7 +349,7 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     %% ====================================================================
     
     %% ================ Replay of the scenario ============================
-    [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,sensors,mcmc,dss);
+    [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements] = replayScenario(data,modelParameters,draws,environment,model,sensors,mcmc,dss);
     %% ====================================================================
     
     %% ================ Analyzing results =================================
@@ -358,12 +382,12 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     if(strcmp(environment.modality,'identification'))
         save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','mcmc','model','sensors','dss',...
-            'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO',...
+            'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO','mealAnnouncements',...
             'analysis');
     else
         save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','model','sensors','dss',...
-            'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO',...
+            'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO','mealAnnouncements',...
             'correctionBolus', 'hypotreatments',...
             'analysis');
     end

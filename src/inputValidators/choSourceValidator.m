@@ -18,11 +18,11 @@ function valid = choSourceValidator(choSource,data,modality,scenario)
 %
 % ---------------------------------------------------------------------
     
-    expectedCHOSources = {'data','dss'};
+    expectedCHOSources = {'data','generated'};
 
     valid = any(validatestring(choSource,expectedCHOSources));
     if(~valid)
-        error("'choSource' must be 'data' or 'dss'.");
+        error("'choSource' must be 'data' or 'generated'.");
     end
     
     %Check that the user is not trying to set choSource during

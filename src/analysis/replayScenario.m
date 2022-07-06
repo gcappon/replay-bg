@@ -1,4 +1,4 @@
-function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments] = replayScenario(data,modelParameters,draws,environment,model,sensors,mcmc,dss)
+function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements] = replayScenario(data,modelParameters,draws,environment,model,sensors,mcmc,dss)
 % function  replayScenario(data,modelParameters,draws,environment,model,sensors,mcmc,dss)
 % Replays the given scenario defined by the given data.
 %
@@ -31,7 +31,9 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
 %   - CHO: a structure containing the input CHO used to obtain glucose
 %   (g/min);
 %   - hypotreatments: a structure containing the input hypotreatments used 
-%   to obtain glucose (g/min).
+%   to obtain glucose (g/min);
+%   - mealAnnouncements: is a vector containing the carbohydrate intake at each time
+%   step that the user announces to the bolus calculator (g/min).  
 %
 % ---------------------------------------------------------------------
 %
@@ -56,6 +58,7 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
     insulinBasal.realizations = zeros(model.TSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     CHO.realizations = zeros(model.TSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     hypotreatments.realizations = zeros(model.TSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
+    mealAnnouncements.realizations = zeros(model.TSTEPS,length(draws.(mcmc.thetaNames{1}).samples));
     
     %physioCheck = zeros(length(draws.(mcmc.thetaNames{1}).samples),1);
     
@@ -84,7 +87,7 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
         %physioCheck(r) = all(struct2array(check));
         
         %...and simulate the scenario using the given data
-        [G, CGM, iB, cB, ib, C, ht, ~] = computeGlicemia(modelParameters,data,model,sensors,dss,environment);
+        [G, CGM, iB, cB, ib, C, ht, mA, ~] = computeGlicemia(modelParameters,data,model,sensors,dss,environment);
         cgm.realizations(:,r) = CGM;
         glucose.realizations(:,r) = G;
         insulinBolus.realizations(:,r) = iB;
@@ -92,6 +95,7 @@ function [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotr
         insulinBasal.realizations(:,r) = ib;
         CHO.realizations(:,r) = C;
         hypotreatments.realizations(:,r) = ht;
+        mealAnnouncements.realizations(:,r) = mA;
         
     end
     

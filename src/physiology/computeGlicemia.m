@@ -1,4 +1,4 @@
-function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, x] = computeGlicemia(mP,data,model,sensors,dss,environment)
+function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements, x] = computeGlicemia(mP,data,model,sensors,dss,environment)
 % function  computeGlicemia(mP,data,model,sensors,dss,environment)
 % Compute the glycemic profile obtained with the ReplayBG physiological
 % model using the given inputs and model parameters.
@@ -24,9 +24,11 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
 %   - insulinBasal: a vector containing the input basal insulin used to
 %   obtain G (U/min);
 %   - CHO: a vector containing the input CHO used to obtain glucose
-%   (g/min);
+%   (g/min);     
 %   - hypotreatments: a vector containing the input hypotreatments used 
 %   to obtain G (g/min);
+%   - mealAnnouncements: is a vector containing the carbohydrate intake at each time
+%   step that the user announces to the bolus calculator (g/min);  
 %   - x: is a matrix containing the simulated model states. 
 %
 % ---------------------------------------------------------------------
@@ -95,6 +97,53 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
     %Simulate the physiological model
     for k = 2:model.TSTEPS
         
+        if(strcmp(environment.choSource,'generated'))
+            
+            %Call the meal generator function handler
+            [C, MA, type, dss] = feval(dss.mealGeneratorHandler, G, meal, mealAnnouncements, insulinBolus,basal,time,k-1,dss);
+            
+            %Add the meal to meal model input if needed (remember
+            %to add meal absorption delay). Do not add delay to the
+            %announcement.
+            switch(environment.scenario)
+                case 'single-meal'
+                    if(k+mP.beta <= model.TSTEPS)
+                        mealDelayed(k+mP.beta) = mealDelayed(k+mP.beta) + C*1000/mP.BW;
+                    end
+                   
+                case 'multi-meal'
+                    
+                    switch(type)
+                        case 'B'
+                            if(k+round(mP.betaB) <= model.TSTEPS)
+                                mealDelayed.breakfast(k+round(mP.betaB)) = mealDelayed.breakfast(k+round(mP.betaB)) + C*1000/mP.BW;
+                            end
+                        case 'L'
+                            if(k+round(mP.betaL) <= model.TSTEPS)
+                                mealDelayed.lunch(k+round(mP.betaL)) = mealDelayed.lunch(k+round(mP.betaL)) + C*1000/mP.BW;
+                            end
+                        case 'D'
+                            if(k+round(mP.betaD) <= model.TSTEPS)
+                                mealDelayed.dinner(k+round(mP.betaD)) = mealDelayed.dinner(k+round(mP.betaD)) + C*1000/mP.BW;
+                            end
+                        case 'S'
+                            if(k+round(mP.betaS) <= model.TSTEPS)
+                                mealDelayed.snack(k+round(mP.betaS)) = mealDelayed.snack(k+round(mP.betaS)) + C*1000/mP.BW;
+                            end
+                        case ''
+                            
+                        otherwise
+                            error("The specified meal type must be 'B', 'L', 'D', 'S', or ''.");
+                    end
+            end
+            
+            %Add the meal announcement for bolus calculation
+            mealAnnouncements(k) = mealAnnouncements(k) + MA;
+            
+            %Update the CHO event vectors
+            CHO(k) = CHO(k) + C;
+        
+        end
         if(strcmp(environment.bolusSource,'dss'))
         
             %Call the bolus calculator function handler
@@ -117,7 +166,7 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
             [HT, dss] = feval(dss.hypoTreatmentsHandler,G,CHO,hypotreatments,insulinBolus,insulinBasal,time,k-1,dss);
             
             %Add the hypotreatments to meal model input if needed (remember
-            %to add meal absorption delay)
+            %to add meal absorption delay). NO need to announce an HT.
             switch(environment.scenario)
                 case 'single-meal'
                     mealDelayed(k) = mealDelayed(k) + HT*1000/mP.BW;                    

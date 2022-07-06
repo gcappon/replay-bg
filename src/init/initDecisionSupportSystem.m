@@ -1,9 +1,15 @@
 function dss = initDecisionSupportSystem(BW,CR,CF,GT,...
+    mealGeneratorHandler, mealGeneratorHandlerParams, ...
     bolusCalculatorHandler, bolusCalculatorHandlerParams, ...
     basalHandler, basalHandlerParams, ...
     enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams, ...
     environment)
-% function  initDecisionSupportSystem(CR,CF,enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams)
+% function  initDecisionSupportSystem(BW,CR,CF,GT,...
+%    mealGeneratorHandler, mealGeneratorHandlerParams, ...
+%    bolusCalculatorHandler, bolusCalculatorHandlerParams, ...
+%    basalHandler, basalHandlerParams, ...
+%    enableHypoTreatments,hypoTreatmentsHandler,enableCorrectionBoluses,correctionBolusesHandler,hypoTreatmentsHandlerParams,correctionBolusesHandlerParams, ...
+%    environment)
 % Initializes the 'dss' core variable.
 %
 % Inputs:
@@ -14,6 +20,11 @@ function dss = initDecisionSupportSystem(BW,CR,CF,GT,...
 %   integrated decision support system;
 %   - GT: the target glucose value in mg/dl to be used by the decsion
 %   support system modules;
+%   - mealGeneratorHandler: a vector of characters that specifies the
+%   name of the function handler that implements a meal generator to be
+%   used during the replay of a given scenario;
+%   - mealGeneratorHandlerParams: a structure that contains the parameters
+%   to pass to the mealGeneratorHandler function;
 %   - bolusCalculatorHandler: a vector of characters that specifies the
 %   name of the function handler that implements a bolus calculator to be
 %   used during the replay of a given scenario;
@@ -68,6 +79,10 @@ function dss = initDecisionSupportSystem(BW,CR,CF,GT,...
     dss.GT = GT;
     dss.CR = CR;
     dss.CF = CF;
+    
+    %Meal Generator module parameters
+    dss.mealGeneratorHandler = mealGeneratorHandler;
+    dss.mealGeneratorHandlerParams = mealGeneratorHandlerParams;
     
     %Bolus Calculator module parameters
     dss.bolusCalculatorHandler = bolusCalculatorHandler;
