@@ -1,4 +1,4 @@
-function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment)
+function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements, data,environment)
 % function  analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment)
 % Analyses the simulated glucose traces obtained using ReplayBG.
 %
@@ -17,6 +17,8 @@ function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, 
 %   (g/min);
 %   - hypotreatments: a structure containing the input hypotreatments used 
 %   to obtain glucose (g/min);
+%   - mealAnnouncements: is a vector containing the carbohydrate intake at each time
+%   step that the user announces to the bolus calculator (g/min);  
 %   - data: timetable which contains the data to be used by the tool;
 %   - environment: a structure that contains general parameters to be used
 %   by ReplayBG;
@@ -70,6 +72,7 @@ function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, 
     %Initialize CHO amount variables 
     totalCHO = zeros(length(insulinBolus.realizations),1);
     totalHypotreatments = zeros(length(insulinBolus.realizations),1);
+    totalMealAnnouncements = zeros(length(mealAnnouncements.realizations),1);
     %Initialize counting variables
     correctionBolusInsulinNumber = zeros(length(insulinBolus.realizations),1);
     hypotreatmentNumber = zeros(length(insulinBolus.realizations),1);
@@ -85,6 +88,7 @@ function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, 
         %Compute CHO amounts for each realization
         totalCHO(r) = sum(CHO.realizations(:,r));
         totalHypotreatments(r) = sum(hypotreatments.realizations(:,r));
+        totalMealAnnouncements(r) = sum(mealAnnouncements.realizations(:,r));
         
         %Compute numbers for each realization
         correctionBolusInsulinNumber(r) = length(find(correctionBolus.realizations(:,r)));
@@ -102,6 +106,7 @@ function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, 
         
         analysis.(fields{f}).event.totalCHO = prctile(totalCHO,p(f));%[g]
         analysis.(fields{f}).event.totalHypotreatments = prctile(totalHypotreatments,p(f));%[g]
+        analysis.(fields{f}).event.totalMealAnnouncements = prctile(totalMealAnnouncements,p(f));%[g]
         
         analysis.(fields{f}).event.correctionBolusInsulinNumber = prctile(correctionBolusInsulinNumber,p(f));%[#]
         analysis.(fields{f}).event.hypotreatmentNumber = prctile(hypotreatmentNumber,p(f));%[#]

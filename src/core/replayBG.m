@@ -353,7 +353,7 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     %% ====================================================================
     
     %% ================ Analyzing results =================================
-    analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment);
+    analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements, data,environment);
     %% ====================================================================
     
     %% ================ Plotting results ==================================
