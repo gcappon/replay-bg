@@ -266,7 +266,7 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 % 
 %   - Cappon et al., "ReplayBG: a methodology to identify a personalized
 %   model from type 1 diabetes data and simulate glucose concentrations to
-%   assess alternative therapies", IEEE TBME, 2022 (under revision).
+%   assess alternative therapies", IEEE TBME, 2023 (under revision).
 %
 % ---------------------------------------------------------------------
 %
