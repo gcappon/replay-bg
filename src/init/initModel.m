@@ -1,4 +1,4 @@
-function model = initModel(data,sampleTime,glucoseModel, pathology, seed, environment)
+function model = initModel(data,sampleTime,glucoseModel, pathology, core, seed, environment)
 % function  initModel(data,sampleTime,glucoseModel, pathology, seed, environment)
 % Initializes the 'model' core variable.
 %
@@ -9,6 +9,8 @@ function model = initModel(data,sampleTime,glucoseModel, pathology, seed, enviro
 %   model to use;
 %   - pathology: a vector of characters that specifies the pathology 
 %   related to the given data;
+%   - core: a vector of characters that defines what model core equations
+%   to use;
 %   - seed: an integer that specifies the random seed. For reproducibility;
 %   - environment: a structure that contains general parameters to be used
 %   by ReplayBG.
@@ -38,17 +40,22 @@ function model = initModel(data,sampleTime,glucoseModel, pathology, seed, enviro
     
     %Data hyperparameters
     model.glucoseModel = glucoseModel; %glucose selection {'BG','IG'}
-    model.pathology = pathology; %model selection {'t1d','t2d','pbh'}
+    model.pathology = pathology; %pathology selection {'t1d','t2d','pbh'}
+    
+    model.coreModel = 'cappon'; %model core selection {'cappon', 'resalat'}
     
     %Model dimensionality
     switch(model.pathology)
         case 't1d'
             
-            switch(environment.scenario)
-                case 'single-meal'
-                    model.nx = 9; %number of states
-                case 'multi-meal'
-                    model.nx = 21; %number of states
+            switch(model.coreModel)
+                case 'cappon'
+                    switch(environment.scenario)
+                        case 'single-meal'
+                            model.nx = 9; %number of states
+                        case 'multi-meal'
+                            model.nx = 21; %number of states
+                    end
             end
             
         case 't2d'

@@ -293,6 +293,7 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     addParameter(ip,'seed',randi([1 1048576]),@(x) seedValidator(x)); % default = randi([1 1048576])
     
     addParameter(ip,'pathology','t1d',@(x) pathologyValidator(x)); %default = 't1d'
+    addParameter(ip,'coreModel','cappon',@(x) coreModelValidator(x)); %default = 'cappon'
     
     addParameter(ip,'bolusSource','data',@(x) bolusSourceValidator(x,data,modality));
     addParameter(ip,'basalSource','data',@(x) basalSourceValidator(x,data,modality));

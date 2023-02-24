@@ -14,19 +14,6 @@ function valid = pathologyValidator(pathology)
 % This file is part of ReplayBG.
 %
 % ---------------------------------------------------------------------
-
-    valid = any(strcmp(data.Properties.VariableNames,'choLabel'));
-    
-    if(~valid)
-        error("Must contain a column named 'choLabel'.");
-    end
-    
-    okLabels = ["B","L","D","S","H"];
-    labels = data.choLabel(data.CHO > 0);
-    valid = valid && all(contains(labels,okLabels));
-    if(~valid)
-        error("Must contain a label for every CHO and they must be 'B', 'L', 'D', 'S', or 'H'.");
-    end
     
     expectedPathologies = {'t1d','t2d','pbh','healthy'};
 

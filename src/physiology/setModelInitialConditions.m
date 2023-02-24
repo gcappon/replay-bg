@@ -29,46 +29,49 @@ function x0 = setModelInitialConditions(data,modelParameters,model,environment)
                         
     switch(model.pathology)
             case 't1d'
+                
+                switch(model.coreModel)
+                    case 'cappon'
+                        switch(environment.scenario)
+                            case 'single-meal'
 
-                switch(environment.scenario)
-                    case 'single-meal'
-                        
-                        %Set initial conditions 
-                        x0(1:model.nx,1) = [mP.G0; ...                                 %G(0)
-                              mP.Xpb; ...                                                                                          %X(0)
-                              mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
-                              (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
-                              (mP.ka1/mP.ke)*mP.u2ss/(mP.ka1+mP.kd) + (mP.ka2/mP.ke)*(mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...    %Ip(0) 
-                              0; ...                                                                                               %Qsto1(0)
-                              0; ...                                                                                               %Qsto2(0)
-                              mP.Qgutb; ...                                                                                        %Qgut(0)
-                              mP.G0];                                                 %IG(0)  
+                                %Set initial conditions 
+                                x0(1:model.nx,1) = [mP.G0; ...                                 %G(0)
+                                      mP.Xpb; ...                                                                                          %X(0)
+                                      mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
+                                      (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
+                                      (mP.ka1/mP.ke)*mP.u2ss/(mP.ka1+mP.kd) + (mP.ka2/mP.ke)*(mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...    %Ip(0) 
+                                      0; ...                                                                                               %Qsto1(0)
+                                      0; ...                                                                                               %Qsto2(0)
+                                      mP.Qgutb; ...                                                                                        %Qgut(0)
+                                      mP.G0];                                                 %IG(0)  
 
-                    case 'multi-meal'
-                        
-                        %Set initial conditions
-                        x0(1:model.nx,1) = [mP.G0; ...                                 %G(0)
-                              mP.Xpb; ...                                                                                          %X(0)
-                              mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
-                              (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
-                              (mP.ka1/mP.ke)*mP.u2ss/(mP.ka1+mP.kd) + (mP.ka2/mP.ke)*(mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...    %Ip(0) 
-                              0; ...                                                                                               %Qsto1B(0)
-                              0; ...                                                                                               %Qsto2B(0)
-                              mP.QgutbB; ...                                                                                        %QgutB(0)
-                              0; ...                                                                                               %Qsto1L(0)
-                              0; ...                                                                                               %Qsto2L(0)
-                              mP.QgutbL; ...                                                                                        %QgutL(0)
-                              0; ...                                                                                               %Qsto1D(0)
-                              0; ...                                                                                               %Qsto2D(0)
-                              mP.QgutbD; ...                                                                                        %QgutD(0)
-                              0; ...                                                                                               %Qsto1S(0)
-                              0; ...                                                                                               %Qsto2S(0)
-                              mP.QgutbS; ...                                                                                        %QgutS(0)
-                              0; ...                                                                                               %Qsto1H(0)
-                              0; ...                                                                                               %Qsto2H(0)
-                              mP.QgutbH; ...                                                                                        %QgutH(0)
-                              mP.G0];                                                 %IG(0) 
-                          
+                            case 'multi-meal'
+
+                                %Set initial conditions
+                                x0(1:model.nx,1) = [mP.G0; ...                                 %G(0)
+                                      mP.Xpb; ...                                                                                          %X(0)
+                                      mP.u2ss/(mP.ka1+mP.kd); ...                                                                          %Isc1(0)                              
+                                      (mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...                                                           %Isc2(0)
+                                      (mP.ka1/mP.ke)*mP.u2ss/(mP.ka1+mP.kd) + (mP.ka2/mP.ke)*(mP.kd/mP.ka2)*mP.u2ss/(mP.ka1+mP.kd); ...    %Ip(0) 
+                                      0; ...                                                                                               %Qsto1B(0)
+                                      0; ...                                                                                               %Qsto2B(0)
+                                      mP.QgutbB; ...                                                                                        %QgutB(0)
+                                      0; ...                                                                                               %Qsto1L(0)
+                                      0; ...                                                                                               %Qsto2L(0)
+                                      mP.QgutbL; ...                                                                                        %QgutL(0)
+                                      0; ...                                                                                               %Qsto1D(0)
+                                      0; ...                                                                                               %Qsto2D(0)
+                                      mP.QgutbD; ...                                                                                        %QgutD(0)
+                                      0; ...                                                                                               %Qsto1S(0)
+                                      0; ...                                                                                               %Qsto2S(0)
+                                      mP.QgutbS; ...                                                                                        %QgutS(0)
+                                      0; ...                                                                                               %Qsto1H(0)
+                                      0; ...                                                                                               %Qsto2H(0)
+                                      mP.QgutbH; ...                                                                                        %QgutH(0)
+                                      mP.G0];                                                 %IG(0) 
+
+                        end
                 end
             
         case 't2d'

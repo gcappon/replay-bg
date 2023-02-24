@@ -70,11 +70,14 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
     [meal,mealDelayed, mealAnnouncements] = mealSetup(data,model,mP,environment);
     
     %Time vector for DSS
-    switch(environment.scenario)
-        case 'single-meal'
-            time = data.Time(1):minutes(1):(data.Time(1) + minutes(length(meal) - 1));
-        case 'multi-meal'
-            time = data.Time(1):minutes(1):(data.Time(1) + minutes(length(meal.breakfast) - 1));
+    switch(model.coreModel)
+    	case 'cappon'
+        switch(environment.scenario)
+            case 'single-meal'
+                time = data.Time(1):minutes(1):(data.Time(1) + minutes(length(meal) - 1));
+            case 'multi-meal'
+                time = data.Time(1):minutes(1):(data.Time(1) + minutes(length(meal.breakfast) - 1));
+        end
     end
     
     %Hour of the day vector for multi-meal simulations
@@ -85,13 +88,16 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
     insulinBolus = bolus/1000*mP.BW;
     correctionBolus = insulinBolus*0;
     
-    switch(environment.scenario)
-        case 'single-meal'
-            CHO = meal/1000*mP.BW;
-            hypotreatments = CHO*0; %Hypotreatments definition is not present in single-meal --> set to 0
-        case 'multi-meal'
-            CHO = (meal.breakfast + meal.lunch + meal.dinner + meal.snack) /1000*mP.BW;
-            hypotreatments = meal.hypotreatment/1000*mP.BW;
+    switch(model.coreModel)
+    	case 'cappon'
+            switch(environment.scenario)
+                case 'single-meal'
+                    CHO = meal/1000*mP.BW;
+                    hypotreatments = CHO*0; %Hypotreatments definition is not present in single-meal --> set to 0
+                case 'multi-meal'
+                    CHO = (meal.breakfast + meal.lunch + meal.dinner + meal.snack) /1000*mP.BW;
+                    hypotreatments = meal.hypotreatment/1000*mP.BW;
+            end
     end
     
     %Simulate the physiological model
@@ -105,35 +111,38 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
             %Add the meal to meal model input if needed (remember
             %to add meal absorption delay). Do not add delay to the
             %announcement.
-            switch(environment.scenario)
-                case 'single-meal'
-                    if(k+mP.beta <= model.TSTEPS)
-                        mealDelayed(k+mP.beta) = mealDelayed(k+mP.beta) + C*1000/mP.BW;
-                    end
-                   
-                case 'multi-meal'
-                    
-                    switch(type)
-                        case 'B'
-                            if(k+round(mP.betaB) <= model.TSTEPS)
-                                mealDelayed.breakfast(k+round(mP.betaB)) = mealDelayed.breakfast(k+round(mP.betaB)) + C*1000/mP.BW;
+            switch(model.coreModel)
+                case 'cappon'
+                    switch(environment.scenario)
+                        case 'single-meal'
+                            if(k+mP.beta <= model.TSTEPS)
+                                mealDelayed(k+mP.beta) = mealDelayed(k+mP.beta) + C*1000/mP.BW;
                             end
-                        case 'L'
-                            if(k+round(mP.betaL) <= model.TSTEPS)
-                                mealDelayed.lunch(k+round(mP.betaL)) = mealDelayed.lunch(k+round(mP.betaL)) + C*1000/mP.BW;
+
+                        case 'multi-meal'
+
+                            switch(type)
+                                case 'B'
+                                    if(k+round(mP.betaB) <= model.TSTEPS)
+                                        mealDelayed.breakfast(k+round(mP.betaB)) = mealDelayed.breakfast(k+round(mP.betaB)) + C*1000/mP.BW;
+                                    end
+                                case 'L'
+                                    if(k+round(mP.betaL) <= model.TSTEPS)
+                                        mealDelayed.lunch(k+round(mP.betaL)) = mealDelayed.lunch(k+round(mP.betaL)) + C*1000/mP.BW;
+                                    end
+                                case 'D'
+                                    if(k+round(mP.betaD) <= model.TSTEPS)
+                                        mealDelayed.dinner(k+round(mP.betaD)) = mealDelayed.dinner(k+round(mP.betaD)) + C*1000/mP.BW;
+                                    end
+                                case 'S'
+                                    if(k+round(mP.betaS) <= model.TSTEPS)
+                                        mealDelayed.snack(k+round(mP.betaS)) = mealDelayed.snack(k+round(mP.betaS)) + C*1000/mP.BW;
+                                    end
+                                case ''
+
+                                otherwise
+                                    error("The specified meal type must be 'B', 'L', 'D', 'S', or ''.");
                             end
-                        case 'D'
-                            if(k+round(mP.betaD) <= model.TSTEPS)
-                                mealDelayed.dinner(k+round(mP.betaD)) = mealDelayed.dinner(k+round(mP.betaD)) + C*1000/mP.BW;
-                            end
-                        case 'S'
-                            if(k+round(mP.betaS) <= model.TSTEPS)
-                                mealDelayed.snack(k+round(mP.betaS)) = mealDelayed.snack(k+round(mP.betaS)) + C*1000/mP.BW;
-                            end
-                        case ''
-                            
-                        otherwise
-                            error("The specified meal type must be 'B', 'L', 'D', 'S', or ''.");
                     end
             end
             
@@ -167,11 +176,14 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
             
             %Add the hypotreatments to meal model input if needed (remember
             %to add meal absorption delay). NO need to announce an HT.
-            switch(environment.scenario)
-                case 'single-meal'
-                    mealDelayed(k) = mealDelayed(k) + HT*1000/mP.BW;                    
-                case 'multi-meal'
-                    mealDelayed.hypotreatment(k) = mealDelayed.hypotreatment(k) + HT*1000/mP.BW;
+            switch(model.coreModel)
+                case 'cappon'
+                    switch(environment.scenario)
+                        case 'single-meal'
+                            mealDelayed(k) = mealDelayed(k) + HT*1000/mP.BW;                    
+                        case 'multi-meal'
+                            mealDelayed.hypotreatment(k) = mealDelayed.hypotreatment(k) + HT*1000/mP.BW;
+                    end
             end
             
             %Update the CHO event vectors
@@ -199,12 +211,14 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
         %Integration step
         switch(model.pathology)
             case 't1d'
-
-                switch(environment.scenario)
-                    case 'single-meal'
-                        x(:,k) = modelStepSingleMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
-                    case 'multi-meal'
-                        x(:,k) = modelStepMultiMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed.breakfast(k), mealDelayed.lunch(k), mealDelayed.dinner(k), mealDelayed.snack(k), mealDelayed.hypotreatment(k), hourOfTheDay(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                switch(model.coreModel)
+                    case 'cappon'
+                        switch(environment.scenario)
+                            case 'single-meal'
+                                x(:,k) = modelStepSingleMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                            case 'multi-meal'
+                                x(:,k) = modelStepMultiMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed.breakfast(k), mealDelayed.lunch(k), mealDelayed.dinner(k), mealDelayed.snack(k), mealDelayed.hypotreatment(k), hourOfTheDay(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                        end
                 end
 
             case 't2d'
