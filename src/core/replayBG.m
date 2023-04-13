@@ -266,7 +266,7 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 % 
 %   - Cappon et al., "ReplayBG: a methodology to identify a personalized
 %   model from type 1 diabetes data and simulate glucose concentrations to
-%   assess alternative therapies", IEEE TBME, 2023 (under revision).
+%   assess alternative therapies", IEEE TBME, 2022 (under revision).
 %
 % ---------------------------------------------------------------------
 %
@@ -292,17 +292,17 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     addParameter(ip,'sampleTime',5,@(x) sampleTimeValidator(x)); % default = 5
     addParameter(ip,'seed',randi([1 1048576]),@(x) seedValidator(x)); % default = randi([1 1048576])
     
-    addParameter(ip,'pathology','t1d',@(x) pathologyValidator(x)); %default = 't1d'
+    addParameter(ip,'pathology','t1d',@(x) pathologyValidator(x,data)); %default = 't1d'
     
     addParameter(ip,'bolusSource','data',@(x) bolusSourceValidator(x,data,modality));
     addParameter(ip,'basalSource','data',@(x) basalSourceValidator(x,data,modality));
     addParameter(ip,'choSource','data',@(x) choSourceValidator(x,data,modality,scenario));
     
-    addParameter(ip,'bolusCalculatorHandler','standardBolusCalculatorHandler',@(x) bolusCalculatorHandlerValidator(x,data,modality));
+    addParameter(ip,'bolusCalculatorHandler','standardBolusCalculatorHandler',@(x) bolusCalculatorHandlerValidator(x,modality));
     addParameter(ip,'bolusCalculatorHandlerParams',[], @(x) bolusCalculatorHandlerParamsValidator(x,modality));
-    addParameter(ip,'basalHandler','defaultBasalHandler',@(x) basalHandlerValidator(x,data,modality));
+    addParameter(ip,'basalHandler','defaultBasalHandler',@(x) basalHandlerValidator(x,modality));
     addParameter(ip,'basalHandlerParams',[], @(x) basalHandlerParamsValidator(x,modality));
-    addParameter(ip,'mealGeneratorHandler','defaultMealGeneratorHandler',@(x) mealGeneratorHandlerValidator(x,data,modality));
+    addParameter(ip,'mealGeneratorHandler','defaultMealGeneratorHandler',@(x) mealGeneratorHandlerValidator(x,modality));
     addParameter(ip,'mealGeneratorHandlerParams',[],@(x) mealGeneratorHandlerParamsValidator(x,modality));
     
     addParameter(ip,'maxETAPerMCMCRun',inf,@(x) maxETAPerMCMCRunValidator(x,modality)); % default = inf

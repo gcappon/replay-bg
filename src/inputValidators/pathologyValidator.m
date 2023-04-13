@@ -1,4 +1,4 @@
-function valid = pathologyValidator(pathology)
+function valid = pathologyValidator(pathology,data)
 % function  pathologyValidator(pathology)
 % Validates the input parameter 'pathology'.
 %

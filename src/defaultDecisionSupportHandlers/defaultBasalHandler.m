@@ -41,7 +41,7 @@ function [B, dss] = defaultBasalHandler(G, mealAnnouncements,bolus,basal,time,ti
 %
 % ---------------------------------------------------------------------
 
-    B = basal(1);
+    B = 0.01;
     
     %If G < 70...
     if(G(timeIndex) < 70)

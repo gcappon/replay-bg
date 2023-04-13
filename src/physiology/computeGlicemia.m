@@ -159,6 +159,21 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
             insulinBolus(k) = insulinBolus(k) + B;
         end
         
+        if(strcmp(environment.basalSource,'dss'))
+        
+            %Call the bolus calculator function handler
+            [B, dss] = feval(dss.basalHandler, G, mealAnnouncements, insulinBolus,basal,time,k-1,dss);
+            
+            %Add insulin basal to insulin basal input if needed (remember to add insulin
+            %absorption delay)
+            if(k+mP.tau <= model.TSTEPS)
+                basalDelayed(k+mP.tau) = basalDelayed(k+mP.tau) + B*1000/mP.BW;
+            end
+            
+            %Update the insulin bolus event vectors
+            insulinBasal(k) = insulinBasal(k) + B;
+        end
+        
         %Use the hypotreatments module if it is enabled
         if(dss.enableHypoTreatments)
             
