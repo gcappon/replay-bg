@@ -51,8 +51,14 @@ function [meal, mealDelayed, mealAnnouncement] = mealSetup(data,model,modelParam
             
             %Add delay of main meal absorption
             mealDelay = round(modelParameters.beta/model.TS);
-            mealDelayed = [zeros(mealDelay,1); meal];
-            mealDelayed = mealDelayed(1:model.TSTEPS);
+            firstMeal = meal;
+            idxFirstMeal = find(firstMeal > 0,1,'first');
+            firstMeal((idxFirstMeal+model.YTS):end) = 0;
+            otherMeals = meal;
+            otherMeals(1:(idxFirstMeal+model.YTS-1)) = 0;
+            firstMealDelayed = [zeros(mealDelay,1); firstMeal];
+            firstMealDelayed = firstMealDelayed(1:model.TSTEPS);
+            mealDelayed = firstMealDelayed + otherMeals;
             
         case 'multi-meal'
             %Initialize the meal structure

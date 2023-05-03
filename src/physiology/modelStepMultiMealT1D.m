@@ -83,7 +83,7 @@ function xk = modelStepMultiMealT1D(xkm1,I,CHOB,CHOL,CHOD,CHOS,CHOH,hourOfTheDay
     
     %Set the basal glucose based on the time of the day
     if(hourOfTheDay>=2 && hourOfTheDay < 8)
-        Gb = mP.Gbdawn;
+        Gb = mP.Gb;
     else
         Gb = mP.Gb;
     end
