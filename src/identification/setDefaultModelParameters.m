@@ -57,7 +57,13 @@ function modelParameters = setDefaultModelParameters(data,BW,model,environment)
                         modelParameters.kempt = 0.18; %1/min 
                         modelParameters.beta = 0; %min
                         modelParameters.f = 0.9; %dimensionless
-
+                        
+                        %Exercise submodel parameters
+                        modelParameters.VO2rest = 0.33; %dimensionless, VO2rest was derived from heart rate round(66/(220-30))
+                        modelParameters.VO2max = 1; %dimensionless, VO2max is normalized and estimated from heart rate (220-age) = 100%. 
+                        modelParameters.e1 = 1.6; %dimensionless
+                        modelParameters.e2 = 0.78; %dimensionless
+                        
                         %Patient specific parameters
                         modelParameters.BW = BW; %kg
 
@@ -116,7 +122,13 @@ function modelParameters = setDefaultModelParameters(data,BW,model,environment)
                         modelParameters.betaS = 0; %min
                         modelParameters.betaH = 0; %min
                         modelParameters.f = 0.9; %dimensionless
-
+                        
+                        %Exercise submodel parameters
+                        modelParameters.V02rest = 0.33; %dimensionless, VO2rest was derived from round(66/(220-30))
+                        modelParameters.V02max = 1; %dimensionless, VO2max is normalized and estimated from heart rate (220-age) = 100%. 
+                        modelParameters.e1 = 2; %dimensionless
+                        modelParameters.e2 = 2; %dimensionless
+                        
                         %Patient specific parameters
                         modelParameters.BW = BW; %kg
 

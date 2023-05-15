@@ -18,7 +18,10 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %   contain a column of strings 'choLabel' that contains for each non-zero
 %   value of the 'CHO' column, a character that specifies the type of CHO
 %   intake ('B' for breakfast, 'L' for lunch, 'D' for dinner, 'S' for
-%   snack, 'H' for hypotreatment).
+%   snack, 'H' for hypotreatment). In case of exercise = 1, data MUST also 
+%   contain a column 'exercise' of double that contains zeros or normalized VO2 values
+%   (i.e., a value from 0 to 1) corresponding to the effort made by the subject 
+%   during physical exercise sessions.
 %   If `modality` is `replay` it can be an empty timetable with only the
 %   Time column. `bolus` column is required if `bolusSource` is `data`.
 %   `basal` column is required if `basalSource` is data. `CHO` and
@@ -38,6 +41,9 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %
 %   - pathology: (optional, default: 't1d') a vector of characters that
 %   specifies the patient pathology. Can be 't1d', 't2d', 'pbh', 'healthy'.
+%
+%   - exercise: (optional, default: 0) a numerical flag that specifies
+%   whether to simulate exercise or not. Can be 0 or 1;
 %
 %   - sampleTime: (optional, default: 5 (min)) an integer that specifies
 %   the data sample time;
@@ -294,6 +300,8 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     
     addParameter(ip,'pathology','t1d',@(x) pathologyValidator(x,data)); %default = 't1d'
     
+    addParameter(ip,'exercise',0,@(x) exerciseValidator(x,data)); % default = 0
+    
     addParameter(ip,'bolusSource','data',@(x) bolusSourceValidator(x,data,modality));
     addParameter(ip,'basalSource','data',@(x) basalSourceValidator(x,data,modality));
     addParameter(ip,'choSource','data',@(x) choSourceValidator(x,data,modality,scenario));
@@ -349,7 +357,7 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     %% ====================================================================
     
     %% ================ Replay of the scenario ============================
-    [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements] = replayScenario(data,modelParameters,draws,environment,model,sensors,mcmc,dss);
+    [cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements, vo2] = replayScenario(data,modelParameters,draws,environment,model,sensors,mcmc,dss);
     %% ====================================================================
     
     %% ================ Analyzing results =================================
@@ -383,12 +391,14 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
         save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','mcmc','model','sensors','dss',...
             'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO','mealAnnouncements',...
+            'vo2', ...
             'analysis');
     else
         save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','model','sensors','dss',...
             'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO','mealAnnouncements',...
             'correctionBolus', 'hypotreatments',...
+            'vo2', ...
             'analysis');
     end
     

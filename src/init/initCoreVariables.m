@@ -38,7 +38,7 @@ function [environment, model, sensors, mcmc, dss] = initCoreVariables(data,BW,ip
     end
     
     %Initialize the model hyperparameters
-    model = initModel(data,ip.Results.sampleTime, ip.Results.glucoseModel,ip.Results.pathology, ip.Results.seed, environment);
+    model = initModel(data,ip.Results.sampleTime, ip.Results.glucoseModel,ip.Results.pathology, ip.Results.exercise, ip.Results.seed, environment);
     
     %Initialize sensors hyperparameters 
     sensors = initSensors(ip.Results.cgmModel, model, environment);

@@ -1,4 +1,4 @@
-function model = initModel(data,sampleTime,glucoseModel, pathology, seed, environment)
+function model = initModel(data,sampleTime,glucoseModel, pathology, exercise, seed, environment)
 % function  initModel(data,sampleTime,glucoseModel, pathology, seed, environment)
 % Initializes the 'model' core variable.
 %
@@ -9,6 +9,8 @@ function model = initModel(data,sampleTime,glucoseModel, pathology, seed, enviro
 %   model to use;
 %   - pathology: a vector of characters that specifies the pathology 
 %   related to the given data;
+%   - exercise: a flag indicating wheter to use the exercise submodel or
+%   not;
 %   - seed: an integer that specifies the random seed. For reproducibility;
 %   - environment: a structure that contains general parameters to be used
 %   by ReplayBG.
@@ -40,6 +42,9 @@ function model = initModel(data,sampleTime,glucoseModel, pathology, seed, enviro
     model.glucoseModel = glucoseModel; %glucose selection {'BG','IG'}
     model.pathology = pathology; %model selection {'t1d','t2d','pbh'}
     
+    %Is exercise submodel active?
+    model.exercise = exercise;
+    
     %Model dimensionality
     switch(model.pathology)
         case 't1d'
@@ -49,6 +54,10 @@ function model = initModel(data,sampleTime,glucoseModel, pathology, seed, enviro
                     model.nx = 9; %number of states
                 case 'multi-meal'
                     model.nx = 21; %number of states
+            end
+            
+            if(exercise)
+                model.nx = model.nx + 1;
             end
             
         case 't2d'

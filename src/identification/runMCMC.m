@@ -181,10 +181,14 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,sensors,dss,environment
             
             if(mod(run,100)==0 || run == mcmc.n)
                 
-                [G, ~, ~, ~, ~, ~, ~, ~, x] = computeGlicemia(mP,data,model,sensors,dss,environment);
+                [G, ~, ~, ~, ~, ~, ~, ~, ~, x] = computeGlicemia(mP,data,model,sensors,dss,environment);
                 G = G(1:(model.YTS/model.TS):end);
 
-                subplot(5,1,1:3)
+                if(model.exercise)
+                    subplot(6,1,1:3)
+                else
+                    subplot(5,1,1:3)
+                end
                 plot(data.Time,y,'r-*','linewidth',2);
                 hold on
 
@@ -197,9 +201,11 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,sensors,dss,environment
                 xlabel('Time');
                 ylabel('Glucose (mg/dl)');
                 
-                subplot(5,1,4)
-                
-                
+                if(model.exercise)
+                    subplot(6,1,4)
+                else
+                    subplot(5,1,4)
+                end
                 stem(data.Time,data.bolus,'k^','linewidth',2);
                 ylabel('Bolus (U/min))');
                 hold on
@@ -207,13 +213,24 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,sensors,dss,environment
                 hold off
                 grid on
                 
-                subplot(5,1,5)
+                if(model.exercise)
+                    subplot(6,1,5)
+                else
+                    subplot(5,1,5)
+                end
                 stem(data.Time,data.CHO,'k^','linewidth',2);
                 hold on
                 legend CHO 
                 hold off
                 grid on
                 
+                if(model.exercise)
+                    subplot(6,1,6)
+                    stem(data.Time,data.exercise,'k^','linewidth',2);
+                    hold on
+                    legend VO2 
+                    hold off
+                end
                 xlabel('Iteration #');
                 ylabel('CHO (g/min)');
                 

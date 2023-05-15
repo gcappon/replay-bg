@@ -1,4 +1,4 @@
-function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements, x] = computeGlicemia(mP,data,model,sensors,dss,environment)
+function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements, vo2, x] = computeGlicemia(mP,data,model,sensors,dss,environment)
 % function  computeGlicemia(mP,data,model,sensors,dss,environment)
 % Compute the glycemic profile obtained with the ReplayBG physiological
 % model using the given inputs and model parameters.
@@ -29,6 +29,8 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
 %   to obtain G (g/min);
 %   - mealAnnouncements: is a vector containing the carbohydrate intake at each time
 %   step that the user announces to the bolus calculator (g/min);  
+%   - vo2: is a vector containing the normalized VO2 at each time when
+%   there is exercise (-);
 %   - x: is a matrix containing the simulated model states. 
 %
 % ---------------------------------------------------------------------
@@ -68,6 +70,9 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
     %intake + its bolus)
     [bolus, basal, bolusDelayed, basalDelayed] = insulinSetup(data,model,mP,environment);
     [meal,mealDelayed, mealAnnouncements] = mealSetup(data,model,mP,environment);
+    
+    %initialize inputs (VO2)
+    vo2 = exerciseSetup(data,model,mP,environment);
     
     %Time vector for DSS
     switch(environment.scenario)
@@ -217,9 +222,17 @@ function [G, CGM, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatmen
 
                 switch(environment.scenario)
                     case 'single-meal'
-                        x(:,k) = modelStepSingleMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                        if(model.exercise)
+                            x(:,k) = modelStepSingleMealExerciseT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), vo2(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                        else
+                            x(:,k) = modelStepSingleMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                        end
                     case 'multi-meal'
-                        x(:,k) = modelStepMultiMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed.breakfast(k), mealDelayed.lunch(k), mealDelayed.dinner(k), mealDelayed.snack(k), mealDelayed.hypotreatment(k), hourOfTheDay(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                        if(model.exercise)
+                            x(:,k) = modelStepMultiMealExerciseT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed.breakfast(k), mealDelayed.lunch(k), mealDelayed.dinner(k), mealDelayed.snack(k), mealDelayed.hypotreatment(k), vo2(k), hourOfTheDay(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                        else
+                            x(:,k) = modelStepMultiMealT1D(x(:,k-1),basalDelayed(k) + bolusDelayed(k), mealDelayed.breakfast(k), mealDelayed.lunch(k), mealDelayed.dinner(k), mealDelayed.snack(k), mealDelayed.hypotreatment(k), hourOfTheDay(k), mP, x(:,k), model); %input at k since using Backwards Euler's algorithm
+                        end
                 end
 
             case 't2d'
