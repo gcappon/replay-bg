@@ -1,4 +1,4 @@
-function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements, data,environment)
+function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements, vo2, data,environment)
 % function  analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments,data,environment)
 % Analyses the simulated glucose traces obtained using ReplayBG.
 %
@@ -19,6 +19,8 @@ function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, 
 %   to obtain glucose (g/min);
 %   - mealAnnouncements: is a vector containing the carbohydrate intake at each time
 %   step that the user announces to the bolus calculator (g/min);  
+%   - vo2: is a vector containing the normalized VO2 at each time when
+%   there is exercise (-);
 %   - data: timetable which contains the data to be used by the tool;
 %   - environment: a structure that contains general parameters to be used
 %   by ReplayBG;
@@ -62,7 +64,7 @@ function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, 
         
     end
     
-    % ---------- Compute also insulin and meal "events" metrics
+    % ---------- Compute also insulin, meal, exercise "events" metrics
     
     %Initialize insulin amount variables 
     totalInsulin = zeros(length(insulinBolus.realizations),1);
@@ -76,6 +78,10 @@ function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, 
     %Initialize counting variables
     correctionBolusInsulinNumber = zeros(length(insulinBolus.realizations),1);
     hypotreatmentNumber = zeros(length(insulinBolus.realizations),1);
+    %Initialize exercise variables
+    exerciseSessionNumber = zeros(length(insulinBolus.realizations),1);
+    %TODO: add other metrics for exercise (e.g., average VO2 per session,
+    %duration of each session)
     
     for r = 1:size(insulinBolus.realizations,2)
         
@@ -94,6 +100,20 @@ function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, 
         correctionBolusInsulinNumber(r) = length(find(correctionBolus.realizations(:,r)));
         hypotreatmentNumber(r) = length(find(hypotreatments.realizations(:,r)));
         
+        %Compute exercise metrics for each realization
+        e = find(vo2.realizations(:,r));
+        if(isempty(e))
+            exerciseSessionNumber(r) = 0;
+        else
+            d = diff(e);
+            idxs = find(d > 1);
+            if(isempty(idxs))
+                exerciseSessionNumber(r) = 1;
+            else
+                exerciseSessionNumber(r) = 1 + length(idxs);
+            end
+        end
+        
     end
     
     p = [50, 5, 25, 75, 95];
@@ -110,6 +130,8 @@ function analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, 
         
         analysis.(fields{f}).event.correctionBolusInsulinNumber = prctile(correctionBolusInsulinNumber,p(f));%[#]
         analysis.(fields{f}).event.hypotreatmentNumber = prctile(hypotreatmentNumber,p(f));%[#]
+        
+        analysis.(fields{f}).event.exerciseSessionNumber = prctile(exerciseSessionNumber,p(f)); %[#]
         
     end
     

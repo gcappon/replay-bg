@@ -62,4 +62,9 @@ function check = checkIdentifiedParameters(mP)
     check.beta = 1*(mP.beta>=0 && mP.beta<=60);
     check.beta = 1;
     
+    %Exercise submodel (from Alkhateeb et al, PLoS One,
+    %2021 - Supplementary Material)
+    check.e1 = (mP.e1>=0)*(mP.e1<=4);
+    check.e2 = (mP.e2>=0)*(mP.e2<=4);
+    
  end

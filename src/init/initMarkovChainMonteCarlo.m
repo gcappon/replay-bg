@@ -61,7 +61,14 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                     ka20 = 0.014;
                     kd0 = 0.026;
                     beta0 = 15;
-
+                    
+                    e10 = 1.6;
+                    e20 = 0.78;
+                    
+                    Qgut0 = 0;
+                    X0 = 0;
+                    Ip0 = 0;
+                    
                     %MCMC vectors assignment
                     mcmc.thetaNames = {'SG','SI','Gb','p2','kempt','kabs','kd','ka2','beta'}; %names of the parameters to identify
                     mcmc.std = [5e-4, 1e-6, 1, 1e-3, 5e-3, 1e-3, 1e-3, 1e-3, 0.5]; %initial guess for the SD of each parameter
@@ -93,6 +100,9 @@ function mcmc = initMarkovChainMonteCarlo(maxETAPerMCMCRun,maxMCMCIterations,max
                     betaD0 = 15;
                     betaS0 = 15;
                     betaH0 = 0;
+                    
+                    e10 = 1.6;
+                    e20 = 0.78;
                     
                     Qgut0 = 0;
                     X0 = 0;

@@ -48,6 +48,11 @@ function prior = definePriorPDF(model, environment)
                         prior.kempt = @(mP) lognpdf(mP.kempt,-1.9646,0.7069)*(mP.kempt<1);
                         prior.beta = @(mP) 1*(mP.beta>=0 && mP.beta<=60);
                         
+                        %Exercise submodel (from Alkhateeb et al, PLoS One,
+                        %2021 - Supplementary Material)
+                        prior.e1 = @(mP) normpdf(mP.e1,2,0.1)*(mP.e1>=0)*(mP.e1<=4);
+                        prior.e2 = @(mP) normpdf(mP.e2,2,0.1)*(mP.e2>=0)*(mP.e2<=4);
+                        
                     case 'multi-meal'
                         %Glucose-insulin submodel parameters
                         prior.SIB = @(mP) gampdf(mP.SIB*mP.VG,3.3,5e-4)*((mP.SIB*mP.VG)<1e-2);
@@ -84,7 +89,12 @@ function prior = definePriorPDF(model, environment)
                         prior.betaD = @(mP) 1*(mP.betaD>=0 && mP.betaD<=60);
                         prior.betaS = @(mP) 1*(mP.betaS>=0 && mP.betaS<=60);
                         prior.betaH = @(mP) 1*(mP.betaH>=0 && mP.betaH<=60);
-
+                        
+                        %Exercise submodel (from Alkhateeb et al, PLoS One,
+                        %2021 - Supplementary Material)
+                        prior.e1 = @(mP) normpdf(mP.e1,2,0.1)*(mP.e1>=0)*(mP.e1<=4);
+                        prior.e2 = @(mP) normpdf(mP.e2,2,0.1)*(mP.e2>=0)*(mP.e2<=4);
+                        
                 end
             
         case 't2d'

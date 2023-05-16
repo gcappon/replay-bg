@@ -53,6 +53,11 @@ function parametersOK = checkCopulaExtractions(draws, mcmc, modelParameters, mod
                         limits.kempt = @(x,mP) logical(x>0).*(x<1);
                         limits.beta = @(x,mP) logical(x>=0).*(x<=60);
                         
+                        %Exercise submodel (from Alkhateeb et al, PLoS One,
+                        %2021 - Supplementary Material)
+                        limits.e1 = @(x,mP) logical(x>=0).*(x<=4);
+                        limits.e2 = @(x,mP) logical(x>=0).*(x<=4);
+                        
                         parametersOK = true(mcmc.tbe,1);
                         for p = 1:length(mcmc.thetaNames)
                             if(nargin(limits.(mcmc.thetaNames{p}) == 2))
@@ -77,7 +82,7 @@ function parametersOK = checkCopulaExtractions(draws, mcmc, modelParameters, mod
                                 end
                             end
                         end
-    
+
                     case 'multi-meal'
                         %Glucose-insulin submodel parameters
                         limits.SIB = @(x,mP) logical((x*mP.VG>0).*((x*mP.VG)<1e-2));
@@ -111,6 +116,11 @@ function parametersOK = checkCopulaExtractions(draws, mcmc, modelParameters, mod
                         limits.betaD = @(x,mP) logical(x>=0).*(x<=60);
                         limits.betaS = @(x,mP) logical(x>=0).*(x<=60);
                         limits.betaH = @(x,mP) logical(x>=0).*(x<=60);
+                        
+                        %Exercise submodel (from Alkhateeb et al, PLoS One,
+                        %2021 - Supplementary Material)
+                        limits.e1 = @(x,mP) logical(x>=0).*(x<=4);
+                        limits.e2 = @(x,mP) logical(x>=0).*(x<=4);
                         
                         parametersOK = true(mcmc.tbe,1);
                         for p = 1:length(mcmc.thetaNames)

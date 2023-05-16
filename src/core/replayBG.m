@@ -361,14 +361,14 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     %% ====================================================================
     
     %% ================ Analyzing results =================================
-    analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements, data,environment);
+    analysis = analyzeResults(cgm, glucose, insulinBolus, correctionBolus, insulinBasal, CHO, hypotreatments, mealAnnouncements, vo2, data,environment);
     %% ====================================================================
     
     %% ================ Plotting results ==================================
     if(environment.plotMode)
         
         %Replay overview
-        plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotreatments, correctionBolus, data,environment);
+        plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotreatments, correctionBolus, vo2, data,environment);
         
         %Convert the profile to a timetable to comply with AGATA
         dataHat = glucoseVectorToTimetable(cgm.median,minutes(data.Time(2)-data.Time(1)),data.Time(1));

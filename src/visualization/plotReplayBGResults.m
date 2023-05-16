@@ -1,4 +1,4 @@
-function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotreatments, correctionBolus,data,environment)
+function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotreatments, correctionBolus,vo2,data,environment)
 % function  plotReplayBGResults(glucose,data,enviroment)
 % Plot the obtained glucose results against data.
 %
@@ -7,6 +7,7 @@ function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotr
 %   simulated via ReplayBG; 
 %   - glucose: a structure which contains the obtained glucose traces 
 %   simulated via ReplayBG; 
+%   - vo2: is a vector containing the normalized VO2 at each time when there is exercise (-).
 %   - data: timetable which contains the data to be used by the tool;
 %   - environment: a structure that contains general parameters to be used
 %   by ReplayBG.
@@ -29,7 +30,7 @@ function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotr
     if(strcmp(environment.modality,'identification'))
         
         %Plot glucose data
-        ax(1) = subplot(5,1,1:3);
+        ax(1) = subplot(6,1,1:3);
         hp1(1) = plot(data.Time,data.glucose,'r-*','linewidth',2);
         hold on
         hp1(2) = plot(data.Time,cgm.median,'k-o','linewidth',2);
@@ -55,7 +56,7 @@ function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotr
         hold off
 
         %Plot CHO data
-        ax(2) = subplot(514);
+        ax(2) = subplot(614);
         hp2(1) = stem(data.Time, data.CHO,'^','linewidth',2,'color',[70,130,180]/255);
         hold on
         grid on
@@ -64,7 +65,7 @@ function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotr
         hold off
 
         %Plot insulin data
-        ax(3) = subplot(515);
+        ax(3) = subplot(615);
         hp3(1) = stem(data.Time,data.bolus,'^','linewidth',2,'color',[50,205,50]/255);
         hold on;
         hp3(2) = plot(data.Time, data.basal*60,'-','linewidth',2,'color',[0,0,0]/255);
@@ -72,12 +73,20 @@ function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotr
         ylabel('Insulin (data)','FontWeight','bold','FontSize',18);
         grid on
         hold off
+        
+        %Plot exercise data
+        ax(4) = subplot(616);
+        hp4(1) = stem(data.Time,data.exercise,'^','linewidth',2,'color',[249, 115, 6]/255);
+        legend(hp4,'VO2 (data) [-]');
+        ylabel('VO2 (data)','FontWeight','bold','FontSize',18);
+        grid on
+        hold off
     end
     
     if(strcmp(environment.modality,'replay'))
         
         %Plot glucose data
-        ax(1) = subplot(5,1,1:3);
+        ax(1) = subplot(6,1,1:3);
         hold on
         hp1(1) = plot(data.Time,cgm.median,'k-o','linewidth',2);
         hp1(2) = plot(data.Time,glucose.median(1:5:end),'b-o','linewidth',2);
@@ -108,7 +117,7 @@ function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotr
         HTEvents = sum(hypotreatments.realizations')/1000;
         
         %Plot CHO data
-        ax(2) = subplot(514);
+        ax(2) = subplot(614);
         hp2(1) = stem(eventTime, CHOEvents,'^','linewidth',2,'color',[70,130,180]/255);
         hold on
         hp2(2) = stem(eventTime, HTEvents,'^','linewidth',2,'color',[0,204,204]/255);
@@ -123,13 +132,22 @@ function plotReplayBGResults(cgm,glucose,insulinBolus, insulinBasal, CHO, hypotr
         CBEvents = sum(correctionBolus.realizations')/1000;
         BRate = sum(insulinBasal.realizations'*60)/1000;
         
-        ax(3) = subplot(515);
+        ax(3) = subplot(615);
         hp3(1) = stem(eventTime, BEvents,'^','linewidth',2,'color',[50,205,50]/255);
         hold on;
         hp3(2) = stem(eventTime, CBEvents,'^','linewidth',2,'color',[51,102,0]/255);
         hp3(3) = plot(eventTime, BRate,'-*','linewidth',2,'color',[0,0,0]/255);
         legend(hp3,'Bolus insulin (replay) [U/min]','Correction bolus insulin (replay) [U/min]','Basal insulin (replay) [U/h]');
         ylabel('Insulin (replay)','FontWeight','bold','FontSize',18);
+        grid on
+        hold off
+        
+        %Plot exercise data
+        ExEvents = sum(vo2.realizations')/1000;
+        ax(4) = subplot(616);
+        hp4(1) = stem(eventTime,ExEvents,'^','linewidth',2,'color',[249, 115, 6]/255);
+        legend(hp4,'VO2 (replay) [-]');
+        ylabel('VO2 (replay)','FontWeight','bold','FontSize',18);
         grid on
         hold off
         

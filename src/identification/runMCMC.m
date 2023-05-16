@@ -219,6 +219,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,sensors,dss,environment
                     subplot(5,1,5)
                 end
                 stem(data.Time,data.CHO,'k^','linewidth',2);
+                ylabel('CHO (g/min)');
                 hold on
                 legend CHO 
                 hold off
@@ -232,7 +233,7 @@ function [pHat, accept, ll] = runMCMC(data,mcmc,mP,model,sensors,dss,environment
                     hold off
                 end
                 xlabel('Iteration #');
-                ylabel('CHO (g/min)');
+                ylabel('VO2 (-)');
                 
                 pause(1e-6);
                 
