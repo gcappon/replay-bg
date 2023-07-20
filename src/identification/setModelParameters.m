@@ -28,7 +28,7 @@ function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment
 % This file is part of ReplayBG.
 %
 % ---------------------------------------------------------------------
-
+    
     if(strcmp(environment.modality,'identification'))
         
         if(environment.verbose)
@@ -47,6 +47,9 @@ function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment
         
         %Identify model parameters (if modality: 'identification')
         [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, model, sensors, dss, environment);
+        
+        % Check model parameters 
+        draws.physiologicalPlausibility = checkPhysiologicalPlausibility(data,modelParameters,draws,environment,model,sensors,mcmc,dss);
         
     else
         

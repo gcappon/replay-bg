@@ -26,7 +26,8 @@ function vo2 = exerciseSetup(data,model,modelParameters,environment)
     vo2 = zeros(model.TSTEPS,1);
     
     %if(strcmp(environment.bolusSource,'data'))
-        
+    
+    if(model.exercise)
         %Find the boluses
         eIdx = find(data.exercise);
 
@@ -34,6 +35,8 @@ function vo2 = exerciseSetup(data,model,modelParameters,environment)
         for i = 1:length(eIdx)
             vo2((1+(eIdx(i)-1)*(model.YTS/model.TS)):(eIdx(i)*(model.YTS/model.TS))) = data.exercise(eIdx(i)); % here I am simply "spreading" the event
         end
+        
+    end
          
     %end
     
