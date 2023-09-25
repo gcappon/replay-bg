@@ -155,7 +155,7 @@ function physiologicalPlausibility = checkPhysiologicalPlausibility(data,modelPa
     dataFakeTest3 = dataFake;
     
     maxCheck = 25;
-    check = 1;
+    check = 0;
     lBasal = 0;
     rBasal = 0.5;
     dataFakeTest3.basal(:) = (rBasal+lBasal)/2;
@@ -183,7 +183,7 @@ function physiologicalPlausibility = checkPhysiologicalPlausibility(data,modelPa
         
         
         converged = 0;
-        
+        check = 0;
         while(check < maxCheck && ~converged)
             
             %...and simulate the scenario using the given data
