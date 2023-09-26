@@ -1,4 +1,4 @@
-function environment = initEnvironment(modality,saveName,saveSuffix,scenario, bolusSource, basalSource, choSource, plotMode,enableLog,verbose)
+function environment = initEnvironment(modality,saveName,saveFolder,saveSuffix,scenario, bolusSource, basalSource, choSource, plotMode,enableLog,verbose)
 % function  initEnvironment(modality,saveName,saveSuffix,scenario, bolusSource, basalSource, choSource, plotMode,enableLog,verbose)
 % Initializes the 'environment' core variable.
 %
@@ -74,6 +74,29 @@ function environment = initEnvironment(modality,saveName,saveSuffix,scenario, bo
     if(~exist(fullfile(environment.replayBGPath,'results','workspaces'),'dir'))
         mkdir(fullfile(environment.replayBGPath,'results','workspaces'));
     end
+
+    %Create the specific results subfolder if necessary
+    environment.saveFolder = saveFolder;
+    if ~(strcmp(saveFolder,''))
+        if(~exist(fullfile(environment.replayBGPath,'results'),'dir'))
+            mkdir(fullfile(environment.replayBGPath,'results'));
+        end
+        if(~exist(fullfile(environment.replayBGPath,'results','distributions',saveFolder),'dir'))
+            mkdir(fullfile(environment.replayBGPath,'results','distributions',saveFolder));
+        end
+        if(~exist(fullfile(environment.replayBGPath,'results','logs',saveFolder),'dir'))
+            mkdir(fullfile(environment.replayBGPath,'results','logs',saveFolder));
+        end
+        if(~exist(fullfile(environment.replayBGPath,'results','mcmcChains',saveFolder),'dir'))
+            mkdir(fullfile(environment.replayBGPath,'results','mcmcChains',saveFolder));
+        end
+        if(~exist(fullfile(environment.replayBGPath,'results','modelParameters',saveFolder),'dir'))
+            mkdir(fullfile(environment.replayBGPath,'results','modelParameters',saveFolder));
+        end
+        if(~exist(fullfile(environment.replayBGPath,'results','workspaces',saveFolder),'dir'))
+            mkdir(fullfile(environment.replayBGPath,'results','workspaces',saveFolder));
+        end
+    end
     
     %Store the ReplayBG modality
     environment.modality = modality; 
@@ -92,7 +115,7 @@ function environment = initEnvironment(modality,saveName,saveSuffix,scenario, bo
     environment.enableLog = enableLog; % if 0 do not log 
     
     if(environment.enableLog)
-        environment.logFile = fullfile(environment.replayBGPath,'results','logs',[datestr(datetime('now'),'yyyy-mm-dd_hh:MM') '_' environment.modality '_' environment.saveName environment.saveSuffix '.txt']);
+        environment.logFile = fullfile(environment.replayBGPath,'results','logs',environment.saveFolder,[datestr(datetime('now'),'yyyy-mm-dd_hh:MM') '_' environment.modality '_' environment.saveName environment.saveSuffix '.txt']);
         if(exist(environment.logFile,'file'))
             delete(environment.logFile);
         end % if log
