@@ -136,7 +136,7 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
                 for p = 1:length(mcmc.thetaNames)
                     name = [name '-' mcmc.thetaNames{p}];
                 end %for p
-                save(fullfile(environment.replayBGPath,'results','mcmcChains',[name '_iter' num2str(k-1) '_' environment.saveName]),'mcmc', 'pHat', 'accept', 'll', 'conv');
+                save(fullfile(environment.replayBGPath,'results','mcmcChains',environment.saveFolder,[name '_iter' num2str(k-1) '_' environment.saveName]),'mcmc', 'pHat', 'accept', 'll', 'conv');
             end
             
             %Set new std and theta0
@@ -293,12 +293,12 @@ function [modelParameters, draws] = identifyModelParameters(data, BW, mcmc, mode
         end
         
         %Save distributions here 
-        save(fullfile(environment.replayBGPath,'results','distributions',['distributions_' environment.saveName]),'mcmc','distributions','draws');
+        save(fullfile(environment.replayBGPath,'results','distributions',environment.saveFolder,['distributions_' environment.saveName]),'mcmc','distributions','draws');
             
     % =====================================================================
     
     %% ========== Save modelParameters for future usage  ==================
-        save(fullfile(environment.replayBGPath,'results','modelParameters',['modelParameters_' environment.saveName]),'modelParameters');
+        save(fullfile(environment.replayBGPath,'results','modelParameters',environment.saveFolder,['modelParameters_' environment.saveName]),'modelParameters');
     % =====================================================================
     
  end
