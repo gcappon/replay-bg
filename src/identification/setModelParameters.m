@@ -59,8 +59,8 @@ function [modelParameters, mcmc, draws] = setModelParameters(data,BW,environment
         end
         
         %Load the model parameters (if modality: 'replay')
-        load(fullfile(environment.replayBGPath,'results','modelParameters',['modelParameters_' environment.saveName]));
-        load(fullfile(environment.replayBGPath,'results','distributions',['distributions_' environment.saveName]));
+        load(fullfile(environment.replayBGPath,'results','modelParameters',environment.saveFolder,['modelParameters_' environment.saveName]));
+        load(fullfile(environment.replayBGPath,'results','distributions',environment.saveFolder,['distributions_' environment.saveName]));
 
     end
     

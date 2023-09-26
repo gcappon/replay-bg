@@ -239,6 +239,8 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
 %
 %   - saveSuffix: (optional, default: '') a vector of char to be attached
 %   as suffix to the resulting output files' name;
+%   - saveFolder: (optional, default: '') a vector of char for the results
+%   subfolder;
 %   - plotMode: (optional, default: 1) a numerical flag that specifies
 %   whether to show the plot of the results or not. Can be 0 or 1;
 %   - enableLog: (optional, default: 1) a numerical flag that specifies
@@ -335,6 +337,7 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     addParameter(ip,'correctionBolusesHandler','correctsAbove250Handler', @(x) correctionBolusesHandlerValidator(x,modality)); % default = 'correctsAbove250Handler'
     addParameter(ip,'correctionBolusesHandlerParams',[], @(x) correctionBolusesHandlerParamsValidator(x,modality)); % default = 'correctsAbove250Handler'
     
+    addParameter(ip,'saveFolder','',@(x) saveFolderValidator(x)); % default = ''
     addParameter(ip,'saveSuffix','',@(x) saveSuffixValidator(x)); % default = ''
     addParameter(ip,'plotMode',1,@(x) plotModeValidator(x)); % default = 1
     addParameter(ip,'enableLog',1,@(x) enableLogValidator(x)); % default = 1
@@ -388,13 +391,19 @@ function replayBG(modality, data, BW, scenario, saveName, varargin)
     end
     
     if(strcmp(environment.modality,'identification'))
-        save(fullfile(environment.replayBGPath,'results','workspaces',['identification_' environment.saveName environment.saveSuffix]),...
+        if ~exist(environment.saveFolder, 'dir')
+            mkdir(environment.saveFolder)
+        end
+        save(fullfile(environment.replayBGPath,'results','workspaces',environment.saveFolder,['identification_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','mcmc','model','sensors','dss',...
             'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO','mealAnnouncements',...
             'vo2', ...
             'analysis');
     else
-        save(fullfile(environment.replayBGPath,'results','workspaces',['replay_' environment.saveName environment.saveSuffix]),...
+        if ~exist(environment.saveFolder, 'dir')
+            mkdir(environment.saveFolder)
+        end
+        save(fullfile(environment.replayBGPath,'results','workspaces',environment.saveFolder,['replay_' environment.saveName environment.saveSuffix]),...
             'data','BW','environment','model','sensors','dss',...
             'cgm','glucose','insulinBolus', 'insulinBasal', 'CHO','mealAnnouncements',...
             'correctionBolus', 'hypotreatments',...
