@@ -57,5 +57,8 @@ function sensors = initSensors(cgmModel, model, environment)
         time = toc;
         fprintf(['DONE. (Elapsed time ' num2str(time/60) ' min)\n']);
     end
-    
+
+    sensors.ekm1 = 0;
+    sensors.ekm2 = 0;
+
 end

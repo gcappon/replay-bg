@@ -25,7 +25,11 @@ function CGM = cgmMeasure(IG, t, sensors)
     % Generate noise
     z = randn(1);
     u = sensors.cgm.errorParameters(7)*z;
-    e = filter(1,[1, -sensors.cgm.errorParameters(5), -sensors.cgm.errorParameters(6)],u);
+%     e = filter(1,[1, -sensors.cgm.errorParameters(5), -sensors.cgm.errorParameters(6)],u);
+    e = u + sensors.cgm.errorParameters(5) * sensors.ekm1 + sensors.cgm.errorParameters(6) * sensors.ekm2;
+
+    sensors.ekm1 = e;
+    sensors.ekm2 = sensors.ekm1;
 
     % Get final CGM
     CGM = IGs + e;
