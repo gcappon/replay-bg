@@ -28,8 +28,8 @@ function CGM = cgmMeasure(IG, t, sensors)
 %     e = filter(1,[1, -sensors.cgm.errorParameters(5), -sensors.cgm.errorParameters(6)],u);
     e = u + sensors.cgm.errorParameters(5) * sensors.ekm1 + sensors.cgm.errorParameters(6) * sensors.ekm2;
 
-    sensors.ekm1 = e;
     sensors.ekm2 = sensors.ekm1;
+    sensors.ekm1 = e;
 
     % Get final CGM
     CGM = IGs + e;
